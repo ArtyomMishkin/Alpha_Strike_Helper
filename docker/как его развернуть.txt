@@ -1,0 +1,14 @@
+# Сборка образов
+docker-compose -f docker/docker-compose.yml build
+
+# Запуск контейнеров
+docker-compose -f docker/docker-compose.yml up -d
+
+# Просмотр логов
+docker-compose -f docker/docker-compose.yml logs -f app
+
+# Остановка
+docker-compose -f docker/docker-compose.yml down
+
+# Полная очистка с удалением volumes
+docker-compose -f docker/docker-compose.yml down -v

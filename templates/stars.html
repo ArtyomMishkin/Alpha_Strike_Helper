@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Звёзды - Alpha Strike Helper</title>
+    <link rel="stylesheet" href="/static/main.css">
+    <style>
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .btn-primary { background: #2196F3; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .btn-primary:hover { background: #1976D2; }
+        .stars-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .star-card { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .star-title { font-size: 20px; font-weight: bold; margin-bottom: 15px; color: #333; }
+        .star-info { margin-bottom: 15px; color: #666; }
+        .star-actions { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-small { padding: 8px 12px; font-size: 14px; }
+        .btn-danger { background: #f44336; color: white; border: none; padding: 6px 10px; border-radius: 3px; cursor: pointer; font-size: 12px; }
+        .btn-danger:hover { background: #da190b; }
+        .empty-state { text-align: center; color: #999; padding: 30px; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+        .modal-content { background-color: #fefefe; margin: 5% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 600px; border-radius: 8px; }
+        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close:hover { color: black; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        input, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box; }
+        input:focus, textarea:focus { outline: none; border-color: #2196F3; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="logo">⚔️ Alpha Strike Helper</h1>
+            <ul class="nav-menu">
+                <li><a href="/">Главная</a></li>
+                <li><a href="/cards">Карты</a></li>
+                <li><a href="/collections">Коллекции</a></li>
+                <li><a href="/lances">Лэнсы</a></li>
+                <li><a href="/stars" class="active">Звёзды</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>⭐ Мои Звёзды</h1>
+            <button class="btn-primary" onclick="openCreateStarModal()">+ Создать звезду</button>
+        </div>
+
+        <div id="starsContainer" class="stars-grid">
+            <!-- Звёзды будут загружены здесь -->
+        </div>
+    </div>
+
+    <!-- Modal для создания звезды -->
+    <div id="createStarModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCreateStarModal()">&times;</span>
+            <h2>Создать звезду</h2>
+            <div class="form-group">
+                <label>Название:</label>
+                <input type="text" id="starName" placeholder="Название звезды">
+            </div>
+            <div class="form-group">
+                <label>Описание:</label>
+                <textarea id="starDescription" placeholder="Описание"></textarea>
+            </div>
+            <button class="btn-primary" onclick="createStar()" style="width: 100%;">Создать</button>
+        </div>
+    </div>
+
+    <script>
+        const API = 'http://localhost:8080/api/v1';
+
+        async function loadStars() {
+            try {
+                console.log('📥 Loading stars...');
+                const response = await fetch(`${API}/stars`);
+                
+                if (!response.ok) {
+                    console.error('HTTP Error:', response.status);
+                    document.getElementById('starsContainer').innerHTML = `<div class="empty-state">❌ Ошибка загрузки (HTTP ${response.status})</div>`;
+                    return;
+                }
+                
+                const result = await response.json();
+                console.log('Raw response:', result);
+                
+                // Обработка ответа: может быть {data: [...]} или просто [...]
+                let stars = Array.isArray(result) ? result : (result.data || []);
+                console.log('Parsed stars:', stars);
+                
+                const container = document.getElementById('starsContainer');
+                container.innerHTML = '';
+
+                if (!stars || stars.length === 0) {
+                    container.innerHTML = '<div class="empty-state">⭐ Нет звёзд. Создайте первую!</div>';
+                    return;
+                }
+
+                stars.forEach(star => {
+                    const card = document.createElement('div');
+                    card.className = 'star-card';
+                    card.innerHTML = `
+                        <div class="star-title">${star.name || 'Без названия'}</div>
+                        <div class="star-info">${star.description || 'Нет описания'}</div>
+                        <small style="color: #999;">ID: ${star.id}, User: ${star.user_id}</small>
+                        <div class="star-actions">
+                            <button class="btn-primary btn-small" onclick="viewStar(${star.id})">Открыть</button>
+                            <button class="btn-danger btn-small" onclick="deleteStar(${star.id})">Удалить</button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Ошибка загрузки звёзд:', error);
+                document.getElementById('starsContainer').innerHTML = `<div class="empty-state">❌ Ошибка: ${error.message}</div>`;
+            }
+        }
+
+        async function createStar() {
+            const name = document.getElementById('starName').value;
+            const description = document.getElementById('starDescription').value;
+
+            if (!name) {
+                alert('Введите название звезды');
+                return;
+            }
+
+            try {
+                console.log('📝 Creating star:', name);
+                const response = await fetch(`${API}/stars`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, description })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('✅ Star created:', result);
+                    alert('✅ Звезда создана!');
+                    closeCreateStarModal();
+                    loadStars();
+                } else {
+                    const error = await response.text();
+                    console.error('❌ Error response:', error);
+                    alert('❌ Ошибка: ' + error);
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('❌ Ошибка: ' + error.message);
+            }
+        }
+
+        async function deleteStar(id) {
+            if (!confirm('Удалить звезду?')) return;
+            
+            try {
+                const response = await fetch(`${API}/stars/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    alert('✅ Звезда удалена!');
+                    loadStars();
+                } else {
+                    alert('❌ Ошибка при удалении (HTTP ' + response.status + ')');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('❌ Ошибка: ' + error.message);
+            }
+        }
+
+        function viewStar(id) {
+            alert('Звезда #' + id + '\n\nДополнительные функции будут добавлены позже');
+        }
+
+        function openCreateStarModal() {
+            document.getElementById('createStarModal').style.display = 'block';
+        }
+
+        function closeCreateStarModal() {
+            document.getElementById('createStarModal').style.display = 'none';
+            document.getElementById('starName').value = '';
+            document.getElementById('starDescription').value = '';
+        }
+
+        window.onclick = function(event) {
+            let modal = document.getElementById('createStarModal');
+            if (event.target === modal) {
+                closeCreateStarModal();
+            }
+        };
+
+        // Load on page load
+        loadStars();
+    </script>
+</body>
+</html>

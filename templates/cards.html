@@ -1,0 +1,164 @@
+<div style="max-width: 1400px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <div>
+            <h2 style="margin-bottom: 8px;">🃏 Mech Cards</h2>
+            <p style="color: var(--text-secondary); font-size: 14px;">Browse BattleMechs catalog</p>
+        </div>
+    </div>
+
+    <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+        <input type="text" id="searchInput" placeholder="Search mechs by name..." style="flex: 1; padding: 10px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text);">
+        <select id="filterRole" style="padding: 10px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text);">
+            <option value="">All Roles</option>
+            <option value="Striker">Striker</option>
+            <option value="Sniper">Sniper</option>
+            <option value="Battle Armor">Battle Armor</option>
+            <option value="Recon">Recon</option>
+        </select>
+    </div>
+
+    <div id="cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+        <!-- Cards will be loaded here -->
+        <div style="text-align: center; padding: 40px; grid-column: 1/-1; color: var(--text-secondary);">
+            Loading mechs...
+        </div>
+    </div>
+</div>
+
+<script>
+let allCards = [];
+
+function getRoleColor(role) {
+    const colors = {
+        'Striker': '#ff6b6b',
+        'Sniper': '#4ecdc4',
+        'Battle Armor': '#a85ce5',
+        'Recon': '#ffc107'
+    };
+    return colors[role] || '#a7a9a9';
+}
+
+async function loadCards() {
+    try {
+        const response = await fetch('/api/v1/cards');
+        if (response.ok) {
+            const data = await response.json();
+            allCards = (Array.isArray(data) ? data : data.cards || []);
+            if (allCards.length === 0) {
+                loadDemoCards();
+            } else {
+                renderCards(allCards);
+            }
+        } else {
+            loadDemoCards();
+        }
+    } catch (error) {
+        console.log('API не доступен, используем демо-данные:', error);
+        loadDemoCards();
+    }
+}
+
+function loadDemoCards() {
+    allCards = [
+        { id: 1, name: "Timber Wolf Prime", role: "Striker", pv: 52, quantity: 2, chassis: "OmniMech", faction: "Clan Wolf" },
+        { id: 2, name: "Nova Cat", role: "Sniper", pv: 45, quantity: 1, chassis: "OmniMech", faction: "Clan Wolf" },
+        { id: 3, name: "Mad Cat Mk II", role: "Striker", pv: 63, quantity: 1, chassis: "OmniMech", faction: "Clan Wolf" },
+        { id: 4, name: "Elemental Star", role: "Battle Armor", pv: 28, quantity: 3, chassis: "Battle Armor", faction: "Clan Wolf" },
+        { id: 5, name: "Locust LCT-1V", role: "Recon", pv: 23, quantity: 1, chassis: "BattleMech", faction: "Federated Suns" },
+        { id: 6, name: "Stormcrow Prime", role: "Striker", pv: 38, quantity: 1, chassis: "OmniMech", faction: "Clan Wolf" }
+    ];
+    renderCards(allCards);
+}
+
+function renderCards(cardsToRender = allCards) {
+    const grid = document.getElementById('cards-grid');
+    
+    if (!cardsToRender || cardsToRender.length === 0) {
+        grid.innerHTML = `
+            <div style="text-align: center; padding: 40px; grid-column: 1/-1; color: var(--text-secondary);">
+                <p style="font-size: 24px; margin-bottom: 10px;">🃏</p>
+                <p>No mechs found.</p>
+            </div>
+        `;
+        return;
+    }
+
+    grid.innerHTML = cardsToRender.map((card, idx) => `
+        <div class="card-item" data-card-id="${card.id}" style="background: linear-gradient(135deg, var(--surface) 0%, rgba(32,128,144,0.1) 100%); border: 2px solid ${getRoleColor(card.role)}; border-radius: 12px; overflow: hidden; transition: all 0.3s; display: flex; flex-direction: column;">
+            <div style="background: linear-gradient(135deg, ${getRoleColor(card.role)}33 0%, rgba(32,128,144,0.05) 100%); padding: 20px; border-bottom: 1px solid var(--border);">
+                <h3 style="margin: 0 0 8px 0; color: var(--text); font-size: 18px; font-weight: 600;">${card.name || ''}</h3>
+                <p style="margin: 0 0 8px 0; color: ${getRoleColor(card.role)}; font-size: 12px; font-weight: 600; text-transform: uppercase;">
+                    ${card.role || 'N/A'}
+                </p>
+                <p style="margin: 0; color: var(--text-secondary); font-size: 12px;">${card.chassis || 'Unknown'} • ${card.faction || 'Neutral'}</p>
+            </div>
+            
+            <div style="padding: 16px; flex: 1; display: flex; flex-direction: column;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                    <div style="text-align: center; padding: 12px; background: rgba(32,128,144,0.1); border-radius: 6px;">
+                        <div style="color: var(--text-secondary); font-size: 11px; margin-bottom: 4px;">PV</div>
+                        <div style="color: var(--primary); font-weight: 600; font-size: 20px;">${card.pv || 0}</div>
+                    </div>
+                    <div style="text-align: center; padding: 12px; background: rgba(32,128,144,0.1); border-radius: 6px;">
+                        <div style="color: var(--text-secondary); font-size: 11px; margin-bottom: 4px;">QTY</div>
+                        <div style="color: var(--primary); font-weight: 600; font-size: 20px;">${card.quantity || 0}</div>
+                    </div>
+                </div>
+
+                <button class="add-card-btn" data-card-id="${card.id}" style="width: 100%; padding: 10px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.3s; pointer-events: auto;">
+                    ➕ Add to Collection
+                </button>
+            </div>
+        </div>
+    `).join('');
+    
+    attachCardEventListeners();
+}
+
+function attachCardEventListeners() {
+    const cards = document.querySelectorAll('.card-item');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+            this.style.boxShadow = '0 10px 30px rgba(32,128,144,0.3)';
+        });
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    const btns = document.querySelectorAll('.add-card-btn');
+    btns.forEach(btn => {
+        btn.addEventListener('mouseenter', function() { this.style.opacity = '0.9'; });
+        btn.addEventListener('mouseleave', function() { this.style.opacity = '1'; });
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const cardId = parseInt(this.dataset.cardId);
+            const card = allCards.find(c => c.id === cardId);
+            if (card) {
+                alert(`Added "${card.name}" to collection!`);
+            }
+        });
+    });
+}
+
+function filterCards() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const roleFilter = document.getElementById('filterRole').value;
+
+    let filtered = allCards.filter(card => {
+        const matchesSearch = !searchTerm || (card.name && card.name.toLowerCase().includes(searchTerm));
+        const matchesRole = !roleFilter || card.role === roleFilter;
+        return matchesSearch && matchesRole;
+    });
+
+    renderCards(filtered);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('searchInput').addEventListener('input', filterCards);
+    document.getElementById('filterRole').addEventListener('change', filterCards);
+    loadCards();
+});
+</script>

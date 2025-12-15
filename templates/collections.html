@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Коллекции - Alpha Strike Helper</title>
+    <link rel="stylesheet" href="/static/main.css">
+    <style>
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .btn-primary { background: #2196F3; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .btn-primary:hover { background: #1976D2; }
+        .collections-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .collection-card { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .collection-title { font-size: 20px; font-weight: bold; margin-bottom: 15px; color: #333; }
+        .collection-info { margin-bottom: 15px; color: #666; }
+        .collection-actions { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-small { padding: 8px 12px; font-size: 14px; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow-y: auto; }
+        .modal-content { background-color: #fefefe; margin: 5% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 600px; border-radius: 8px; max-height: 90vh; overflow-y: auto; }
+        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close:hover { color: black; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        input, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box; }
+        input:focus, textarea:focus { outline: none; border-color: #2196F3; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #ddd; }
+        .tab { padding: 10px 20px; cursor: pointer; border: none; background: none; color: #666; font-size: 16px; }
+        .tab.active { color: #2196F3; border-bottom: 3px solid #2196F3; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .list { list-style: none; padding: 0; }
+        .list-item { background: #f5f5f5; padding: 12px; margin-bottom: 8px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
+        .list-item-text { flex: 1; }
+        .list-item-actions { display: flex; gap: 8px; }
+        .btn-danger { background: #f44336; color: white; border: none; padding: 6px 10px; border-radius: 3px; cursor: pointer; font-size: 12px; }
+        .btn-danger:hover { background: #da190b; }
+        .empty-state { text-align: center; color: #999; padding: 30px; }
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; background: #f0f0f0; padding: 15px; border-radius: 5px; }
+        .stat { text-align: center; }
+        .stat-number { font-size: 24px; font-weight: bold; color: #2196F3; }
+        .stat-label { color: #666; font-size: 12px; margin-top: 5px; }
+        .export-section { background: #e8f5e9; padding: 15px; border-radius: 5px; margin-top: 15px; }
+        .btn-export { background: #FF9800; color: white; }
+        .btn-export:hover { background: #e68900; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="logo">⚔️ Alpha Strike Helper</h1>
+            <ul class="nav-menu">
+                <li><a href="/">Главная</a></li>
+                <li><a href="/cards">Карты мехов</a></li>
+                <li><a href="/collections" class="active">Коллекции</a></li>
+                <li><a href="/lances">Лэнсы</a></li>
+                <li><a href="/stars">Звёзды</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>📚 Мои Коллекции</h1>
+            <button class="btn-primary" onclick="openCreateCollectionModal()">+ Создать коллекцию</button>
+        </div>
+
+        <div id="collectionsContainer" class="collections-grid">
+            <!-- Коллекции будут загружены здесь -->
+        </div>
+    </div>
+
+    <!-- Modal для создания коллекции -->
+    <div id="createCollectionModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCreateCollectionModal()">&times;</span>
+            <h2>Создать коллекцию</h2>
+            <div class="form-group">
+                <label>Название:</label>
+                <input type="text" id="collectionName" placeholder="Название коллекции">
+            </div>
+            <div class="form-group">
+                <label>Описание:</label>
+                <textarea id="collectionDescription" placeholder="Описание"></textarea>
+            </div>
+            <button class="btn-primary" onclick="createCollection()" style="width: 100%;">Создать</button>
+        </div>
+    </div>
+
+    <!-- Modal для управления коллекцией -->
+    <div id="collectionDetailModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCollectionDetailModal()">&times;</span>
+            <h2 id="detailTitle"></h2>
+            
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number" id="lanceCount">0</div>
+                    <div class="stat-label">Лэнсов</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="starCount">0</div>
+                    <div class="stat-label">Звёзд</div>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab(event, 'lances')">Лэнсы</button>
+                <button class="tab" onclick="switchTab(event, 'stars')">Звёзды</button>
+            </div>
+
+            <!-- Лэнсы -->
+            <div id="lances-tab" class="tab-content active">
+                <h3>Лэнсы в коллекции</h3>
+                <div id="lancesList"></div>
+                <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="openAddLanceModal()">+ Добавить лэнс</button>
+            </div>
+
+            <!-- Звёзды -->
+            <div id="stars-tab" class="tab-content">
+                <h3>Звёзды в коллекции</h3>
+                <div id="starsList"></div>
+                <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="openAddStarModal()">+ Добавить звезду</button>
+            </div>
+
+            <!-- Экспорт -->
+            <div class="export-section">
+                <h3>📥 Экспорт коллекции</h3>
+                <button class="btn-primary btn-export" style="width: 100%;" onclick="exportCollectionPDF()">📄 Скачать PDF</button>
+            </div>
+
+            <button class="btn-danger" style="width: 100%; margin-top: 15px;" onclick="deleteCollection()">Удалить коллекцию</button>
+        </div>
+    </div>
+
+    <!-- Modal для добавления лэнса -->
+    <div id="addLanceModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddLanceModal()">&times;</span>
+            <h2>Добавить лэнс</h2>
+            <div class="form-group">
+                <label>Название:</label>
+                <input type="text" id="lanceName" placeholder="Название лэнса">
+            </div>
+            <div class="form-group">
+                <label>Описание:</label>
+                <textarea id="lanceDescription" placeholder="Описание"></textarea>
+            </div>
+            <button class="btn-primary" onclick="createLance()" style="width: 100%;">Создать</button>
+        </div>
+    </div>
+
+    <!-- Modal для добавления звезды -->
+    <div id="addStarModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddStarModal()">&times;</span>
+            <h2>Добавить звезду</h2>
+            <div class="form-group">
+                <label>Название:</label>
+                <input type="text" id="starName" placeholder="Название звезды">
+            </div>
+            <div class="form-group">
+                <label>Описание:</label>
+                <textarea id="starDescription" placeholder="Описание"></textarea>
+            </div>
+            <button class="btn-primary" onclick="createStar()" style="width: 100%;">Создать</button>
+        </div>
+    </div>
+
+    <script>
+        const API = 'http://localhost:8080/api/v1';
+        let currentCollectionId = null;
+
+        // === Коллекции ===
+        async function loadCollections() {
+            try {
+                const response = await fetch(`${API}/collections`);
+                if (!response.ok) {
+                    console.error('HTTP Error:', response.status);
+                    alert('❌ Ошибка при загрузке коллекций (HTTP ' + response.status + ')');
+                    return;
+                }
+                
+                const result = await response.json();
+                
+                // Обработка ответа: может быть {data: [...]} или просто [...]
+                const collections = result.data || result;
+                
+                const container = document.getElementById('collectionsContainer');
+                container.innerHTML = '';
+
+                if (!collections || collections.length === 0) {
+                    container.innerHTML = '<div class="empty-state">Нет коллекций. Создайте первую!</div>';
+                    return;
+                }
+
+                collections.forEach(col => {
+                    const card = document.createElement('div');
+                    card.className = 'collection-card';
+                    card.innerHTML = `
+                        <div class="collection-title">${col.name || 'Без названия'}</div>
+                        <div class="collection-info">${col.description || 'Нет описания'}</div>
+                        <div class="collection-actions">
+                            <button class="btn-primary btn-small" onclick="openCollectionDetail(${col.id})">Открыть</button>
+                            <button class="btn-danger btn-small" onclick="deleteCollectionById(${col.id})">Удалить</button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Ошибка загрузки коллекций:', error);
+                alert('❌ Ошибка при загрузке коллекций: ' + error.message);
+            }
+        }
+
+        async function createCollection() {
+            const name = document.getElementById('collectionName').value;
+            const description = document.getElementById('collectionDescription').value;
+
+            if (!name) {
+                alert('Введите название коллекции');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API}/collections`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, description })
+                });
+
+                if (response.ok) {
+                    alert('✅ Коллекция создана!');
+                    closeCreateCollectionModal();
+                    loadCollections();
+                } else {
+                    const error = await response.text();
+                    alert('❌ Ошибка: ' + error);
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('❌ Ошибка: ' + error.message);
+            }
+        }
+
+        async function deleteCollectionById(id) {
+            if (!confirm('Вы уверены?')) return;
+            
+            try {
+                const response = await fetch(`${API}/collections/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    alert('✅ Коллекция удалена!');
+                    loadCollections();
+                } else {
+                    alert('❌ Ошибка при удалении (HTTP ' + response.status + ')');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('❌ Ошибка: ' + error.message);
+            }
+        }
+
+        // === Детали коллекции ===
+        async function openCollectionDetail(id) {
+            currentCollectionId = id;
+            try {
+                const response = await fetch(`${API}/collections/${id}`);
+                if (!response.ok) {
+                    alert('❌ Ошибка при загрузке деталей (HTTP ' + response.status + ')');
+                    return;
+                }
+                
+                const result = await response.json();
+                const collection = result.data || result;
+                
+                document.getElementById('detailTitle').textContent = collection.name || 'Коллекция';
+                
+                // Загружаем Лэнсы и Звёзды
+                await loadLances();
+                await loadStars();
+                
+                document.getElementById('collectionDetailModal').style.display = 'block';
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('❌ Ошибка при загрузке деталей: ' + error.message);
+            }
+        }
+
+        // === Лэнсы ===
+        async function loadLances() {
+            try {
+                const response = await fetch(`${API}/lances`);
+                if (!response.ok) {
+                    console.error('Ошибка загрузки лэнсов:', response.status);
+                    return;
+                }
+                
+                const result = await response.json();
+                const lances = result.data || result;
+                
+                const container = document.getElementById('lancesList');
+                container.innerHTML = '';
+
+                if (!lances || lances.length === 0) {
+                    container.innerHTML = '<div class="empty-state">Нет лэнсов в коллекции</div>';
+                    document.getElementById('lanceCount').textContent = '0';
+                    return;
+                }
+
+                document.getElementById('lanceCount').textContent = lances.length;
+
+                const ul = document.createElement('ul');
+                ul.className = 'list';
+                
+                lances.forEach(lance => {
+                    const li = document.createElement('li');
+                    li.className = 'list-item';
+                    li.innerHTML = `
+                        <div class="list-item-text">
+                            <strong>${lance.name || 'Без названия'}</strong><br>
+                            <small>${lance.description || 'Нет описания'}</small>
+                        </div>
+                        <div class="list-item-actions">
+                            <button class="btn-danger btn-small" onclick="deleteLance(${lance.id})">Удалить</button>
+                        </div>
+                    `;
+                    ul.appendChild(li);
+                });
+
+                container.appendChild(ul);
+            } catch (error) {
+                console.error('Ошибка загрузки лэнсов:', error);
+            }
+        }
+
+        async function createLance() {
+            const name = document.getElementById('lanceName').value;
+            const description = document.getElementById('lanceDescription').value;
+
+            if (!name) {
+                alert('Введите название лэнса');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API}/lances`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, description, collection_id: currentCollectionId })
+                });
+
+                if (response.ok) {
+                    alert('✅ Лэнс создан!');
+                    closeAddLanceModal();
+                    loadLances();
+                } else {
+                    const error = await response.text();
+                    alert('❌ Ошибка: ' + error);
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('❌ Ошибка: ' + error.message);
+            }
+        }
+
+        async function deleteLance(id) {
+            if (!confirm('Удалить лэнс?')) return;
+            
+            try {
+                const response = await fetch(`${API}/lances/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    loadLances();
+                } else {
+                    alert('❌ Ошибка при удалении');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+            }
+        }
+
+        // === Звёзды ===
+        async function loadStars() {
+            try {
+                const response = await fetch(`${API}/stars`);
+                if (!response.ok) {
+                    console.error('Ошибка загрузки звёзд:', response.status);
+                    return;
+                }
+                
+                const result = await response.json();
+                const stars = result.data || result;
+                
+                const container = document.getElementById('starsList');
+                container.innerHTML = '';
+
+                if (!stars || stars.length === 0) {
+                    container.innerHTML = '<div class="empty-state">Нет звёзд в коллекции</div>';
+                    document.getElementById('starCount').textContent = '0';
+                    return;
+                }
+
+                document.getElementById('starCount').textContent = stars.length;
+
+                const ul = document.createElement('ul');
+                ul.className = 'list';
+                
+                stars.forEach(star => {
+                    const li = document.createElement('li');
+                    li.className = 'list-item';
+                    li.innerHTML = `
+                        <div class="list-item-text">
+                            <strong>${star.name || 'Без названия'}</strong><br>
+                            <small>${star.description || 'Нет описания'}</small>
+                        </div>
+                        <div class="list-item-actions">
+                            <button class="btn-danger btn-small" onclick="deleteStar(${star.id})">Удалить</button>
+                        </div>
+                    `;
+                    ul.appendChild(li);
+                });
+
+                container.appendChild(ul);
+            } catch (error) {
+                console.error('Ошибка загрузки звёзд:', error);
+            }
+        }
+
+        async function createStar() {
+            const name = document.getElementById('starName').value;
+            const description = document.getElementById('starDescription').value;
+
+            if (!name) {
+                alert('Введите название звезды');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API}/stars`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, description, collection_id: currentCollectionId })
+                });
+
+                if (response.ok) {
+                    alert('✅ Звезда создана!');
+                    closeAddStarModal();
+                    loadStars();
+                } else {
+                    const error = await response.text();
+                    alert('❌ Ошибка: ' + error);
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('❌ Ошибка: ' + error.message);
+            }
+        }
+
+        async function deleteStar(id) {
+            if (!confirm('Удалить звезду?')) return;
+            
+            try {
+                const response = await fetch(`${API}/stars/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    loadStars();
+                } else {
+                    alert('❌ Ошибка при удалении');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+            }
+        }
+
+        // === Экспорт ===
+        function exportCollectionPDF() {
+            if (!currentCollectionId) {
+                alert('Выберите коллекцию');
+                return;
+            }
+            window.location.href = `${API}/collections/${currentCollectionId}/export-pdf`;
+        }
+
+        // === Модалы ===
+        function openCreateCollectionModal() {
+            document.getElementById('createCollectionModal').style.display = 'block';
+        }
+
+        function closeCreateCollectionModal() {
+            document.getElementById('createCollectionModal').style.display = 'none';
+            document.getElementById('collectionName').value = '';
+            document.getElementById('collectionDescription').value = '';
+        }
+
+        function closeCollectionDetailModal() {
+            document.getElementById('collectionDetailModal').style.display = 'none';
+            currentCollectionId = null;
+        }
+
+        function openAddLanceModal() {
+            document.getElementById('addLanceModal').style.display = 'block';
+        }
+
+        function closeAddLanceModal() {
+            document.getElementById('addLanceModal').style.display = 'none';
+            document.getElementById('lanceName').value = '';
+            document.getElementById('lanceDescription').value = '';
+        }
+
+        function openAddStarModal() {
+            document.getElementById('addStarModal').style.display = 'block';
+        }
+
+        function closeAddStarModal() {
+            document.getElementById('addStarModal').style.display = 'none';
+            document.getElementById('starName').value = '';
+            document.getElementById('starDescription').value = '';
+        }
+
+        function switchTab(event, tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function deleteCollection() {
+            if (!currentCollectionId) return;
+            if (!confirm('Удалить всю коллекцию?')) return;
+            
+            deleteCollectionById(currentCollectionId).then(() => {
+                closeCollectionDetailModal();
+                loadCollections();
+            });
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            let modal = document.getElementById('createCollectionModal');
+            if (event.target === modal) {
+                closeCreateCollectionModal();
+            }
+            
+            modal = document.getElementById('collectionDetailModal');
+            if (event.target === modal) {
+                closeCollectionDetailModal();
+            }
+            
+            modal = document.getElementById('addLanceModal');
+            if (event.target === modal) {
+                closeAddLanceModal();
+            }
+            
+            modal = document.getElementById('addStarModal');
+            if (event.target === modal) {
+                closeAddStarModal();
+            }
+        };
+
+        // Load on page load
+        loadCollections();
+    </script>
+</body>
+</html>

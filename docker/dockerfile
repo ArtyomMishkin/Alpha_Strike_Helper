@@ -1,0 +1,46 @@
+# ==================== Многоступенчатая сборка ====================
+
+# Стадия 1: Сборка
+FROM golang:1.21-alpine AS builder
+
+# Установка необходимых инструментов
+RUN apk add --no-cache git ca-certificates tzdata
+
+WORKDIR /build
+
+# Копирование модулей для кэширования зависимостей
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Копирование исходного кода
+COPY . .
+
+# Сборка приложения
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+    -ldflags="-w -s" \
+    -o /build/server \
+    ./cmd/server
+
+# Стадия 2: Финальный образ
+FROM alpine:latest
+
+# Установка CA сертификатов и timezone данных
+RUN apk --no-cache add ca-certificates tzdata
+
+WORKDIR /app
+
+# Копирование бинарника из builder стадии
+COPY --from=builder /build/server .
+
+# Копирование статических файлов и шаблонов
+COPY static ./static
+COPY templates ./templates
+
+# Создание директории для логов
+RUN mkdir -p /app/logs
+
+# Открытие порта
+EXPOSE 8080
+
+# Запуск приложения
+ENTRYPOINT ["./server"]
