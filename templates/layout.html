@@ -294,6 +294,18 @@
         let starMembers = [];
         let currentFilters = {};
 
+        function closeLancesModal() {
+    document.getElementById('lancesModal').classList.remove('active');
+    currentLanceId = null;
+    lanceMembers = []; // Очищаем список при закрытии
+}
+
+function closeStarsModal() {
+    document.getElementById('starsModal').classList.remove('active');
+    currentStarId = null;
+    starMembers = [];
+}
+
         function showPage(page) {
             document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-menu a').forEach(el => el.classList.remove('active'));
@@ -613,6 +625,8 @@
 
 
         async function createLance() {
+             currentLanceId = null;
+              document.getElementById('modal-title').textContent = 'Новый лэнс';
   const name = document.getElementById('lance-name').value;
   const description = document.getElementById('lance-description').value;
 
@@ -647,6 +661,57 @@
   } catch (error) {
     alert(error.message);
   }
+}
+
+async function createStar() {
+     currentStarId = null;
+     document.getElementById('star-name').value = '';
+    const name = document.getElementById('star-name').value;
+    const description = document.getElementById('star-description').value;
+
+    if (!name) {
+        alert('Название обязательно');
+        return;
+    }
+
+    if (starMembers.length > 5) {
+        alert('Максимум 5 мехов в звезде!');
+        return;
+    }
+
+    try {
+        const url = currentStarId ? `${API}/stars/${currentStarId}` : `${API}/stars`;
+        const method = currentStarId ? 'PUT' : 'POST';
+
+        const members = starMembers.map((m, index) => ({
+            card_id: m.id,
+            position: index + 1
+        }));
+
+        const response = await fetch(url, {
+            method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name,
+                description,
+                faction: 'Inner Sphere',
+                members: members
+            })
+        });
+
+        if (response.ok) {
+            alert(currentStarId ? 'Звезда обновлена!' : 'Звезда создана!');
+            closeStarsModal();
+            loadStars();
+        } else {
+            const error = await response.json();
+            alert(error.error || error.message);
+        }
+    } catch (error) {
+        alert(error.message);
+    }
 }
 
 
@@ -826,39 +891,48 @@
             updateStarMembersList();
         }
 
-        async function createStar() {
-            const name = document.getElementById('star-name').value;
-            const description = document.getElementById('star-description').value;
-            if (!name) return alert('Введите название');
-            if (starMembers.length < 3) return alert('Минимум 3 меха!');
-            
-            try {
-                const url = currentStarId ? `${API}/stars/${currentStarId}` : `${API}/stars`;
-                const method = currentStarId ? 'PUT' : 'POST';
-                
-                const members = starMembers.map((mech, index) => ({
-                    card_id: mech.id,
-                    position: index + 1
-                }));
-                
-                const response = await fetch(url, {
-                    method,
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, description, faction: 'Inner Sphere', members })
-                });
-                
-                if (response.ok) {
-                    alert(currentStarId ? 'Обновлено!' : 'Звезда создана!');
-                    closeStarsModal();
-                    loadStars();
-                } else {
-                    const error = await response.json();
-                    alert('Ошибка: ' + (error.error || error.message));
-                }
-            } catch (error) {
-                alert('Ошибка: ' + error.message);
-            }
+       function saveStar() {
+    const name = document.getElementById('star-name').value;
+    const description = document.getElementById('star-description').value;
+    const faction = document.getElementById('star-faction').value;
+
+    if (!name) {
+        alert('Введите название звезды');
+        return;
+    }
+
+    const members = [];
+    document.querySelectorAll('[data-star-slot]').forEach((slot, idx) => {
+        const mechId = slot.dataset.mechId;
+        if (mechId) {
+            members.push({ card_id: parseInt(mechId), position: idx + 1 });
         }
+    });
+
+    const data = {
+        name: name,
+        description: description,
+        faction: faction,
+        members: members
+    };
+
+    const method = currentStarId ? 'PUT' : 'POST';
+    const url = currentStarId ? API + '/stars/' + currentStarId : API + '/stars';
+
+    fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(result => {
+        console.log('[SAVE_STAR] Result:', result);
+         alert(currentStarId ? 'Звезда обновлена!' : 'Звезда создана!');
+    closeModal('modal-star');
+    refreshStars();
+})
+}
+
 
         async function printStar(id) {
             console.log('[PRINT_STAR] Printing star ID:', id);
@@ -988,6 +1062,48 @@
                 alert('Ошибка: ' + error.message);
             }
         }
+        function saveLance() {
+    const name = document.getElementById('lance-name').value;
+    const description = document.getElementById('lance-description').value;
+    const faction = document.getElementById('lance-faction').value;
+
+    if (!name) {
+        alert('Введите название лэнса');
+        return;
+    }
+
+    const members = [];
+    document.querySelectorAll('[data-lance-slot]').forEach((slot, idx) => {
+        const mechId = slot.dataset.mechId;
+        if (mechId) {
+            members.push({ card_id: parseInt(mechId), position: idx + 1 });
+        }
+    });
+
+    const data = {
+        name: name,
+        description: description,
+        faction: faction,
+        members: members
+    };
+
+    const method = currentLanceId ? 'PUT' : 'POST';
+    const url = currentLanceId ? API + '/lances/' + currentLanceId : API + '/lances';
+
+    fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(result => {
+        console.log('[SAVE_LANCE] Result:', result);
+        closeModal('modal-star');
+        refreshStars();
+    })
+    .catch(err => alert('Ошибка сохранения: ' + err.message));
+}
+
 
         async function deleteCollection(id) {
             if (!confirm('Удалить коллекцию?')) return;
@@ -1013,7 +1129,6 @@
         function closeCreateCollectionModal() {
             document.getElementById('createCollectionModal').classList.remove('active');
         }
-
         window.onclick = function(event) {
             if (event.target === document.getElementById('lancesModal')) closeLancesModal();
             if (event.target === document.getElementById('starsModal')) closeStarsModal();
