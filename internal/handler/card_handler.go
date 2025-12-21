@@ -1,11 +1,11 @@
 package handler
 
 import (
-	"net/http"
-	"strconv"
-
 	"Alpha_Strike_Helper/internal/domain"
 	"Alpha_Strike_Helper/internal/service"
+	"math"
+	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,8 +23,9 @@ func NewCardHandler(service *service.CardService) *CardHandler {
 func (h *CardHandler) List(c *gin.Context) {
 	// Параметры пагинации
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize := 3604 // Разумное значение по умолчанию
 
-	pageSize := 99999 // ← УВЕЛИЧЬ НА 99999 чтобы загрузить ВСЕ
+	// Поддержка параметров pagesize и page_size
 	if ps := c.Query("pagesize"); ps != "" {
 		if v, err := strconv.Atoi(ps); err == nil && v > 0 {
 			pageSize = v
@@ -41,7 +42,6 @@ func (h *CardHandler) List(c *gin.Context) {
 
 	// Фильтры
 	filters := make(map[string]interface{})
-
 	if role := c.Query("role"); role != "" {
 		filters["role"] = role
 	}
@@ -67,6 +67,7 @@ func (h *CardHandler) List(c *gin.Context) {
 		filters["pv_max"] = pvMax
 	}
 
+	// ✅ КЛЮЧЕВАЯ СТРОКА: cards, total, err
 	cards, total, err := h.service.ListCards(filters, page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -77,12 +78,18 @@ func (h *CardHandler) List(c *gin.Context) {
 		cards = []domain.Card{}
 	}
 
+	// ✅ РАСЧЕТ total_pages (исправление основной проблемы)
+	totalPages := int64(math.Ceil(float64(total) / float64(pageSize)))
+	if totalPages < 1 {
+		totalPages = 1
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"data":        cards,
 		"page":        page,
 		"page_size":   pageSize,
 		"total":       total,
-		"total_pages": 1,
+		"total_pages": totalPages, // ✅ ИСПРАВЛЕНО: было "1"
 	})
 }
 

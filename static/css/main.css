@@ -826,7 +826,11 @@ body {
 }
 
 .page.active {
-    display: block;
+    display: flex !important;
+    flex-direction: column;
+    width: 100% !important;
+    height: auto;
+    min-height: 100vh;
 }
 
 /* Hero Section */
@@ -1291,3 +1295,17 @@ textarea {
         width: 100%;
     }
 }
+/* ==================== Roster Grid ==================== */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-20);
+  padding: var(--space-20);
+  width: 100%;
+}
+
+
+
+
+
