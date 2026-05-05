@@ -51,8 +51,23 @@ func (h *CardHandler) List(c *gin.Context) {
 	if faction := c.Query("faction"); faction != "" {
 		filters["faction"] = faction
 	}
+	if availableFaction := c.Query("available_faction"); availableFaction != "" {
+		filters["available_faction"] = availableFaction
+	}
+	if factionGroup := c.Query("faction_group"); factionGroup != "" {
+		filters["faction_group"] = factionGroup
+	}
 	if cardType := c.Query("type"); cardType != "" {
 		filters["type"] = cardType
+	}
+	if unitType := c.Query("unit_type"); unitType != "" {
+		filters["unit_type"] = unitType
+	}
+	if era := c.Query("era"); era != "" {
+		filters["era"] = era
+	}
+	if availableEra := c.Query("available_era"); availableEra != "" {
+		filters["available_era"] = availableEra
 	}
 	if techBase := c.Query("techbase"); techBase != "" {
 		filters["tech_base"] = techBase

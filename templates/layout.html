@@ -91,6 +91,8 @@
             height: fit-content;
             position: sticky;
             top: 20px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
         }
         
         .filter-group {
@@ -139,6 +141,31 @@
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 15px;
         }
+
+        .sticky-filters {
+            position: sticky;
+            top: 10px;
+            z-index: 5;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #e5ecfb;
+            border-radius: 8px;
+            padding: 6px 8px;
+            margin-bottom: 10px;
+            font-size: 11px;
+            color: #666;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .filters-summary {
+            margin-top: 10px;
+            font-size: 11px;
+            color: #4a5568;
+            background: #f8fbff;
+            border: 1px solid #dbe7ff;
+            border-radius: 8px;
+            padding: 8px;
+            min-height: 32px;
+        }
         
         .card {
             background: #f9f9f9;
@@ -161,11 +188,139 @@
             margin-bottom: 8px;
             color: #1e3c72;
         }
+
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .card-pv-badge {
+            border: 1px solid #cfe0ff;
+            background: #eef3ff;
+            color: #1e3c72;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-weight: 700;
+            font-size: 12px;
+            white-space: nowrap;
+        }
         
         .card-model {
             font-size: 12px;
             color: #999;
             margin-bottom: 8px;
+        }
+
+        .card-image-wrap {
+            margin-bottom: 10px;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            background: #fff;
+            aspect-ratio: 4 / 3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .card-main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .card-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .card-row-box {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 12px;
+        }
+
+        .card-row-title {
+            font-size: 11px;
+            color: #666;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .card-row-value {
+            color: #1e3c72;
+            font-weight: 700;
+        }
+
+        .damage-box {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 8px;
+        }
+
+        .damage-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            font-size: 11px;
+            margin-top: 6px;
+        }
+
+        .damage-cell {
+            border: 1px solid #e6e6e6;
+            border-radius: 4px;
+            padding: 4px;
+            text-align: center;
+            background: #fafafa;
+        }
+
+        .crit-table {
+            margin-top: 8px;
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+            background: #fff;
+        }
+
+        .crit-table th, .crit-table td {
+            border: 1px solid #ddd;
+            padding: 4px 6px;
+            text-align: left;
+        }
+
+        .crit-table th {
+            background: #f5f8ff;
+            color: #1e3c72;
+        }
+
+        .crit-track {
+            display: inline-flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .crit-box {
+            width: 11px;
+            height: 11px;
+            border: 1px solid #777;
+            border-radius: 2px;
+            display: inline-block;
+            background: #fff;
         }
         
         .card-stats {
@@ -268,6 +423,112 @@
         }
         
         .btn-danger:hover { background: #c0392b; }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-card {
+            width: 100%;
+            max-width: 520px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 14px 16px;
+            background: #f3f7ff;
+            border-bottom: 1px solid #e5ecfb;
+            color: #1e3c72;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .modal-body {
+            padding: 16px;
+            color: #333;
+            line-height: 1.45;
+            font-size: 14px;
+            white-space: pre-line;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 0 16px 16px;
+        }
+
+        .availability-modal-card {
+            max-width: 820px;
+        }
+
+        .availability-meta {
+            font-size: 12px;
+            color: #666;
+            margin-top: 6px;
+        }
+
+        .availability-table-wrap {
+            max-height: 60vh;
+            overflow: auto;
+            border: 1px solid #e6e6e6;
+            border-radius: 8px;
+        }
+
+        .availability-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            min-width: 420px;
+        }
+
+        .availability-table th,
+        .availability-table td {
+            border: 1px solid #ececec;
+            padding: 6px 8px;
+            text-align: center;
+            vertical-align: middle;
+            background: #fff;
+        }
+
+        .availability-table th {
+            background: #f8fbff;
+            color: #1e3c72;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .availability-table td:first-child,
+        .availability-table th:first-child {
+            text-align: left;
+            white-space: nowrap;
+            position: sticky;
+            left: 0;
+            z-index: 2;
+            background: #f8fbff;
+        }
+
+        .availability-yes {
+            color: #1d7a33;
+            font-weight: 700;
+        }
+
+        .availability-no {
+            color: #9aa0a6;
+        }
         
         /* Roster */
         .roster-section {
@@ -385,6 +646,13 @@
             text-align: center;
             padding: 30px;
             color: #999;
+        }
+
+        .hangar-list {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
         }
         
         /* Formations */
@@ -625,6 +893,22 @@
             .tabs { gap: 5px; }
             .tab-button { padding: 10px 16px; font-size: 12px; }
         }
+
+        .legal-notice {
+            max-width: 1400px;
+            margin: 0 0 14px 0;
+            padding: 10px 14px;
+            font-size: 11px;
+            line-height: 1.45;
+            color: #f7fbff;
+            background: rgba(10, 20, 40, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            border-radius: 8px;
+            position: sticky;
+            top: 8px;
+            z-index: 30;
+            backdrop-filter: blur(2px);
+        }
     </style>
 </head>
 <body>
@@ -633,10 +917,15 @@
             <h1>Alpha Strike Helper</h1>
             <p class="header-info">Конструктор ростеров для Alpha Strike</p>
         </header>
+        <div class="legal-notice">
+            BattleTech, Alpha Strike и связанные наименования/элементы являются интеллектуальной собственностью The Topps Company, Inc. и Catalyst Game Labs.
+            Данный проект является неофициальным фанатским инструментом, не аффилирован с правообладателями и создан исключительно для информационно-игрового использования.
+        </div>
 
         <!-- Tabs -->
         <div class="tabs">
             <button class="tab-button active" data-tab="cards">Список мехов</button>
+            <button class="tab-button" data-tab="hangar">Ангар</button>
             <button class="tab-button" data-tab="roster">Ростер</button>
             <button class="tab-button" data-tab="formations">Формации</button>
             <button class="tab-button" data-tab="export">Экспорт</button>
@@ -652,12 +941,31 @@
                         <input type="text" id="filterName" placeholder="Commando">
                     </div>
                     <div class="filter-group">
-                        <label>Фракция</label>
-                        <select id="filterFaction">
+                        <label>Группа фракции</label>
+                        <select id="filterFactionGroup">
                             <option value="">Все</option>
-                            <option value="Clan">Clan</option>
-                            <option value="Inner Sphere">Inner Sphere</option>
                         </select>
+                    </div>
+                    <div class="filter-group" style="position: relative;">
+                        <label>Доступная фракция</label>
+                        <input type="text" id="filterAvailableFaction" placeholder="Например: Clan Wolf">
+                        <div id="filterAvailableFactionSuggestions" style="display:none; position:absolute; z-index:20; left:0; right:0; top:100%; margin-top:4px; background:#fff; border:1px solid #ddd; border-radius:6px; max-height:180px; overflow:auto; box-shadow:0 4px 12px rgba(0,0,0,.1);"></div>
+                    </div>
+                    <div class="filter-group">
+                        <label>Доступная эпоха</label>
+                        <select id="filterAvailableEra">
+                            <option value="">Все</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Тип юнита</label>
+                        <select id="filterUnitType">
+                            <option value="">Все</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>SPECIAL (способности)</label>
+                        <input type="text" id="filterSpecial" placeholder="Например: ECM, CASE, OMNI">
                     </div>
                     <div class="filter-group">
                         <label>Размер</label>
@@ -680,16 +988,42 @@
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label>Min PV</label>
+                        <label>Мин. PV</label>
                         <input type="number" id="filterPVMin" placeholder="0" min="0">
                     </div>
                     <div class="filter-group">
-                        <label>Max PV</label>
+                        <label>Макс. PV</label>
                         <input type="number" id="filterPVMax" placeholder="100" min="0">
                     </div>
+                    <div class="filter-group">
+                        <label>Сортировка списка</label>
+                        <select id="filterSort">
+                            <option value="name">По названию</option>
+                            <option value="pv">По стоимости (PV)</option>
+                        </select>
+                    </div>
                     <button class="filter-button" onclick="applyFilters()">Применить</button>
+                    <button class="filter-button" style="margin-top: 8px; background: #6c757d" onclick="clearFilters()">Сбросить</button>
+                    <div id="activeFilters" class="filters-summary"></div>
                 </div>
-                <div id="cardsContainer" class="cards-container"></div>
+                <div>
+                    <div id="activeFiltersSticky" class="sticky-filters"></div>
+                    <div id="cardsContainer" class="cards-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 1.5: Hangar -->
+        <div id="hangar" class="tab-content">
+            <div class="roster-section">
+                <div class="roster-controls">
+                    <h3 style="margin-bottom: 15px; color: #1e3c72">Ангар</h3>
+                    <input type="text" class="search-mech" id="hangarSearch" placeholder="Поиск в ангаре..." onkeyup="renderHangar()">
+                    <button class="filter-button" style="margin-top: 6px; background: #6c757d" onclick="clearHangar()">Очистить ангар</button>
+                </div>
+                <div class="hangar-list">
+                    <div id="hangarList"></div>
+                </div>
             </div>
         </div>
 
@@ -699,23 +1033,28 @@
                 <div class="roster-controls">
                     <h3 style="margin-bottom: 15px; color: #1e3c72">Управление</h3>
                     <div class="faction-selector">
-                        <div class="faction-buttons">
-                            <button class="faction-btn" data-faction="Clan" onclick="selectFaction('Clan')">⚔️ Clan</button>
-                            <button class="faction-btn" data-faction="Inner Sphere" onclick="selectFaction('Inner Sphere')">🛡️ Inner Sphere</button>
-                        </div>
+                        <label for="rosterFactionSelect" style="display:block;font-size:12px;color:#666;margin-bottom:6px;">Фракция ростера</label>
+                        <select id="rosterFactionSelect" class="search-mech" style="margin-bottom:0;" onchange="selectFaction(this.value)">
+                            <option value="">Все доступные</option>
+                        </select>
+                        <div id="rosterFactionHint" style="font-size:11px;color:#666;margin-top:6px;"></div>
+                        <label for="rosterEraSelect" style="display:block;font-size:12px;color:#666;margin:10px 0 6px;">Эпоха ростера</label>
+                        <select id="rosterEraSelect" class="search-mech" style="margin-bottom:0;" onchange="selectRosterEra(this.value, true)">
+                            <option value="">Все эпохи</option>
+                        </select>
                     </div>
                     <h3 style="margin: 20px 0 15px; color: #1e3c72">Поиск</h3>
-                    <input type="text" class="search-mech" id="mechSearch" placeholder="Введите имя меха..." onkeyup="searchMechs()">
+                    <input type="text" class="search-mech" id="mechSearch" placeholder="Введите имя юнита..." onkeyup="searchMechs()">
                     <div id="mechSearchResults" class="mech-search-results"></div>
                     <h3 style="margin: 20px 0 15px; color: #1e3c72">Ростер</h3>
-                    <div style="font-size: 12px; color: #999; margin-bottom: 10px">Мехов в ростере: <span id="rosterCount">0</span></div>
+                    <div style="font-size: 12px; color: #999; margin-bottom: 10px">Юнитов в ростере: <span id="rosterCount">0</span></div>
                 </div>
                 <div class="roster-list">
                     <div id="rosterList">
                         <div class="roster-empty">
                             <div style="font-size: 48px; margin-bottom: 10px">📋</div>
                             <p>Ростер пуст</p>
-                            <p style="font-size: 12px">Добавьте мехов через вкладку "Список мехов"</p>
+                            <p style="font-size: 12px">Добавьте юнитов через вкладку "Список мехов"</p>
                         </div>
                     </div>
                 </div>
@@ -727,23 +1066,16 @@
             <div class="formations-section">
                 <div class="formations-control">
                     <h3 style="margin-bottom: 15px; color: #1e3c72">Формации</h3>
+                    <div id="formationsContextInfo" style="font-size:12px;color:#666;background:#f5f8ff;border:1px solid #dbe7ff;border-radius:8px;padding:8px;margin-bottom:12px;">
+                        Фракция: не выбрана
+                    </div>
                     <div class="formation-type-selector">
                         <h3 style="margin-bottom: 15px; color: #1e3c72">Выбор типа</h3>
                         <select id="formationTypeSelect" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px; font-size: 13px;" onchange="addFormationToRoster()">
                             <option value="">-- Выбрать --</option>
                             <option value="No Formation">No Formation</option>
-                            <option value="Battle Lance">Battle Lance (4)</option>
-                            <option value="Assault Lance">Assault Lance (4)</option>
-                            <option value="Striker Lance">Striker Lance (4)</option>
-                            <option value="Fire Support Lance">Fire Support Lance (4)</option>
-                            <option value="Recon Lance">Recon Lance (4)</option>
-                            <option value="Command Lance">Command Lance (4)</option>
-                            <option value="Pursuit Lance">Pursuit Lance (4)</option>
-                            <option value="Omni Star">Omni Star (5)</option>
-                            <option value="Assault Star">Assault Star (5)</option>
                         </select>
                     </div>
-                    <button class="filter-button" style="margin-top: 20px" onclick="autoFormFormations()">Авто-формирование</button>
                 </div>
                 <div>
                     <h3 style="margin-bottom: 15px; color: #1e3c72">Формации</h3>
@@ -763,7 +1095,7 @@
                 <div class="roster-stats">
                     <h3 style="margin-bottom: 15px; color: #1e3c72">Статистика</h3>
                     <div class="stat-row">
-                        <span class="stat-label-text">Мехов</span>
+                        <span class="stat-label-text">Юнитов</span>
                         <span class="stat-value-text" id="statMechs">0</span>
                     </div>
                     <div class="stat-row">
@@ -795,14 +1127,52 @@
                 <div class="export-option">
                     <h3>PDF</h3>
                     <p>Распечатайте ростер со всеми характеристиками</p>
+                    <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#555;margin-bottom:10px;">
+                        <input type="checkbox" id="printIncludeImages" onchange="setPrintIncludeImages(this.checked)">
+                        Добавлять изображение юнита на карточку
+                    </label>
                     <button class="btn btn-primary" onclick="printToPDF()">Распечатать PDF</button>
                 </div>
 
                 <!-- Preview -->
                 <div class="export-option">
                     <h3>Предпросмотр</h3>
-                    <div class="export-preview" id="jsonPreview">{"faction": "", "totalMechs": 0, "totalPV": 0, "mechs": []}</div>
+                    <div class="export-preview" id="jsonPreview">{"faction": "", "era": "", "totalUnits": 0, "totalPV": 0, "units": []}</div>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div id="confirmModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+        <div class="modal-card">
+            <div id="confirmModalTitle" class="modal-header">Подтверждение</div>
+            <div id="confirmModalMessage" class="modal-body"></div>
+            <div class="modal-actions">
+                <button id="confirmModalNo" class="btn btn-secondary" style="width:auto; min-width:96px;">Нет</button>
+                <button id="confirmModalYes" class="btn btn-primary" style="width:auto; min-width:96px;">Да</button>
+            </div>
+        </div>
+    </div>
+    <div id="formationTypeModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="formationTypeModalTitle">
+        <div class="modal-card">
+            <div id="formationTypeModalTitle" class="modal-header">Изменить формацию</div>
+            <div class="modal-body">
+                <label for="formationTypeModalSelect" style="display:block;margin-bottom:8px;color:#666;font-size:12px;">Новый тип формации</label>
+                <select id="formationTypeModalSelect" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
+                    <option value="No Formation">No Formation</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button id="formationTypeModalCancel" class="btn btn-secondary" style="width:auto; min-width:96px;">Отмена</button>
+                <button id="formationTypeModalApply" class="btn btn-primary" style="width:auto; min-width:96px;">Применить</button>
+            </div>
+        </div>
+    </div>
+    <div id="availabilityModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="availabilityModalTitle">
+        <div class="modal-card availability-modal-card">
+            <div id="availabilityModalTitle" class="modal-header">Доступность юнита</div>
+            <div id="availabilityModalBody" class="modal-body"></div>
+            <div class="modal-actions">
+                <button id="availabilityModalClose" class="btn btn-primary" style="width:auto; min-width:96px;">Закрыть</button>
             </div>
         </div>
     </div>
@@ -810,19 +1180,112 @@
     <script>
         const state = {
             allCards: [],
+            chassisSources: {},
             roster: [],
             selectedFaction: null,
+            rosterFactionManuallySelected: false,
+            rosterEraManuallySelected: false,
+            selectedEra: null,
+            printIncludeImages: false,
+            hangar: [],
             formations: [],
-            currentFormationFilter: 'all'
+            currentFormationFilter: 'all',
+            factionGroupToFactions: {},
+            rosterCommonFactions: [],
+            factionToPrimaryGroup: {},
+            groupToGeneralFactions: {}
         };
+
+        const ERA_CHRONOLOGY = [
+            'Age of War',
+            'Star League',
+            'Early Succession War',
+            'Late Succession War - LosTech',
+            'Late Succession War - Renaissance',
+            'Clan Invasion',
+            'Civil War',
+            'Jihad',
+            'Early Republic',
+            'Late Republic',
+            'Dark Age',
+            'ilClan'
+        ];
+
+        function eraOrderIndex(eraName) {
+            const normalized = String(eraName || '').trim().toLowerCase();
+            const idx = ERA_CHRONOLOGY.findIndex(e => e.toLowerCase() === normalized);
+            return idx === -1 ? Number.MAX_SAFE_INTEGER : idx;
+        }
+
+        function sortErasChronologically(eras) {
+            return Array.from(new Set((eras || []).map(e => String(e || '').trim()).filter(Boolean)))
+                .sort((a, b) => {
+                    const byChronology = eraOrderIndex(a) - eraOrderIndex(b);
+                    if (byChronology !== 0) return byChronology;
+                    return a.localeCompare(b);
+                });
+        }
+
+        const FORMATION_BATTLEMECH_LANCE_TYPES = [
+            'Battle Lance', 'Light Battle Lance', 'Medium Battle Lance', 'Heavy Battle Lance',
+            'Assault Lance', 'Fast Assault Lance',
+            'Striker Lance', 'Light Striker Lance', 'Heavy Striker Lance',
+            'Fire Support Lance', 'Artillery Fire Lance', 'Direct Fire Lance', 'Anti-Air Lance',
+            'Recon Lance', 'Light Recon Lance', 'Heavy Recon Lance',
+            'Command Lance', 'Vehicle Command Lance',
+            'Pursuit Lance', 'Probe Lance', 'Sweep Lance',
+            'Support Lance'
+        ];
+
+        function lanceFormationToStar(lanceType) {
+            return String(lanceType || '').replace(/Lance/g, 'Star');
+        }
+
+        function lanceFormationToLevel(lanceType) {
+            return String(lanceType || '').replace(/Lance/g, 'Level');
+        }
+
+        function rebuildFormationTypeSelectOptions() {
+            const select = document.getElementById('formationTypeSelect');
+            if (!select) return;
+            const onlyBM = state.roster.length > 0 && state.roster.every(u => String(u.unit_type || '').toLowerCase() === 'battlemech');
+            const side = getRosterFormationSide();
+            let types = ['No Formation'];
+            if (!onlyBM) {
+                if (side === 'clan') {
+                    types.push('Support Star');
+                } else if (side === 'comstar') {
+                    types.push('Support Level');
+                } else {
+                    types.push('Support Lance');
+                }
+            } else if (side === 'clan') {
+                types.push(...FORMATION_BATTLEMECH_LANCE_TYPES.map(lanceFormationToStar));
+            } else if (side === 'comstar') {
+                types.push(...FORMATION_BATTLEMECH_LANCE_TYPES.map(lanceFormationToLevel));
+            } else {
+                types.push(...FORMATION_BATTLEMECH_LANCE_TYPES);
+            }
+            const unique = [...new Set(types)];
+            select.innerHTML = '<option value="">-- Выбрать --</option>' +
+                unique.map(t => {
+                    const sz = getFormationSize(t);
+                    const suffix = sz ? ` (${sz})` : '';
+                    return `<option value="${escapeHtml(t)}">${escapeHtml(t)}${suffix}</option>`;
+                }).join('');
+        }
 
         const API_BASE_URL = 'http://localhost:8080/api/v1';
 
         document.addEventListener('DOMContentLoaded', () => {
+            state.hangar = loadHangarStorage();
+            loadChassisSources();
             setupTabs();
             loadCards();
+            setupFilterUXHandlers();
             updateRosterDisplay();
             updateStats();
+            renderHangar();
         });
 
         function setupTabs() {
@@ -843,19 +1306,41 @@
             });
             document.getElementById(tabName).classList.add('active');
             document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-            if (tabName === 'formations') displayFormations();
+            if (tabName === 'formations') {
+                updateFormationsContextInfo();
+                displayFormations();
+            }
             else if (tabName === 'export') updateExportPreview();
+            else if (tabName === 'hangar') renderHangar();
         }
 
         async function loadCards() {
             try {
-                const response = await fetch(`${API_BASE_URL}/cards?page=1&pagesize=9999`);
-                const result = await response.json();
-                console.log('API Response:', result);
-                if (result.data) {
-                    state.allCards = result.data;
-                    displayCards(state.allCards);
+                const pageSize = 5000;
+                let page = 1;
+                let totalPages = 1;
+                const allCards = [];
+
+                while (page <= totalPages) {
+                    const response = await fetch(`${API_BASE_URL}/cards?page=${page}&pagesize=${pageSize}`);
+                    if (!response.ok) {
+                        throw new Error(`cards fetch failed on page ${page}: ${response.status}`);
+                    }
+                    const result = await response.json();
+                    const chunk = Array.isArray(result?.data) ? result.data : [];
+                    allCards.push(...chunk);
+                    totalPages = Number(result?.total_pages || 1);
+                    page += 1;
                 }
+
+                state.allCards = allCards;
+                initDynamicFilterOptions(state.allCards);
+                setupFactionAutocomplete(state.allCards);
+                refreshRosterFactionOptions();
+                refreshRosterEraOptions();
+                rebuildFormationTypeSelectOptions();
+                displayCards(state.allCards);
+                renderActiveFilters({ sortBy: 'name' }, state.allCards.length);
             } catch (error) {
                 console.error('Ошибка загрузки карточек:', error);
                 state.allCards = [];
@@ -863,15 +1348,224 @@
             }
         }
 
+        async function loadChassisSources() {
+            const urls = ['/static/data/chassis_sources.json', 'static/data/chassis_sources.json'];
+            for (const url of urls) {
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) continue;
+                    const payload = await response.json();
+                    state.chassisSources = payload || {};
+                    return;
+                } catch (_) {
+                    // try next URL
+                }
+            }
+            state.chassisSources = {};
+        }
+
+        function normalizeChassisName(name) {
+            return String(name || '')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function buildChassisLookupKeys(name) {
+            const base = normalizeChassisName(name);
+            if (!base) return [];
+
+            const keys = new Set();
+            const lowered = base.toLowerCase();
+            keys.add(lowered);
+
+            // Handle parenthetical aliases, e.g. "Masakari (Warhawk)".
+            const parenMatches = [...lowered.matchAll(/\(([^)]*)\)/g)]
+                .map((m) => String(m[1] || '').trim())
+                .filter(Boolean);
+            parenMatches.forEach((v) => keys.add(v));
+
+            // Name without parenthetical part.
+            const noParen = lowered.replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim();
+            if (noParen) keys.add(noParen);
+
+            // Split slash aliases, e.g. "Mad Cat/Timber Wolf".
+            const slashParts = noParen.split('/').map(v => v.trim()).filter(Boolean);
+            slashParts.forEach(p => keys.add(p));
+            parenMatches.forEach((part) => {
+                part.split('/').map(v => v.trim()).filter(Boolean).forEach((v) => keys.add(v));
+            });
+
+            // If unit name ends with an obvious variant code (A, Prime, 7D, etc.),
+            // also try without the last token. Keep full name for normal chassis.
+            const variantTokens = new Set(['prime', 'standard', 'config']);
+            const words = noParen.split(' ').filter(Boolean);
+            if (words.length > 1) {
+                const last = words[words.length - 1];
+                const isVariantLike = variantTokens.has(last) || /^[a-z0-9\-]{1,4}$/i.test(last);
+                if (isVariantLike) {
+                    keys.add(words.slice(0, -1).join(' '));
+                }
+            }
+
+            // Common canonical alias pairs used in source dataset.
+            if (keys.has('timber wolf')) keys.add('mad cat (timber wolf)');
+            if (keys.has('mad cat')) keys.add('timber wolf');
+            if (keys.has('hellbringer')) keys.add('loki');
+            if (keys.has('loki')) keys.add('hellbringer');
+            if (keys.has('summoner')) keys.add('thor');
+            if (keys.has('thor')) keys.add('summoner');
+            if (keys.has('dire wolf')) keys.add('daishi');
+            if (keys.has('daishi')) keys.add('dire wolf');
+            if (keys.has('warhawk')) keys.add('masakari');
+            if (keys.has('masakari')) keys.add('warhawk');
+
+            // Elemental variants should share source info, except Water Elemental.
+            if (/\bwater elemental\b/i.test(lowered)) {
+                keys.delete('elemental');
+                keys.delete('elemental battle armor');
+            } else if (/\belemental\b/i.test(lowered)) {
+                keys.add('elemental');
+                keys.add('elemental battle armor');
+            }
+
+            return Array.from(keys);
+        }
+
+        function getChassisSources(name) {
+            const keys = buildChassisLookupKeys(name);
+            const sources = new Set();
+            keys.forEach((key) => {
+                const entries = state.chassisSources[key];
+                if (!Array.isArray(entries)) return;
+                entries.forEach((entry) => {
+                    const cleaned = String(entry || '').trim();
+                    if (cleaned) sources.add(cleaned);
+                });
+            });
+            return Array.from(sources).sort((a, b) => a.localeCompare(b));
+        }
+
+        function parseFactionEraAvailability(rawValue) {
+            if (!rawValue) return {};
+            let parsed = rawValue;
+            if (typeof rawValue === 'string') {
+                try {
+                    parsed = JSON.parse(rawValue);
+                } catch (_) {
+                    return {};
+                }
+            }
+            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+            const result = {};
+            Object.entries(parsed).forEach(([faction, eras]) => {
+                const key = String(faction || '').trim();
+                if (!key) return;
+                if (Array.isArray(eras)) {
+                    result[key] = eras.map(e => String(e || '').trim()).filter(Boolean);
+                    return;
+                }
+                if (eras && typeof eras === 'object') {
+                    const derived = Object.entries(eras)
+                        .filter(([, available]) => Boolean(available))
+                        .map(([era]) => String(era || '').trim())
+                        .filter(Boolean);
+                    result[key] = derived;
+                }
+            });
+            return result;
+        }
+
+        function buildAvailabilityModalHtml(card) {
+            const matrix = parseFactionEraAvailability(card?.faction_era_availability);
+            const factionSet = new Set([
+                ...(Array.isArray(card?.available_factions) ? card.available_factions : []),
+                ...Object.keys(matrix)
+            ].map(v => String(v || '').trim()).filter(Boolean));
+            const eraSet = new Set([
+                ...(Array.isArray(card?.available_eras) ? card.available_eras : [])
+            ].map(v => String(v || '').trim()).filter(Boolean));
+            Object.values(matrix).forEach(eras => {
+                (Array.isArray(eras) ? eras : []).forEach(era => eraSet.add(String(era || '').trim()));
+            });
+
+            const factions = Array.from(factionSet).sort((a, b) => a.localeCompare(b));
+            const eras = sortErasChronologically(Array.from(eraSet));
+            if (!factions.length || !eras.length) {
+                return `<div>Для этого юнита нет подробной матрицы доступности по фракциям и эпохам.</div>`;
+            }
+
+            const matrixRows = factions.map((faction) => {
+                const availableEras = new Set((matrix[faction] || []).map(e => String(e).toLowerCase()));
+                const cells = eras.map((era) => {
+                    const enabled = availableEras.has(String(era).toLowerCase());
+                    return `<td class="${enabled ? 'availability-yes' : 'availability-no'}">${enabled ? '✓' : '—'}</td>`;
+                }).join('');
+                return `<tr><td>${escapeHtml(faction)}</td>${cells}</tr>`;
+            }).join('');
+
+            return `
+                <div class="availability-meta">
+                    Доступные фракции: ${factions.length} | Доступные эпохи: ${eras.length}
+                </div>
+                <div class="availability-table-wrap" style="margin-top:10px;">
+                    <table class="availability-table">
+                        <thead>
+                            <tr>
+                                <th>Фракция \\ Эпоха</th>
+                                ${eras.map(era => `<th>${escapeHtml(era)}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${matrixRows}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function showAvailabilityModal(cardId) {
+            const modal = document.getElementById('availabilityModal');
+            const titleEl = document.getElementById('availabilityModalTitle');
+            const bodyEl = document.getElementById('availabilityModalBody');
+            const closeBtn = document.getElementById('availabilityModalClose');
+            if (!modal || !titleEl || !bodyEl || !closeBtn) return;
+
+            const card = state.allCards.find(c => String(c.id) === String(cardId));
+            if (!card) return;
+
+            titleEl.textContent = `Доступность: ${card.name || 'Юнит'}`;
+            bodyEl.innerHTML = buildAvailabilityModalHtml(card);
+            modal.classList.add('active');
+
+            const cleanup = () => {
+                modal.classList.remove('active');
+                closeBtn.removeEventListener('click', onClose);
+                modal.removeEventListener('click', onOverlay);
+                window.removeEventListener('keydown', onEsc);
+            };
+            const onClose = () => cleanup();
+            const onOverlay = (e) => {
+                if (e.target === modal) cleanup();
+            };
+            const onEsc = (e) => {
+                if (e.key === 'Escape') cleanup();
+            };
+
+            closeBtn.addEventListener('click', onClose);
+            modal.addEventListener('click', onOverlay);
+            window.addEventListener('keydown', onEsc);
+        }
+
         function displayCards(cards) {
     const container = document.getElementById('cardsContainer');
+    const visibleCards = (cards || []).filter(card => Number(card?.point_value || 0) > 0);
     
-    if (!cards || cards.length === 0) {
-        container.innerHTML = `<div class="empty-state" style="grid-column: 1 / -1"><div class="empty-state-icon">📦</div><p>Мехи не найдены</p><p style="font-size: 12px;">Используйте фильтры для поиска</p></div>`;
+    if (!visibleCards.length) {
+        container.innerHTML = `<div class="empty-state" style="grid-column: 1 / -1"><p>Юниты не найдены, вероятнее всего выбранная группа/фракция не корректна</p></div>`;
         return;
     }
 
-    container.innerHTML = cards.map(card => {
+    container.innerHTML = visibleCards.map(card => {
         //   ИСПРАВЛЕНИЕ: Правильные имена полей
         const pv = card.point_value || 0;
         const techBase = card.tech_base || 'Unknown';
@@ -885,18 +1579,21 @@
         const damageShort = parseInt(card.damage_short) || 0;
         const damageMedium = parseInt(card.damage_medium) || 0;
         const damageLong = parseInt(card.damage_long) || 0;
+        const overheat = parseInt(card.overheat) || 0;
+        const imageUrl = card.image_url ? String(card.image_url).trim() : '';
         
         const keywordsArray = Array.isArray(card.keywords) ? card.keywords : (card.keywords ? String(card.keywords).split(',').map(k => k.trim()) : []);
         const keywordsText = keywordsArray.join(', ');
+        const sources = getChassisSources(card.name);
 
         // Экранируем спецсимволы для onclick
         const safeName = (card.name || '').replace(/'/g, "\\'").replace(/"/g, '\\"');
         const safeTechBase = (techBase || '').replace(/'/g, "\\'").replace(/"/g, '\\"');
-
         return `
             <div class="card">
                 <div class="card-name">${escapeHtml(card.name)}</div>
                 ${card.model_number ? `<div class="card-model">${escapeHtml(card.model_number)}</div>` : ''}
+                ${imageUrl ? `<div class="card-image-wrap"><img class="card-image" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(card.name)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.card-image-wrap').style.display='none'"></div>` : ''}
                 
                 <div class="card-model" style="color: #666; font-size: 11px; margin-bottom: 8px;">
                     ${escapeHtml(techBase)}
@@ -906,53 +1603,408 @@
                     <div class="stat"><span class="stat-label">PV</span><div class="stat-value">${pv}</div></div>
                     <div class="stat"><span class="stat-label">Size</span><div class="stat-value" style="font-size: 11px">${sizeText}</div></div>
                     <div class="stat"><span class="stat-label">Armor/Struct</span><div class="stat-value">${card.armor}/${card.structure}</div></div>
-                    <div class="stat"><span class="stat-label">Role</span><div class="stat-value" style="font-size: 11px">${card.role ?? '-'}</div></div>
+                    <div class="stat"><span class="stat-label">Роль</span><div class="stat-value" style="font-size: 11px">${card.role ?? '-'}</div></div>
                 </div>
                 <div class="card-detailed-stats">
-                    <div class="damage-stat"><span class="damage-label">Short</span><span class="damage-values">${damageShort}/${damageMedium}/${damageLong}</span></div>
+                    <div class="damage-stat"><span class="damage-label">short/medium/long</span><span class="damage-values">${damageShort}/${damageMedium}/${damageLong}</span></div>
                     <div class="move-stat"><span class="move-label">Move</span><span class="move-value">${escapeHtml(card.move)}</span></div>
+                    <div class="move-stat"><span class="move-label">OV</span><span class="move-value">${overheat}</span></div>
                 </div>
                 ${keywordsText ? `<div class="card-abilities"><strong>Keywords: </strong>${escapeHtml(keywordsText)}</div>` : ''}
                 ${abilitiesText ? `<div class="card-abilities"><strong>Abilities: </strong>${escapeHtml(abilitiesText)}</div>` : ''}
+                ${sources.length ? `<div class="card-abilities"><strong>Где взять:</strong> ${escapeHtml(sources.join('; '))}</div>` : ''}
                 <div class="card-actions">
-                    <button class="btn btn-primary" onclick="addToRoster('${card.id}', '${safeName}', ${pv}, '${safeTechBase}')">Add to Roster</button>
+                    <button class="btn btn-primary" onclick="addToRoster('${card.id}', '${safeName}', ${pv}, '${safeTechBase}')">В ростер</button>
+                    <button class="btn btn-secondary" onclick="addCardToHangar('${card.id}')">В ангар</button>
+                    <button class="btn btn-secondary" onclick="showAvailabilityModal('${card.id}')">Доступность</button>
                 </div>
             </div>
         `;
     }).join('');
 }
 
+        function getCriticalTableHtml(card) {
+            const unitType = String(card.unit_type || '').toLowerCase();
+            let rows = [];
+            if (unitType.includes('battlemech')) {
+                rows = [
+                    ['Engine', 3],
+                    ['Fire Control', 2],
+                    ['MP', 2],
+                    ['Weapons', 3]
+                ];
+            } else if (unitType.includes('vehicle') || unitType.includes('combat vehicle')) {
+                rows = [
+                    ['Weapons', 2],
+                    ['Fire Control', 2],
+                    ['Engine', 2],
+                    ['Motive -2 MV', 2],
+                    ['Motive 1/2 MV', 2],
+                    ['Motive 0 MV', 1]
+                ];
+            } else if (unitType.includes('aerospace') || unitType.includes('fighter')) {
+                rows = [
+                    ['Engine', 3],
+                    ['Fire Control', 2],
+                    ['Weapons', 2]
+                ];
+            } else if (unitType.includes('infantry') || unitType.includes('battle armor')) {
+                rows = [];
+            } else {
+                rows = [
+                    ['Engine', 2],
+                    ['Fire Control', 1],
+                    ['Weapons', 2],
+                    ['MP', 1]
+                ];
+            }
+
+            const track = (count) => `<span class="crit-track">${Array.from({ length: count }, () => '<span class="crit-box"></span>').join('')}</span>`;
+
+            return `
+                <table class="crit-table">
+                    <thead>
+                        <tr><th colspan="2">Критические попадания</th></tr>
+                    </thead>
+                    <tbody>
+                        ${rows.length ? rows.map(r => `<tr><td>${escapeHtml(r[0])}</td><td>${track(r[1])}</td></tr>`).join('') : `<tr><td colspan="2">Для этого типа юнита критические треки не используются</td></tr>`}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function loadHangarStorage() {
+            try {
+                const raw = localStorage.getItem('ash_hangar_v1');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed)) return parsed;
+                }
+            } catch (_) {}
+            try {
+                const cookie = document.cookie.split('; ').find(v => v.startsWith('ash_hangar_v1='));
+                if (cookie) {
+                    const value = decodeURIComponent(cookie.split('=')[1]);
+                    const parsed = JSON.parse(value);
+                    if (Array.isArray(parsed)) return parsed;
+                }
+            } catch (_) {}
+            return [];
+        }
+
+        function saveHangarStorage() {
+            const payload = JSON.stringify(state.hangar);
+            try {
+                localStorage.setItem('ash_hangar_v1', payload);
+            } catch (_) {}
+            try {
+                document.cookie = `ash_hangar_v1=${encodeURIComponent(payload)}; path=/; max-age=${60 * 60 * 24 * 365}`;
+            } catch (_) {}
+        }
+
+        function addCardToHangar(cardId) {
+            const card = state.allCards.find(c => String(c.id) === String(cardId));
+            if (!card) return;
+            const normalizeChassisName = (name) => String(name || '').replace(/\s+[A-Za-z0-9\-]+$/, '').trim() || String(name || '').trim();
+            const chassisName = normalizeChassisName(card.name);
+            const key = `${chassisName}|${card.unit_type || ''}`;
+            const existing = state.hangar.find(i => i.key === key);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                state.hangar.push({
+                    key,
+                    name: chassisName,
+                    unit_type: card.unit_type || '',
+                    role: card.role || '',
+                    pv: card.point_value || 0,
+                    qty: 1
+                });
+            }
+            saveHangarStorage();
+            renderHangar();
+        }
+
+        function updateHangarQty(encodedKey, delta) {
+            const key = decodeURIComponent(encodedKey);
+            const item = state.hangar.find(i => i.key === key);
+            if (!item) return;
+            item.qty = Math.max(0, (item.qty || 0) + delta);
+            state.hangar = state.hangar.filter(i => i.qty > 0);
+            saveHangarStorage();
+            renderHangar();
+        }
+
+        function clearHangar() {
+            state.hangar = [];
+            saveHangarStorage();
+            renderHangar();
+        }
+
+        function getHangarUsedQtyForKey(hangarKey) {
+            const key = String(hangarKey || '');
+            if (!key) return 0;
+            return (state.roster || []).reduce((sum, r) => {
+                const rk = String(r.hangar_key || '');
+                if (rk !== key) return sum;
+                return sum + (Number(r.hangar_used_qty || 0) || 0);
+            }, 0);
+        }
+
+        function renderHangar() {
+            const container = document.getElementById('hangarList');
+            if (!container) return;
+            const q = (document.getElementById('hangarSearch')?.value || '').toLowerCase().trim();
+            let items = [...state.hangar];
+            if (q) {
+                items = items.filter(i =>
+                    String(i.name || '').toLowerCase().includes(q) ||
+                    String(i.unit_type || '').toLowerCase().includes(q)
+                );
+            }
+            if (!items.length) {
+                container.innerHTML = `<div class="roster-empty"><p>Ангар пуст</p></div>`;
+                return;
+            }
+            container.innerHTML = items.map(item => `
+                <div class="roster-item">
+                    <div class="roster-item-info">
+                        <div class="roster-item-name">${escapeHtml(item.name)}</div>
+                        <div class="roster-item-details">${escapeHtml(item.unit_type || '-')} | Роль: ${escapeHtml(item.role || '-')} | PV ${item.pv || 0}</div>
+                    </div>
+                    <div class="roster-item-pv">
+                        <div>Имеется: x${item.qty || 0}</div>
+                        <div style="font-size:11px;color:#fff;opacity:0.95;">Используется: x${getHangarUsedQtyForKey(item.key)}</div>
+                    </div>
+                    <button class="btn btn-secondary" style="flex:0 0 auto; width:auto; min-width:24px; padding:3px 6px; font-size:11px;" onclick="updateHangarQty('${encodeURIComponent(item.key)}', -1)">-</button>
+                    <button class="btn btn-primary" style="flex:0 0 auto; width:auto; min-width:24px; padding:3px 6px; font-size:11px;" onclick="updateHangarQty('${encodeURIComponent(item.key)}', 1)">+</button>
+                </div>
+            `).join('');
+        }
 
 
 
+
+
+        function initDynamicFilterOptions(cards) {
+            const availableEras = new Set();
+            const factionGroups = new Set();
+            const unitTypes = new Set();
+            const factionGroupCounts = {};
+            const generalByGroup = {};
+            cards.forEach(card => {
+                (card.available_eras || []).forEach(e => availableEras.add(e));
+                if (card.faction_group) factionGroups.add(card.faction_group);
+                (card.available_faction_groups || []).forEach(g => factionGroups.add(g));
+                if (card.unit_type) unitTypes.add(card.unit_type);
+
+                const legacyFaction = String(card.faction || '').trim();
+                const legacyGroup = String(card.faction_group || '').trim();
+                if (legacyFaction && legacyGroup) {
+                    if (!factionGroupCounts[legacyFaction]) factionGroupCounts[legacyFaction] = {};
+                    factionGroupCounts[legacyFaction][legacyGroup] = (factionGroupCounts[legacyFaction][legacyGroup] || 0) + 1;
+                    if (legacyFaction.toLowerCase().includes('general')) {
+                        if (!generalByGroup[legacyGroup]) generalByGroup[legacyGroup] = new Set();
+                        generalByGroup[legacyGroup].add(legacyFaction);
+                    }
+                }
+            });
+            fillSelect('filterAvailableEra', sortErasChronologically(Array.from(availableEras)));
+            fillSelect('filterFactionGroup', Array.from(factionGroups).sort());
+            fillSelect('filterUnitType', Array.from(unitTypes).sort());
+
+            // Determine primary group for each faction by frequency to avoid noisy cross-links.
+            const groupToFactions = {};
+            const factionToPrimaryGroup = {};
+            Object.entries(factionGroupCounts).forEach(([faction, groups]) => {
+                const primary = Object.entries(groups).sort((a, b) => b[1] - a[1])[0];
+                if (!primary) return;
+                const group = primary[0];
+                factionToPrimaryGroup[faction] = group;
+                if (!groupToFactions[group]) groupToFactions[group] = [];
+                groupToFactions[group].push(faction);
+            });
+            Object.keys(groupToFactions).forEach(group => groupToFactions[group].sort());
+            state.factionGroupToFactions = groupToFactions;
+            state.factionToPrimaryGroup = factionToPrimaryGroup;
+            state.groupToGeneralFactions = Object.fromEntries(
+                Object.entries(generalByGroup).map(([group, set]) => [group, Array.from(set).sort()])
+            );
+        }
+
+        function fillSelect(id, values) {
+            const select = document.getElementById(id);
+            if (!select) return;
+            const firstOption = select.querySelector('option')?.outerHTML || '<option value="">Все</option>';
+            select.innerHTML = firstOption + values.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');
+        }
+
+        function setupFactionAutocomplete(cards) {
+            const input = document.getElementById('filterAvailableFaction');
+            const suggestions = document.getElementById('filterAvailableFactionSuggestions');
+            const groupSelect = document.getElementById('filterFactionGroup');
+            if (!input || !suggestions) return;
+            const allFactions = Array.from(new Set(cards.flatMap(c => c.available_factions || []))).sort();
+            const getAllowedFactions = () => {
+                if (!groupSelect || !groupSelect.value) return allFactions;
+                return state.factionGroupToFactions[groupSelect.value] || [];
+            };
+
+            const hide = () => { suggestions.style.display = 'none'; suggestions.innerHTML = ''; };
+            const render = (items) => {
+                if (!items.length) return hide();
+                suggestions.innerHTML = items.map(f => `<div class="suggestion-item" style="padding:8px 10px; cursor:pointer; border-bottom:1px solid #f0f0f0;" data-value="${escapeHtml(f)}">${escapeHtml(f)}</div>`).join('');
+                suggestions.style.display = 'block';
+                suggestions.querySelectorAll('.suggestion-item').forEach(el => {
+                    el.addEventListener('click', () => {
+                        input.value = el.getAttribute('data-value');
+                        hide();
+                        applyFilters();
+                    });
+                    el.addEventListener('mouseenter', () => el.style.background = '#f7f9ff');
+                    el.addEventListener('mouseleave', () => el.style.background = '#fff');
+                });
+            };
+
+            input.addEventListener('input', () => {
+                const q = input.value.trim().toLowerCase();
+                if (q.length < 3) return hide();
+                const allowed = getAllowedFactions();
+                render(allowed.filter(f => f.toLowerCase().includes(q)).slice(0, 12));
+            });
+            input.addEventListener('blur', () => setTimeout(hide, 150));
+            input.addEventListener('focus', () => {
+                const q = input.value.trim().toLowerCase();
+                if (q.length >= 3) {
+                    const allowed = getAllowedFactions();
+                    render(allowed.filter(f => f.toLowerCase().includes(q)).slice(0, 12));
+                }
+            });
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') hide();
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    hide();
+                    applyFilters();
+                }
+            });
+            document.addEventListener('click', (e) => {
+                if (!suggestions.contains(e.target) && e.target !== input) hide();
+            });
+
+            if (groupSelect) {
+                groupSelect.addEventListener('change', () => {
+                    const selectedGroup = groupSelect.value;
+                    const currentFaction = input.value.trim();
+                    if (!selectedGroup) return;
+                    const allowed = state.factionGroupToFactions[selectedGroup] || [];
+                    if (currentFaction && !allowed.includes(currentFaction)) {
+                        input.value = '';
+                    }
+                });
+            }
+        }
 
         function applyFilters() {
+            const specialTerms = (document.getElementById('filterSpecial').value || '')
+                .toLowerCase()
+                .split(',')
+                .map(v => v.trim())
+                .filter(Boolean);
             const filters = {
                 name: document.getElementById('filterName').value.toLowerCase(),
-                faction: document.getElementById('filterFaction').value,
+                factionGroup: document.getElementById('filterFactionGroup').value,
+                availableFaction: document.getElementById('filterAvailableFaction').value.toLowerCase(),
+                availableFactionRaw: (document.getElementById('filterAvailableFaction').value || '').trim(),
+                availableEra: document.getElementById('filterAvailableEra').value,
+                unitType: document.getElementById('filterUnitType').value,
+                sortBy: document.getElementById('filterSort').value || 'name',
+                special: specialTerms,
                 size: document.getElementById('filterSize').value,
                 role: document.getElementById('filterRole').value,
                 pvmin: parseInt(document.getElementById('filterPVMin').value) || 0,
                 pvmax: parseInt(document.getElementById('filterPVMax').value) || 999
             };
 
+            const allowedFactionsByGroup = filters.factionGroup
+                ? (state.factionGroupToFactions[filters.factionGroup] || []).map(f => f.toLowerCase())
+                : [];
+            if (filters.factionGroup && filters.availableFaction) {
+                const isCompatibleFaction = allowedFactionsByGroup.some(f => f === filters.availableFaction);
+                if (!isCompatibleFaction) {
+                    displayCards([]);
+                    renderActiveFilters(filters, 0);
+                    return;
+                }
+            }
+
+            // Auto-sync roster faction from "Список мехов" filter unless user selected it manually in Roster.
+            if (filters.availableFactionRaw && !state.rosterFactionManuallySelected) {
+                const allFactions = Array.from(new Set(state.allCards.flatMap(c => c.available_factions || [])));
+                const raw = filters.availableFactionRaw.toLowerCase();
+                const exact = allFactions.find(f => String(f).toLowerCase() === raw);
+                const partial = allFactions.find(f => String(f).toLowerCase().includes(raw));
+                const resolved = exact || partial || null;
+                if (resolved) {
+                    state.selectedFaction = resolved;
+                    refreshRosterFactionOptions();
+                    updateFormationsContextInfo();
+                }
+            }
+
+            // Auto-sync roster era from "Список мехов" filter unless user selected roster era manually.
+            if (!state.rosterEraManuallySelected) {
+                const eraFromFilter = String(filters.availableEra || '').trim();
+                const nextEra = eraFromFilter || null;
+                if (state.selectedEra !== nextEra) {
+                    state.selectedEra = nextEra;
+                    refreshRosterEraOptions();
+                    updateFormationsContextInfo();
+                }
+            }
+
             let filtered = state.allCards.filter(card => {
+                if (Number(card?.point_value || 0) <= 0) return false;
                 const tech_base = card.tech_base || '';
                 const faction = card.faction || '';
                 const cardFaction = `${tech_base} ${faction}`.toLowerCase();
                 const cardPV = card.point_value !== undefined ? card.point_value : 0;
                 const cardSize = String(card.size || '');
                 const cardRole = card.role || '';
+                const availableFactions = (card.available_factions || []).map(f => String(f).toLowerCase());
+                const availableEras = (card.available_eras || []).map(e => String(e).toLowerCase());
+                const availableFactionGroups = (card.available_faction_groups || []).map(g => String(g).toLowerCase());
+                const legacyFactionGroup = String(card.faction_group || '').toLowerCase();
+                const cardUnitType = String(card.unit_type || '').toLowerCase();
+                const specialsText = Array.isArray(card.abilities)
+                    ? card.abilities.join(',').toLowerCase()
+                    : String(card.abilities || '').toLowerCase();
 
                 if (filters.name && !card.name.toLowerCase().includes(filters.name)) 
                     return false;
 
-                if (filters.faction) {
-                    const isMixed = cardFaction.includes('mixed');
-                    if (filters.faction === 'Clan' && !isMixed && !cardFaction.includes('clan')) 
-                        return false;
-                    if (filters.faction === 'Inner Sphere' && !isMixed && !cardFaction.includes('inner sphere')) 
-                        return false;
+                if (filters.factionGroup) {
+                    const fg = filters.factionGroup.toLowerCase();
+                    if (legacyFactionGroup !== fg && !availableFactionGroups.includes(fg)) return false;
+                }
+
+                if (filters.availableFaction) {
+                    const cardFactionCompat = buildFactionCompatibilitySet(card.available_factions || []);
+                    if (!Array.from(cardFactionCompat).some(f => f.includes(filters.availableFaction))) return false;
+                    if (allowedFactionsByGroup.length > 0 && !allowedFactionsByGroup.includes(filters.availableFaction)) return false;
+                }
+
+                if (filters.availableEra) {
+                    const fae = filters.availableEra.toLowerCase();
+                    if (!availableEras.includes(fae)) return false;
+                }
+                if (filters.unitType && cardUnitType !== filters.unitType.toLowerCase()) {
+                    return false;
+                }
+
+                if (filters.special.length > 0) {
+                    // ALL special tokens must match (comma-separated input)
+                    if (!filters.special.every(s => specialsText.includes(s))) return false;
                 }
 
                 if (filters.size && cardSize !== filters.size)
@@ -967,68 +2019,226 @@
                 return true;
             });
 
+            if (filters.sortBy === 'pv') {
+                filtered.sort((a, b) => {
+                    const apv = Number(a.point_value || 0);
+                    const bpv = Number(b.point_value || 0);
+                    if (apv !== bpv) return apv - bpv;
+                    return String(a.name || '').localeCompare(String(b.name || ''), 'ru', { sensitivity: 'base' });
+                });
+            } else {
+                filtered.sort((a, b) =>
+                    String(a.name || '').localeCompare(String(b.name || ''), 'ru', { sensitivity: 'base' })
+                );
+            }
+
             displayCards(filtered);
+            renderActiveFilters(filters, filtered.length);
         }
+
+        function clearFilters() {
+            [
+                'filterName', 'filterFactionGroup', 'filterAvailableFaction',
+                'filterAvailableEra', 'filterUnitType', 'filterSpecial', 'filterSize', 'filterRole',
+                'filterPVMin', 'filterPVMax', 'filterSort'
+            ].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (el.tagName === 'SELECT') el.value = '';
+                else el.value = '';
+            });
+            const sortSelect = document.getElementById('filterSort');
+            if (sortSelect) sortSelect.value = 'name';
+            displayCards(state.allCards);
+            renderActiveFilters({ sortBy: 'name' }, state.allCards.length);
+        }
+
+        function renderActiveFilters(filters, resultCount) {
+            const target = document.getElementById('activeFilters');
+            const sticky = document.getElementById('activeFiltersSticky');
+            const chips = [];
+            if (filters.name) chips.push(`Имя: ${filters.name}`);
+            if (filters.factionGroup) chips.push(`Группа: ${filters.factionGroup}`);
+            if (filters.availableFaction) chips.push(`Доступная фракция: ${filters.availableFaction}`);
+            if (filters.availableEra) chips.push(`Доступная эпоха: ${filters.availableEra}`);
+            if (filters.unitType) chips.push(`Тип юнита: ${filters.unitType}`);
+            if (Array.isArray(filters.special) && filters.special.length) chips.push(`SPECIAL: ${filters.special.join(', ')}`);
+            if (filters.size) chips.push(`Размер: ${filters.size}`);
+            if (filters.role) chips.push(`Роль: ${filters.role}`);
+            if (filters.pvmin) chips.push(`PV от: ${filters.pvmin}`);
+            if (filters.pvmax && filters.pvmax !== 999) chips.push(`PV до: ${filters.pvmax}`);
+            if (filters.sortBy === 'pv') chips.push('Сортировка: по стоимости (PV)');
+            if (!filters.sortBy || filters.sortBy === 'name') chips.push('Сортировка: по названию');
+            const html = chips.length
+                ? `Найдено: <strong>${resultCount}</strong><br>${chips.map(c => `<span style="display:inline-block;background:#eef3ff;border-radius:10px;padding:2px 8px;margin:2px 4px 0 0;">${escapeHtml(c)}</span>`).join('')}`
+                : `Найдено: <strong>${resultCount}</strong>`;
+            if (target) target.innerHTML = html;
+            if (sticky) sticky.innerHTML = html;
+        }
+
+        function setupFilterUXHandlers() {
+            const filterIds = [
+                'filterName', 'filterFactionGroup', 'filterAvailableFaction', 'filterAvailableEra',
+                'filterUnitType', 'filterSpecial', 'filterSize', 'filterRole', 'filterPVMin', 'filterPVMax', 'filterSort'
+            ];
+
+            filterIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        applyFilters();
+                    }
+                    if (e.key === 'Escape') {
+                        const suggestions = document.getElementById('filterAvailableFactionSuggestions');
+                        if (suggestions) suggestions.style.display = 'none';
+                    }
+                });
+            });
+
+            // Debounce for special input typing.
+            const specialInput = document.getElementById('filterSpecial');
+            if (specialInput) {
+                let timer = null;
+                specialInput.addEventListener('input', () => {
+                    if (timer) clearTimeout(timer);
+                    timer = setTimeout(() => applyFilters(), 300);
+                });
+            }
+        }
+
+function showConfirmDialog(message, title = 'Подтверждение') {
+    const modal = document.getElementById('confirmModal');
+    const titleEl = document.getElementById('confirmModalTitle');
+    const messageEl = document.getElementById('confirmModalMessage');
+    const yesBtn = document.getElementById('confirmModalYes');
+    const noBtn = document.getElementById('confirmModalNo');
+    if (!modal || !titleEl || !messageEl || !yesBtn || !noBtn) {
+        return Promise.resolve(window.confirm(message));
+    }
+
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+    modal.classList.add('active');
+
+    return new Promise(resolve => {
+        const cleanup = () => {
+            modal.classList.remove('active');
+            yesBtn.removeEventListener('click', onYes);
+            noBtn.removeEventListener('click', onNo);
+            modal.removeEventListener('click', onOverlay);
+            document.removeEventListener('keydown', onKeyDown);
+        };
+        const onYes = () => { cleanup(); resolve(true); };
+        const onNo = () => { cleanup(); resolve(false); };
+        const onOverlay = (e) => {
+            if (e.target === modal) {
+                cleanup();
+                resolve(false);
+            }
+        };
+        const onKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                cleanup();
+                resolve(false);
+            }
+        };
+        yesBtn.addEventListener('click', onYes);
+        noBtn.addEventListener('click', onNo);
+        modal.addEventListener('click', onOverlay);
+        document.addEventListener('keydown', onKeyDown);
+    });
+}
 
         // ИСПРАВЛЕНИЕ 1: addToRoster - правильно определяем Mixed
-function addToRoster(cardId, cardName, pv, techBase) {
-    console.log('Adding mech:', cardId, cardName, 'PV:', pv, 'Tech Base:', techBase);
-    
-    const getBaseFaction = (f) => {
-        const lower = f.toLowerCase();
-        if (lower.includes('clan')) {
-            return 'Clan';
-        }
-        if (lower.includes('inner')) {
-            return 'Inner Sphere';
-        }
-        return f;
-    };
-
-    const baseFaction = getBaseFaction(techBase);
-
-    if (state.roster.length === 0) {
-        state.selectedFaction = baseFaction;
-    } else {
-        const rosterBaseFaction = getBaseFaction(state.roster[0].faction);
-        const isMixed = techBase.toLowerCase().includes('mixed');
-        const rosterIsMixed = state.roster[0].faction.toLowerCase().includes('mixed');
-
-        if (!isMixed && !rosterIsMixed && rosterBaseFaction !== baseFaction) {
-            alert(`Cannot add ${baseFaction} mech to ${rosterBaseFaction} roster!`);
+async function addToRoster(cardId, cardName, pv, techBase, opts = {}) {
+    console.log('Adding unit:', cardId, cardName, 'PV:', pv, 'Tech Base:', techBase);
+    const fullCard = state.allCards.find(c => c.id == cardId);
+    const cardFactions = Array.isArray(fullCard?.available_factions) ? fullCard.available_factions : [];
+    const cardEras = Array.isArray(fullCard?.available_eras) ? fullCard.available_eras : [];
+    const selectedFactionUnavailable = state.selectedFaction
+        && !buildFactionCompatibilitySet(cardFactions).has(String(state.selectedFaction).toLowerCase());
+    if (selectedFactionUnavailable) {
+        const confirmed = await showConfirmDialog(
+            'Данный юнит недоступен вашей фракции, вы всё равно хотите его добавить?\n' +
+            'При его добавлении список доступных фракций изменится'
+        );
+        if (!confirmed) {
             return;
         }
     }
+    if (state.selectedEra && !cardEras.some(e => String(e).toLowerCase() === state.selectedEra.toLowerCase())) {
+        alert('Этот юнит недоступен в выбранной эпохе ростера.');
+        return;
+    }
+    if (state.roster.length === 0) {
+        state.rosterCommonFactions = [...cardFactions];
+        if (state.selectedFaction && buildFactionCompatibilitySet(cardFactions).has(String(state.selectedFaction).toLowerCase())) {
+            state.rosterCommonFactions.push(state.selectedFaction);
+            state.rosterCommonFactions = Array.from(new Set(state.rosterCommonFactions));
+        }
+        if (!state.selectedFaction && cardFactions.length > 0) {
+            state.selectedFaction = cardFactions[0];
+        }
+    } else if (cardFactions.length > 0 && state.rosterCommonFactions.length > 0) {
+        const cardFactionSet = buildFactionCompatibilitySet(cardFactions);
+        const intersection = state.rosterCommonFactions.filter(f => cardFactionSet.has(String(f).toLowerCase()));
+        if (intersection.length === 0) {
+            const confirmed = await showConfirmDialog(
+                'Данный юнит недоступен вашей фракции, вы всё равно хотите его добавить?\n' +
+                'При его добавлении список доступных фракций изменится'
+            );
+            if (!confirmed) {
+                return;
+            }
+        }
+        state.rosterCommonFactions = intersection;
+    }
 
-    const existingCard = state.roster.find(r => r.id === cardId);
+    const existingCard = state.roster.find(r => String(r.id) === String(cardId));
     if (existingCard) {
         existingCard.quantity = existingCard.quantity ? existingCard.quantity + 1 : 2;
+        if (opts && opts.hangarKey) {
+            existingCard.hangar_key = opts.hangarKey;
+            existingCard.hangar_used_qty = (Number(existingCard.hangar_used_qty || 0) || 0) + 1;
+        }
     } else {
-        const fullCard = state.allCards.find(c => c.id === cardId);
         const pvNum = typeof pv === 'string' ? parseInt(pv) : (pv || 0);
         
-        //   Сохраняем оригинальный techBase (может быть "Mixed Inner Sphere" или "Mixed Clan")
         state.roster.push({
-            id: cardId,
+            id: String(cardId),
             name: cardName,
             pv: pvNum,
-            faction: techBase,  // Полное значение с Mixed если есть
+            base_pv: Number(fullCard?.point_value || pvNum || 0),
+            skill: 4,
+            faction: techBase,
+            unit_type: fullCard?.unit_type || '-',
             armor: fullCard?.armor || 0,
             structure: fullCard?.structure || 0,
             damage_short: fullCard?.damage_short || 0,
             damage_medium: fullCard?.damage_medium || 0,
             damage_long: fullCard?.damage_long || 0,
             move: fullCard?.move || '-',
+            tmm: fullCard?.tmm || 0,
+            overheat: fullCard?.overheat || 0,
             role: fullCard?.role || '-',
-            keywords: fullCard?.keywords || [],
-            quantity: 1
+            available_factions: cardFactions,
+            available_eras: cardEras,
+            quantity: 1,
+            hangar_key: opts && opts.hangarKey ? opts.hangarKey : null,
+            hangar_used_qty: opts && opts.hangarKey ? 1 : 0
         });
     }
 
     console.log('Updated roster:', state.roster);
+    refreshRosterFactionOptions();
+    updateFormationsContextInfo();
     updateRosterDisplay();
     updateStats();
-    autoFormFormations();
+    if (!opts.skipAutoFormations) {
+        autoFormFormations();
+    }
 }
 
 
@@ -1036,7 +2246,24 @@ function addToRoster(cardId, cardName, pv, techBase) {
 
 
         function removeFromRoster(cardId) {
-        state.roster = state.roster.filter(r => r.id !== cardId);
+        state.roster = state.roster.filter(r => String(r.id) !== String(cardId));
+        if (state.roster.length === 0) {
+            state.rosterCommonFactions = [];
+            state.selectedFaction = null;
+            state.selectedEra = null;
+            state.rosterFactionManuallySelected = false;
+            state.rosterEraManuallySelected = false;
+        } else {
+            let common = Array.isArray(state.roster[0].available_factions) ? [...state.roster[0].available_factions] : [];
+            for (let i = 1; i < state.roster.length; i++) {
+                const nextSet = new Set((state.roster[i].available_factions || []).map(f => String(f).toLowerCase()));
+                common = common.filter(f => nextSet.has(String(f).toLowerCase()));
+            }
+            state.rosterCommonFactions = common;
+        }
+        refreshRosterFactionOptions();
+        refreshRosterEraOptions();
+        updateFormationsContextInfo();
         updateRosterDisplay();
         updateStats();
         autoFormFormations();
@@ -1053,73 +2280,150 @@ function addToRoster(cardId, cardName, pv, techBase) {
             <div class="roster-empty">
                 <div style="font-size: 48px; margin-bottom: 10px">📋</div>
                 <p>Ростер пуст</p>
-                <p style="font-size: 12px">Добавьте мехов через вкладку "Список мехов"</p>
+                <p style="font-size: 12px">Добавьте юнитов через вкладку "Список мехов"</p>
             </div>
         `;
         return;
     }
 
     rosterList.innerHTML = state.roster.map(item => {
-        const pvValue = item.pv || 0;
+        const pvValue = getUnitEffectivePV(item);
+        const skill = ensureSkillValue(item.skill);
         
-        //   Показываем faction как есть (может быть "Mixed Inner Sphere" или "Inner Sphere")
-        const isClan = item.faction.toLowerCase().includes('clan') && !item.faction.toLowerCase().includes('mixed');
-        const isMixed = item.faction.toLowerCase().includes('mixed');
-        
-        let factionDisplay;
-        if (isMixed) {
-            factionDisplay = `🔀 ${item.faction}`;  // Mixed с иконой
-        } else if (isClan) {
-            factionDisplay = '⚔️ Clan';
-        } else {
-            factionDisplay = '🛡️ Inner Sphere';
-        }
+        const factionDisplay = (item.available_factions && item.available_factions.length > 0)
+            ? item.available_factions.slice(0, 2).join(', ') + (item.available_factions.length > 2 ? ' ...' : '')
+            : item.faction;
         
         return `
             <div class="roster-item">
                 <div class="roster-item-info">
                     <div class="roster-item-name">${escapeHtml(item.name)}${item.quantity > 1 ? ` x${item.quantity}` : ''}</div>
-                    <div class="roster-item-details">${factionDisplay}</div>
+                    <div class="roster-item-details">${escapeHtml(item.unit_type || '-')} | ${escapeHtml(item.move || '-')} | TMM ${item.tmm || 0} | OV ${item.overheat || 0} | Skill ${skill}</div>
+                    <div class="roster-item-details">${escapeHtml(factionDisplay)}</div>
                 </div>
                 <div class="roster-item-pv">${pvValue}PV</div>
                 <button class="btn btn-danger" style="width: auto; padding: 6px 10px" onclick="removeFromRoster('${item.id}')">✕</button>
             </div>
         `;
     }).join('');
+    rebuildFormationTypeSelectOptions();
 }
 
         function selectFaction(faction) {
-    console.log('Selecting faction:', faction);
-    
-    if (state.roster.length === 0) {
-        state.selectedFaction = faction;
+    state.selectedFaction = faction || null;
+    state.rosterFactionManuallySelected = !!faction;
+    renderRosterFactionHint();
+    updateFormationsContextInfo();
+    searchMechs();
+}
+
+function refreshRosterFactionOptions() {
+    const select = document.getElementById('rosterFactionSelect');
+    if (!select) return;
+
+    let options = [];
+    if (state.rosterCommonFactions.length > 0) {
+        options = [...state.rosterCommonFactions];
     } else {
-        // Проверяем совместимость
-        const rosterFirst = state.roster[0];
-        const rosterIsClan = rosterFirst.faction.toLowerCase().includes('clan');
-        const isClan = faction.toLowerCase().includes('clan');
-        const isMixed = rosterFirst.faction.toLowerCase().includes('mixed');
-        
-        // Если ростер не пуст и не Mixed - не позволяем менять
-        if (!isMixed && rosterIsClan !== isClan) {
-            alert(`Cannot switch! You have ${rosterFirst.faction} mechs in roster.`);
-            return;
+        options = Array.from(new Set(state.allCards.flatMap(c => c.available_factions || []))).sort();
+    }
+
+    const previous = state.selectedFaction || '';
+    select.innerHTML = `<option value="">Все доступные</option>` + options.map(f => `<option value="${escapeHtml(f)}">${escapeHtml(f)}</option>`).join('');
+
+    if (previous && options.includes(previous)) {
+        select.value = previous;
+    } else {
+        const compatible = buildFactionCompatibilitySet(options).has(String(previous).toLowerCase());
+        if (previous && compatible) {
+            if (!options.includes(previous)) {
+                select.innerHTML += `<option value="${escapeHtml(previous)}">${escapeHtml(previous)}</option>`;
+            }
+            select.value = previous;
+            state.selectedFaction = previous;
+        } else {
+            select.value = '';
+            state.selectedFaction = null;
         }
     }
-    
-    state.selectedFaction = faction;
-    console.log('New selected faction:', state.selectedFaction);
-    
-    // Обновляем кнопки
-    document.querySelectorAll('.faction-btn').forEach(btn => {
-        if (btn.dataset.faction === faction) {
-            btn.classList.add('active');
+    renderRosterFactionHint();
+}
+
+function selectRosterEra(era, isManual = false) {
+    if (isManual) state.rosterEraManuallySelected = true;
+    state.selectedEra = era || null;
+    updateFormationsContextInfo();
+    searchMechs();
+}
+
+function getExpandedFactionFilter(selectedFaction) {
+    if (!selectedFaction) return [];
+    const expanded = new Set([selectedFaction]);
+    const primaryGroup = state.factionToPrimaryGroup[selectedFaction];
+    if (primaryGroup) {
+        const generals = state.groupToGeneralFactions[primaryGroup] || [];
+        generals.forEach(g => expanded.add(g));
+    }
+    return Array.from(expanded);
+}
+
+function getPrimaryGroupForFactionName(factionName) {
+    const faction = String(factionName || '').trim();
+    if (!faction) return '';
+    if (state.factionToPrimaryGroup[faction]) return state.factionToPrimaryGroup[faction];
+    const lower = faction.toLowerCase();
+    for (const [group, generals] of Object.entries(state.groupToGeneralFactions || {})) {
+        if ((generals || []).some(g => String(g).toLowerCase() === lower)) {
+            return group;
+        }
+    }
+    return '';
+}
+
+function buildFactionCompatibilitySet(factions) {
+    const out = new Set();
+    (Array.isArray(factions) ? factions : []).forEach((f) => {
+        const name = String(f || '').trim();
+        if (!name) return;
+        out.add(name.toLowerCase());
+        const group = getPrimaryGroupForFactionName(name);
+        if (!group) return;
+        if (name.toLowerCase().includes('general')) {
+            (state.factionGroupToFactions[group] || []).forEach(x => out.add(String(x).toLowerCase()));
         } else {
-            btn.classList.remove('active');
+            (state.groupToGeneralFactions[group] || []).forEach(x => out.add(String(x).toLowerCase()));
         }
     });
-    
-    searchMechs();
+    return out;
+}
+
+function renderRosterFactionHint() {
+    const hint = document.getElementById('rosterFactionHint');
+    if (!hint) return;
+    if (!state.selectedFaction) {
+        hint.textContent = 'Выберите фракцию, чтобы увидеть связанные General-категории.';
+        return;
+    }
+    const expanded = getExpandedFactionFilter(state.selectedFaction).filter(f => f !== state.selectedFaction);
+    if (expanded.length === 0) {
+        hint.textContent = `Только выбранная фракция: ${state.selectedFaction}`;
+        return;
+    }
+    hint.textContent = `Также учитываются: ${expanded.join(', ')}`;
+}
+
+function refreshRosterEraOptions() {
+    const select = document.getElementById('rosterEraSelect');
+    if (!select) return;
+    const eras = sortErasChronologically(state.allCards.flatMap(c => c.available_eras || []));
+    const previous = state.selectedEra || '';
+    select.innerHTML = `<option value="">Все эпохи</option>` + eras.map(e => `<option value="${escapeHtml(e)}">${escapeHtml(e)}</option>`).join('');
+    if (previous && eras.includes(previous)) {
+        select.value = previous;
+    } else {
+        select.value = '';
+        state.selectedEra = null;
+    }
 }
 
 
@@ -1134,27 +2438,38 @@ function addToRoster(cardId, cardName, pv, techBase) {
     }
 
     let filteredMechs = state.allCards.filter(card => 
+        Number(card?.point_value || 0) > 0 &&
         card.name.toLowerCase().includes(searchTerm)
     );
 
-    // Если выбрана фракция - фильтруем
-    if (state.selectedFaction) {
+    // Если ростер уже не пуст, показываем только совместимые по доступным фракциям юниты.
+    if (state.rosterCommonFactions.length > 0) {
+        const rosterFactionSet = new Set(state.rosterCommonFactions.map(f => String(f).toLowerCase()));
         filteredMechs = filteredMechs.filter(card => {
-            const techBase = card.tech_base || '';
-            const isMixed = techBase.toLowerCase().includes('mixed');
-            const selectedIsClan = state.selectedFaction.toLowerCase().includes('clan');
-            const cardIsClan = techBase.toLowerCase().includes('clan');
-            
-            // Mixed подходит для обеих фракций
-            if (isMixed) return true;
-            
-            // Иначе должны совпадать
-            return selectedIsClan === cardIsClan;
+            const factions = Array.isArray(card.available_factions) ? card.available_factions : [];
+            return factions.some(f => rosterFactionSet.has(String(f).toLowerCase()));
+        });
+    }
+
+    if (state.selectedFaction) {
+        const acceptedFactions = getExpandedFactionFilter(state.selectedFaction).map(f => String(f).toLowerCase());
+        const acceptedSet = new Set(acceptedFactions);
+        filteredMechs = filteredMechs.filter(card => {
+            const factions = Array.isArray(card.available_factions) ? card.available_factions : [];
+            return factions.some(f => acceptedSet.has(String(f).toLowerCase()));
+        });
+    }
+
+    if (state.selectedEra) {
+        const selectedEra = state.selectedEra.toLowerCase();
+        filteredMechs = filteredMechs.filter(card => {
+            const eras = Array.isArray(card.available_eras) ? card.available_eras : [];
+            return eras.some(e => String(e).toLowerCase() === selectedEra);
         });
     }
 
     if (filteredMechs.length === 0) {
-        resultsContainer.innerHTML = `<div class="search-result-item" style="color: #999;">Мехи не найдены</div>`;
+        resultsContainer.innerHTML = `<div class="search-result-item" style="color: #999;">Юниты не найдены</div>`;
         resultsContainer.classList.add('active');
         return;
     }
@@ -1167,7 +2482,7 @@ function addToRoster(cardId, cardName, pv, techBase) {
         
         return `
             <div class="search-result-item" onclick="addToRoster('${mech.id}', '${safeName}', ${pv}, '${safeTechBase}'); document.getElementById('mechSearch').value = ''; document.getElementById('mechSearchResults').classList.remove('active');">
-                <strong>${escapeHtml(mech.name)}</strong> - ${pv}PV
+                <strong>${escapeHtml(mech.name)}</strong> (${escapeHtml(mech.unit_type || '-')}) - ${pv}PV
             </div>
         `;
     }).join('');
@@ -1184,15 +2499,35 @@ function autoFormFormations() {
     }
 
     const currentFaction = state.selectedFaction || state.roster[0]?.faction;
+    const formationSide = getRosterFormationSide();
     
     if (!currentFaction) {
         return;
     }
 
-    console.log('Auto forming with faction:', currentFaction);
+    console.log('Auto forming with faction:', currentFaction, 'side:', formationSide);
+    const onlyBattleMechs = state.roster.every(u => String(u.unit_type || '').toLowerCase() === 'battlemech');
+    if (!onlyBattleMechs) {
+        state.formations.push({
+            id: 0,
+            name: 'No Formation',
+            formationType: 'No Formation',
+            faction: currentFaction,
+            members: state.roster.map(m => {
+                const fullCard = state.allCards.find(c => c.id == m.id) || m;
+                return {
+                    ...fullCard,
+                    ...m,
+                    id: parseInt(m.id)
+                };
+            })
+        });
+        displayFormations();
+        return;
+    }
     
-    // Для Mixed - создаем "No Formation" и кладем туда всех
-    if (currentFaction.toLowerCase().includes('mixed')) {
+    // Для Mixed/unknown - создаем "No Formation" и кладем туда всех
+    if (formationSide === 'mixed' || formationSide === 'unknown') {
         state.formations.push({
             id: 0,
             name: 'No Formation',
@@ -1202,8 +2537,8 @@ function autoFormFormations() {
                 //   Получаем полные данные из allCards
                 const fullCard = state.allCards.find(c => c.id == m.id) || m;
                 return {
+                    ...fullCard,  // База из карточки, поверх сохраняем состояние ростера
                     ...m,
-                    ...fullCard,  // Переписываем с полными данными
                     id: parseInt(m.id)
                 };
             })
@@ -1212,7 +2547,7 @@ function autoFormFormations() {
         return;
     }
     
-    if (currentFaction.includes('Clan')) {
+    if (formationSide === 'clan') {
         const mechsPerStar = 5;
         let mechIndex = 0;
         let formationIndex = 0;
@@ -1224,26 +2559,57 @@ function autoFormFormations() {
                 const fullCard = state.allCards.find(c => c.id == rosterMech.id) || rosterMech;
                 
                 members.push({
+                    ...fullCard,  // База из карточки, поверх сохраняем skill/PV из ростера
                     ...rosterMech,
-                    ...fullCard,  //   Переписываем с полными данными
                     id: parseInt(rosterMech.id)
                 });
                 mechIndex++;
             }
             
             if (members.length > 0) {
-                const formationName = members.length === 5 ? `Omni Star ${formationIndex + 1}` : 'No Formation';
+                const formationName = members.length === 5 ? `Battle Star ${formationIndex + 1}` : 'No Formation';
                 state.formations.push({
                     id: formationIndex,
                     name: formationName,
-                    formationType: members.length === 5 ? 'Omni Star' : 'No Formation',
+                    formationType: members.length === 5 ? 'Battle Star' : 'No Formation',
                     faction: 'Clan',
                     members: members
                 });
                 formationIndex++;
             }
         }
-    } else if (currentFaction.includes('Inner Sphere')) {
+    } else if (formationSide === 'comstar') {
+        const mechsPerLevel = 6;
+        let mechIndex = 0;
+        let formationIndex = 0;
+
+        while (mechIndex < state.roster.length) {
+            let members = [];
+            for (let j = 0; j < mechsPerLevel && mechIndex < state.roster.length; j++) {
+                const rosterMech = state.roster[mechIndex];
+                const fullCard = state.allCards.find(c => c.id == rosterMech.id) || rosterMech;
+
+                members.push({
+                    ...fullCard,
+                    ...rosterMech,
+                    id: parseInt(rosterMech.id)
+                });
+                mechIndex++;
+            }
+
+            if (members.length > 0) {
+                const formationName = members.length === 6 ? `Battle Level ${formationIndex + 1}` : 'No Formation';
+                state.formations.push({
+                    id: formationIndex,
+                    name: formationName,
+                    formationType: members.length === 6 ? 'Battle Level' : 'No Formation',
+                    faction: 'ComStar',
+                    members: members
+                });
+                formationIndex++;
+            }
+        }
+    } else if (formationSide === 'inner_sphere') {
         const mechsPerLance = 4;
         let mechIndex = 0;
         let formationIndex = 0;
@@ -1255,8 +2621,8 @@ function autoFormFormations() {
                 const fullCard = state.allCards.find(c => c.id == rosterMech.id) || rosterMech;
                 
                 members.push({
+                    ...fullCard,  // База из карточки, поверх сохраняем skill/PV из ростера
                     ...rosterMech,
-                    ...fullCard,  //   Переписываем с полными данными
                     id: parseInt(rosterMech.id)
                 });
                 mechIndex++;
@@ -1277,6 +2643,7 @@ function autoFormFormations() {
     }
     
     console.log('Auto formed formations:', state.formations);
+    updateFormationsContextInfo();
     displayFormations();
 }
 
@@ -1291,21 +2658,128 @@ function autoFormFormations() {
 
             const currentFaction = state.selectedFaction || state.roster[0]?.faction || null;
             if (!currentFaction) {
-                alert('Сначала добавьте мехи в ростер!');
+                alert('Сначала добавьте юниты в ростер!');
+                return;
+            }
+            const onlyBattleMechs = state.roster.every(u => String(u.unit_type || '').toLowerCase() === 'battlemech');
+            if (!onlyBattleMechs && selectedType !== 'No Formation') {
+                alert('Формации Lance/Star/Level доступны только для BattleMech. Для текущего состава можно выбрать только No Formation.');
+                return;
+            }
+            const formationSide = getRosterFormationSide();
+            if (selectedType.includes('Star') && formationSide === 'inner_sphere') {
+                alert('Star-формации доступны для Clan-состава.');
+                return;
+            }
+            if (selectedType.includes('Level') && formationSide !== 'comstar') {
+                alert('Level-формации доступны для ComStar/Word of Blake.');
                 return;
             }
 
             state.formations.push({
                 id: state.formations.length,
-                name: selectedType + ' ' + (state.formations.filter(f => f.formationType === selectedType).length + 1),
+                name: getFormationDisplayType(selectedType, getRosterFormationSide()) + ' ' + (state.formations.filter(f => f.formationType === selectedType).length + 1),
                 formationType: selectedType,
                 faction: currentFaction,
                 members: []
             });
 
             document.getElementById('formationTypeSelect').value = '';
+            updateFormationsContextInfo();
             displayFormations();
             updateStats();
+        }
+
+function updateFormationsContextInfo() {
+    const el = document.getElementById('formationsContextInfo');
+    if (!el) return;
+    const faction = state.selectedFaction || 'не выбрана';
+    const era = state.selectedEra || 'все эпохи';
+    el.textContent = `Фракция: ${faction} | Эпоха: ${era}`;
+    rebuildFormationTypeSelectOptions();
+}
+
+function ensureNoFormationBucket() {
+    let bucket = state.formations.find(f => f.formationType === 'No Formation');
+    if (!bucket) {
+        const currentFaction = state.selectedFaction || state.roster[0]?.faction || 'Unknown';
+        bucket = {
+            id: state.formations.length ? Math.max(...state.formations.map(f => f.id)) + 1 : 0,
+            name: 'No Formation',
+            formationType: 'No Formation',
+            faction: currentFaction,
+            members: []
+        };
+        state.formations.push(bucket);
+    }
+    return bucket;
+}
+
+function getRosterFormationSide() {
+    const rosterCards = state.roster.map(m => state.allCards.find(c => String(c.id) === String(m.id)) || m);
+    if (rosterCards.length === 0) return 'unknown';
+    const onlyBattleMechs = rosterCards.every(c => String(c.unit_type || '').toLowerCase() === 'battlemech');
+    if (!onlyBattleMechs) return 'mixed';
+
+    // Priority: explicit roster faction selection should drive Lance/Star availability.
+    // This avoids flips for factions like Clan Sea Fox that can contain mixed tech-base units.
+    if (state.selectedFaction) {
+        const selected = String(state.selectedFaction || '').toLowerCase();
+        const group = String(state.factionToPrimaryGroup[state.selectedFaction] || '').toLowerCase();
+        const isComStarLike = selected.includes('comstar') || selected.includes('word of blake') || selected.includes('wob') ||
+            group.includes('comstar') || group.includes('word of blake');
+        if (isComStarLike) return 'comstar';
+        if (selected.includes('clan') || group.includes('clan') || selected.includes('sea fox')) return 'clan';
+        if (selected.includes('inner sphere') || group.includes('inner sphere')) return 'inner_sphere';
+    }
+
+    let clan = 0;
+    let inner = 0;
+    rosterCards.forEach(c => {
+        const tech = String(c.tech_base || c.faction || '').toLowerCase();
+        if (tech.includes('clan')) clan++;
+        if (tech.includes('inner sphere') || tech === 'is' || tech.startsWith('is ') || tech.includes(' is ')) inner++;
+    });
+    // Fallback: if faction labels contain ComStar/WoB hints in roster entries.
+    const hasComStarLikeFaction = rosterCards.some(c => {
+        const f = String(c.faction || '').toLowerCase();
+        return f.includes('comstar') || f.includes('word of blake') || f.includes('wob');
+    });
+    if (hasComStarLikeFaction && clan === 0 && inner === 0) return 'comstar';
+    if (clan > 0 && inner === 0) return 'clan';
+    if (inner > 0 && clan === 0) return 'inner_sphere';
+    if (clan > 0 && inner > 0) return 'mixed';
+    return 'unknown';
+}
+
+        function migrateStoredFormationTypesToClanStars() {
+            const side = getRosterFormationSide();
+            if (side !== 'clan' && side !== 'comstar') return;
+            state.formations.forEach(f => {
+                if (!f || !f.formationType || f.formationType === 'No Formation') return;
+                let t = f.formationType;
+                if (side === 'clan') {
+                    if (t === 'Omni Star') {
+                        t = 'Battle Star';
+                    } else if (t.includes('Lance')) {
+                        t = lanceFormationToStar(t);
+                    }
+                } else if (side === 'comstar') {
+                    if (t.includes('Lance')) {
+                        t = lanceFormationToLevel(t);
+                    }
+                }
+                if (t !== f.formationType) {
+                    f.formationType = t;
+                    if (f.name) {
+                        if (side === 'clan') {
+                            f.name = String(f.name).replace(/\bOmni Star\b/gi, 'Battle Star').replace(/Lance/g, 'Star');
+                        } else if (side === 'comstar') {
+                            f.name = String(f.name).replace(/Lance/g, 'Level');
+                        }
+                    }
+                }
+            });
         }
 
         
@@ -1319,15 +2793,18 @@ function displayFormations() {
         return;
     }
 
+    migrateStoredFormationTypesToClanStars();
     empty.style.display = 'none';
 
     const formationCards = state.formations.map(formation => {
-        const totalPV = formation.members.reduce((sum, m) => sum + (m.pv || 0), 0);
-        const isValid = validateFormation(formation);
+        const totalPV = formation.members.reduce((sum, m) => sum + getUnitEffectivePV(m), 0);
+        const validation = validateFormation(formation);
+        const isValid = validation.valid;
         const statusIcon = isValid ? '✓' : '✗';
+        const cardKind = formation.formationType.includes('Star') ? 'star' : (formation.formationType.includes('Level') ? 'star' : 'lance');
 
         return `
-            <div class="formation-card ${formation.formationType.includes('Lance') ? 'lance' : 'star'}" 
+            <div class="formation-card ${cardKind}" 
                  style="border-color: ${isValid ? '#27ae60' : '#e74c3c'}" 
                  ondrop="dropMechToFormation(event, ${formation.id})" 
                  ondragover="allowDrop(event)" 
@@ -1336,8 +2813,8 @@ function displayFormations() {
                 <div style="display: flex; justify-content: space-between; align-items: start;">
                     <div>
                         <div class="formation-title">${escapeHtml(formation.name)}</div>
-                        <div class="formation-type-tag ${formation.formationType.includes('Lance') ? 'lance' : 'star'}">
-                            ${escapeHtml(formation.formationType)}
+                        <div class="formation-type-tag ${cardKind}">
+                            ${escapeHtml(getFormationDisplayType(formation.formationType, getRosterFormationSide()))}
                         </div>
                     </div>
                     <div style="margin-top: 8px; font-size: 12px; color: ${isValid ? '#27ae60' : '#e74c3c'};">
@@ -1347,7 +2824,8 @@ function displayFormations() {
 
                 <div class="formation-members">
                     ${formation.members.map((m, idx) => {
-                        const memberPV = m.pv || 0;
+                        const memberPV = getUnitEffectivePV(m);
+                        const skill = ensureSkillValue(m.skill);
                         const abilities = m.abilities || m.keywords || [];
                         const abilitiesText = Array.isArray(abilities) ? abilities.join(', ') : String(abilities || '');
                         
@@ -1359,13 +2837,21 @@ function displayFormations() {
                                  style="cursor: move;">
                                 <div class="formation-member-name">${escapeHtml(m.name)}</div>
                                 <div class="formation-member-pv">${memberPV}PV</div>
+                                <div style="display:flex;align-items:center;gap:4px;margin-top:4px;">
+                                    <span style="font-size:11px;color:#555;">Skill ${skill}</span>
+                                    <button class="btn btn-secondary" style="flex:0 0 auto;width:auto;min-width:20px;padding:2px 5px;font-size:10px;" onclick="changeRosterUnitSkill(${m.id}, 1)">+</button>
+                                    <button class="btn btn-primary" style="flex:0 0 auto;width:auto;min-width:20px;padding:2px 5px;font-size:10px;" onclick="changeRosterUnitSkill(${m.id}, -1)">-</button>
+                                </div>
                                 ${abilitiesText ? `<div style="font-size: 6pt; color: #666;">${escapeHtml(abilitiesText)}</div>` : ''}
                             </div>
                         `;
                     }).join('')}
                 </div>
+                ${renderHangarSuggestionsForFormation(formation)}
+                ${!isValid && validation.reasons.length ? `<div style="margin-top:8px;padding:8px;border:1px solid #ffd1d1;background:#fff6f6;border-radius:6px;font-size:11px;color:#8f2d2d;">${validation.reasons.map(r => `• ${escapeHtml(r)}`).join('<br>')}</div>` : ''}
 
                 <div class="formation-actions">
+                    <button class="btn btn-secondary" onclick="changeFormationType(${formation.id})" style="flex: 1">Change</button>
                     <button class="btn btn-primary" onclick="printFormationPDF(${formation.id})" style="flex: 1">Print</button>
                     <button class="btn btn-danger" onclick="removeFormation(${formation.id})" style="flex: 1">Delete</button>
                 </div>
@@ -1376,23 +2862,575 @@ function displayFormations() {
     container.innerHTML = formationCards;
 }
 
+        function getHangarKeyForCard(card) {
+            const chassisName = normalizeChassisName(card?.name || '');
+            return `${chassisName}|${card?.unit_type || ''}`;
+        }
+
+        function consumeHangarQtyByCard(card) {
+            const key = getHangarKeyForCard(card);
+            const item = state.hangar.find(i => i.key === key);
+            if (!item) return false;
+            const owned = Number(item.qty || 0);
+            const used = getHangarUsedQtyForKey(key);
+            return owned - used > 0;
+        }
+
+        function renderHangarSuggestionsForFormation(formation) {
+            const expectedSize = getFormationSize(formation?.formationType || '');
+            if (!expectedSize) return '';
+            const currentSize = Array.isArray(formation?.members) ? formation.members.length : 0;
+            const missing = expectedSize - currentSize;
+            if (missing <= 0) return '';
+            if (!state.hangar || state.hangar.length === 0) return '';
+            if (!state.selectedFaction) return '';
+
+            const selectedFactionLower = String(state.selectedFaction).toLowerCase();
+            const selectedEraLower = state.selectedEra ? String(state.selectedEra).toLowerCase() : null;
+            const formationMemberIds = new Set((formation?.members || []).map(m => String(m.id)));
+
+            const scored = [];
+
+            for (const h of state.hangar) {
+                const ownedQty = Number(h?.qty || 0);
+                if (ownedQty <= 0) continue;
+                const usedQty = getHangarUsedQtyForKey(h.key);
+                const availableQty = ownedQty - usedQty;
+                if (availableQty <= 0) continue;
+
+                const chassisLower = String(h?.name || '').toLowerCase();
+                const unitType = String(h?.unit_type || '');
+
+                const candidates = (state.allCards || [])
+                    .filter(c => c && Number(c.point_value || 0) > 0)
+                    .filter(c => String(c.unit_type || '') === unitType)
+                    .filter(c => normalizeChassisName(c.name).toLowerCase() === chassisLower)
+                    .filter(c => {
+                        const factions = Array.isArray(c.available_factions) ? c.available_factions : [];
+                        const hasExactFaction = factions.some(f => String(f).toLowerCase() === selectedFactionLower);
+                        if (!hasExactFaction) return false;
+                        if (selectedEraLower) {
+                            const eras = Array.isArray(c.available_eras) ? c.available_eras : [];
+                            if (!eras.some(e => String(e).toLowerCase() === selectedEraLower)) return false;
+                        }
+                        return true;
+                    })
+                    .filter(c => !formationMemberIds.has(String(c.id)));
+
+                if (!candidates.length) continue;
+
+                // Rank candidates by how much they help complete the selected formation.
+                // If missing === 1 we can validate the full formation (size matches) and pick best.
+                const rankedLocal = [];
+                for (const pick of candidates) {
+                    const pv = Number(pick.point_value || 0);
+
+                    let score = pv; // fallback if we can't validate
+                    if (missing === 1) {
+                        const candidateMember = { ...pick, pv, id: parseInt(pick.id) };
+                        const virtual = { ...formation, members: [...formation.members, candidateMember] };
+                        const validation = validateFormation(virtual);
+                        if (validation.valid) {
+                            score = 1000000 + pv;
+                        } else {
+                            score = (10000 - validation.reasons.length * 80) + pv;
+                        }
+                    }
+
+                    rankedLocal.push({
+                        id: pick.id,
+                        name: pick.name,
+                        pv,
+                        techBase: pick.tech_base || '',
+                        score
+                    });
+                }
+
+                rankedLocal.sort((a, b) => b.score - a.score);
+                // Show multiple fitting variants for the same owned chassis/type.
+                // Availability is still enforced on add, this only broadens suggestions.
+                const perHangarCap = Math.max(1, Math.min(rankedLocal.length, 6));
+                rankedLocal.slice(0, perHangarCap).forEach(item => scored.push(item));
+            }
+
+            if (!scored.length) return '';
+
+            const deduped = [];
+            const seenIds = new Set();
+            scored.sort((a, b) => b.score - a.score).forEach(item => {
+                const id = String(item.id);
+                if (seenIds.has(id)) return;
+                seenIds.add(id);
+                deduped.push(item);
+            });
+            const suggestionLimit = Math.min(10, Math.max(5, missing * 3));
+            const diverse = [];
+            const seenChassis = new Set();
+            deduped.forEach(item => {
+                const chassis = normalizeChassisName(item.name).toLowerCase();
+                if (seenChassis.has(chassis)) return;
+                seenChassis.add(chassis);
+                diverse.push(item);
+            });
+            let top = diverse.slice(0, suggestionLimit);
+            if (top.length < Math.min(5, deduped.length)) {
+                for (const item of deduped) {
+                    if (top.length >= suggestionLimit) break;
+                    if (top.some(x => String(x.id) === String(item.id))) continue;
+                    top.push(item);
+                }
+            }
+
+            return `
+                <div style="margin-top:8px;padding:8px;border:1px solid #dbe7ff;background:#f5f8ff;border-radius:8px;font-size:11px;">
+                    <div style="font-weight:700;color:#1e3c72;margin-bottom:6px;">Сюда может подойти из ангара:</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                        ${top.map(s => `
+                            <button class="btn btn-secondary" style="flex: 0 0 auto; padding:4px 8px; font-size:11px;" onclick="addHangarSuggestionToFormation(${formation.id}, ${s.id})">
+                                ${escapeHtml(s.name)} (${s.pv}PV)
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        async function addHangarSuggestionToFormation(formationId, cardId) {
+            const formation = state.formations.find(f => String(f.id) === String(formationId));
+            if (!formation) return;
+
+            const expectedSize = getFormationSize(formation?.formationType || '');
+            const currentSize = Array.isArray(formation.members) ? formation.members.length : 0;
+            if (expectedSize && currentSize >= expectedSize) return;
+
+            const card = (state.allCards || []).find(c => String(c.id) === String(cardId));
+            if (!card) return;
+
+            const canUse = consumeHangarQtyByCard(card);
+            if (!canUse) return;
+
+            const pv = Number(card.point_value || 0);
+            const techBase = card.tech_base || '';
+            const hangarKey = getHangarKeyForCard(card);
+            await addToRoster(card.id, card.name, pv, techBase, { skipAutoFormations: true, hangarKey });
+            renderHangar();
+
+            // Also try to place into the selected (incomplete) formation.
+            const rosterItem = (state.roster || []).find(r => String(r.id) === String(card.id));
+            const member = rosterItem ? { ...rosterItem, ...card, id: parseInt(rosterItem.id) } : { ...card, id: parseInt(card.id) };
+
+            if (Array.isArray(formation.members) && formation.members.length < expectedSize) {
+                // Avoid duplicates by card id inside a single formation (current formation model assumes uniqueness).
+                const already = formation.members.some(m => String(m.id) === String(member.id));
+                if (!already) formation.members.push(member);
+            }
+
+            displayFormations();
+            updateStats();
+        }
+
 
 
         function getFormationSize(formationType) {
             if (formationType.includes('Lance')) return 4;
             if (formationType.includes('Star')) return 5;
+            if (formationType.includes('Level')) return 6;
             return 0;
+        }
+
+        function ensureSkillValue(skill) {
+            const n = Number(skill);
+            if (!Number.isFinite(n)) return 4;
+            return Math.max(0, Math.min(8, Math.round(n)));
+        }
+
+        function getBasePV(unit) {
+            const explicitBase = Number(unit?.base_pv);
+            if (Number.isFinite(explicitBase) && explicitBase > 0) return explicitBase;
+            const pointValue = Number(unit?.point_value);
+            if (Number.isFinite(pointValue) && pointValue > 0) return pointValue;
+            const pv = Number(unit?.pv);
+            return Number.isFinite(pv) ? Math.max(0, pv) : 0;
+        }
+
+        function getLowSkillDeltaPerStep(basePV) {
+            const pv = Math.max(0, Number(basePV || 0));
+            if (pv <= 14) return 1;
+            if (pv <= 24) return 2;
+            if (pv <= 34) return 3;
+            if (pv <= 44) return 4;
+            if (pv <= 54) return 5;
+            if (pv <= 64) return 6;
+            if (pv <= 74) return 7;
+            if (pv <= 84) return 8;
+            if (pv <= 94) return 9;
+            if (pv <= 104) return 10;
+            return 10 + Math.floor((pv - 105) / 10) + 1;
+        }
+
+        function getImprovedSkillDeltaPerStep(basePV) {
+            const pv = Math.max(0, Number(basePV || 0));
+            if (pv <= 7) return 1;
+            if (pv <= 12) return 2;
+            if (pv <= 17) return 3;
+            if (pv <= 22) return 4;
+            if (pv <= 27) return 5;
+            if (pv <= 32) return 6;
+            if (pv <= 37) return 7;
+            if (pv <= 42) return 8;
+            if (pv <= 47) return 9;
+            if (pv <= 52) return 10;
+            return 10 + Math.floor((pv - 53) / 5) + 1;
+        }
+
+        function getSkillAdjustedPV(basePV, skill) {
+            const s = ensureSkillValue(skill);
+            const pv = Math.max(0, Number(basePV || 0));
+            if (s === 4) return pv;
+            if (s > 4) {
+                const per = getLowSkillDeltaPerStep(pv);
+                return Math.max(0, pv - (s - 4) * per);
+            }
+            const per = getImprovedSkillDeltaPerStep(pv);
+            return Math.max(0, pv + (4 - s) * per);
+        }
+
+        function getUnitEffectivePV(unit) {
+            return getSkillAdjustedPV(getBasePV(unit), ensureSkillValue(unit?.skill));
+        }
+
+        function changeRosterUnitSkill(cardId, delta) {
+            const item = state.roster.find(r => String(r.id) === String(cardId));
+            if (!item) return;
+            item.skill = ensureSkillValue((item.skill ?? 4) + Number(delta || 0));
+            item.pv = getUnitEffectivePV(item);
+            state.formations.forEach(f => {
+                (f.members || []).forEach(m => {
+                    if (String(m.id) === String(cardId)) {
+                        m.skill = item.skill;
+                        m.pv = item.pv;
+                    }
+                });
+            });
+            updateRosterDisplay();
+            displayFormations();
+            updateStats();
+            updateExportPreview();
+            renderHangar();
+        }
+
+        function normalizeFormationType(formationType) {
+            if (!formationType) return '';
+            if (formationType.includes('Light Battle')) return 'Light Battle';
+            if (formationType.includes('Medium Battle')) return 'Medium Battle';
+            if (formationType.includes('Heavy Battle')) return 'Heavy Battle';
+            if (formationType.includes('Battle')) return 'Battle';
+            if (formationType.includes('Fast Assault')) return 'Fast Assault';
+            if (formationType.includes('Assault')) return 'Assault';
+            if (formationType.includes('Light Striker')) return 'Light Striker';
+            if (formationType.includes('Heavy Striker')) return 'Heavy Striker';
+            if (formationType.includes('Striker')) return 'Striker';
+            if (formationType.includes('Artillery Fire')) return 'Artillery Fire';
+            if (formationType.includes('Direct Fire')) return 'Direct Fire';
+            if (formationType.includes('Anti-Air')) return 'Anti-Air';
+            if (formationType.includes('Fire Support')) return 'Fire Support';
+            if (formationType.includes('Light Recon')) return 'Light Recon';
+            if (formationType.includes('Heavy Recon')) return 'Heavy Recon';
+            if (formationType.includes('Recon')) return 'Recon';
+            if (formationType.includes('Probe')) return 'Probe';
+            if (formationType.includes('Sweep')) return 'Sweep';
+            if (formationType.includes('Pursuit')) return 'Pursuit';
+            if (formationType.includes('Vehicle Command')) return 'Vehicle Command';
+            if (formationType.includes('Command')) return 'Command';
+            if (formationType.includes('Support')) return 'Support';
+            return formationType;
+        }
+
+        function parseMoveInfo(move) {
+            const txt = String(move || '').toLowerCase();
+            const nums = txt.match(/\d+/g) || [];
+            const first = nums.length ? parseInt(nums[0], 10) : 0;
+            const hasJump = txt.includes('j');
+            return { ground: first, hasJump };
+        }
+
+        function parseDamageValue(raw) {
+            const m = String(raw ?? '').match(/\d+/);
+            return m ? parseInt(m[0], 10) : 0;
+        }
+
+        function unitRole(u) {
+            return String(u.role || '').toLowerCase();
+        }
+
+        function unitSize(u) {
+            const s = parseInt(String(u.size || '0'), 10);
+            return Number.isFinite(s) ? s : 0;
+        }
+
+        function unitArmor(u) {
+            return parseInt(String(u.armor || '0'), 10) || 0;
+        }
+
+        function unitAbilities(u) {
+            const abilities = Array.isArray(u.abilities) ? u.abilities : [];
+            return abilities.map(a => String(a).toUpperCase());
         }
 
         function validateFormation(formation) {
             const expectedSize = getFormationSize(formation.formationType);
-            if (formation.formationType === 'No Formation') return true;
-            return formation.members.length === expectedSize;
+            const reasons = [];
+            if (formation.formationType === 'No Formation') return { valid: true, reasons };
+            if (formation.members.length !== expectedSize) {
+                reasons.push(`Неверный размер: нужно ${expectedSize}, сейчас ${formation.members.length}`);
+                return { valid: false, reasons };
+            }
+
+            const members = formation.members || [];
+            const type = normalizeFormationType(formation.formationType);
+            const n = members.length;
+
+            if (type === 'Battle') {
+                const size3plus = members.filter(u => unitSize(u) >= 3).length;
+                const roleGood = members.filter(u => ['brawler', 'sniper', 'skirmisher'].includes(unitRole(u))).length;
+                if (size3plus < Math.ceil(n * 0.5)) reasons.push('Не менее 50% юнитов должны быть Size 3+');
+                if (roleGood < 3) reasons.push('Нужно минимум 3 юнита ролей Brawler/Sniper/Skirmisher');
+            } else if (type === 'Light Battle') {
+                const size1 = members.filter(u => unitSize(u) === 1).length;
+                const hasSize4Plus = members.some(u => unitSize(u) >= 4);
+                const scoutCount = members.filter(u => unitRole(u) === 'scout').length;
+                if (size1 < Math.ceil(n * 0.75)) reasons.push('Не менее 75% юнитов должны быть Size 1');
+                if (hasSize4Plus) reasons.push('В Light Battle нельзя Size 4+');
+                if (scoutCount < 1) reasons.push('Нужен минимум 1 Scout');
+            } else if (type === 'Medium Battle') {
+                const size2 = members.filter(u => unitSize(u) === 2).length;
+                const hasSize4Plus = members.some(u => unitSize(u) >= 4);
+                if (size2 < Math.ceil(n * 0.5)) reasons.push('Не менее 50% юнитов должны быть Size 2');
+                if (hasSize4Plus) reasons.push('В Medium Battle нельзя Size 4+');
+            } else if (type === 'Heavy Battle') {
+                const size3plus = members.filter(u => unitSize(u) >= 3).length;
+                const hasSize1 = members.some(u => unitSize(u) === 1);
+                if (size3plus < Math.ceil(n * 0.5)) reasons.push('Не менее 50% юнитов должны быть Size 3+');
+                if (hasSize1) reasons.push('В Heavy Battle нельзя Size 1');
+            } else if (type === 'Assault') {
+                const size3plus = members.filter(u => unitSize(u) >= 3).length;
+                const hasSize1 = members.some(u => unitSize(u) === 1);
+                const armorGood = members.filter(u => unitArmor(u) >= 5).length;
+                const med3plus = members.filter(u => parseDamageValue(u.damage_medium) >= 3).length;
+                const juggernauts = members.filter(u => unitRole(u) === 'juggernaut').length;
+                const snipers = members.filter(u => unitRole(u) === 'sniper').length;
+                if (size3plus < 3) reasons.push('Нужно минимум 3 юнита Size 3+');
+                if (hasSize1) reasons.push('В Assault нельзя Size 1');
+                if (armorGood < n) reasons.push('У всех юнитов Armor должен быть 5+');
+                if (med3plus < Math.ceil(n * 0.75)) reasons.push('Минимум 75% юнитов должны иметь Medium Damage 3+');
+                if (!(juggernauts >= 1 || snipers >= 2)) reasons.push('Нужен 1 Juggernaut или 2 Sniper');
+            } else if (type === 'Fast Assault') {
+                const assaultAnalog = formation.formationType.includes('Star') ? 'Assault Star' : 'Assault Lance';
+                const base = validateFormation({ ...formation, formationType: assaultAnalog });
+                base.reasons.forEach(r => reasons.push(r));
+                const fastGood = members.filter(u => {
+                    const m = parseMoveInfo(u.move);
+                    return m.ground >= 10 || m.hasJump;
+                }).length;
+                if (fastGood < n) reasons.push('Для Fast Assault все юниты должны иметь Move 10+ или jump');
+            } else if (type === 'Striker') {
+                const moveGood = members.filter(u => {
+                    const m = parseMoveInfo(u.move);
+                    return m.ground >= 10 || m.hasJump;
+                }).length;
+                const hasSize4 = members.some(u => unitSize(u) >= 4);
+                const roleGood = members.filter(u => ['striker', 'skirmisher'].includes(unitRole(u))).length;
+                if (moveGood < n) reasons.push('Все юниты должны иметь Move 10+ или jump');
+                if (hasSize4) reasons.push('В Striker/Cavalry нельзя Size 4+');
+                if (roleGood < Math.ceil(n * 0.5)) reasons.push('Минимум 50% юнитов должны быть Striker/Skirmisher');
+            } else if (type === 'Light Striker') {
+                const moveGood = members.filter(u => parseMoveInfo(u.move).ground >= 10).length;
+                const hasSize3Plus = members.some(u => unitSize(u) >= 3);
+                const longOver0 = members.filter(u => parseDamageValue(u.damage_long) > 0).length;
+                const roleGood = members.filter(u => ['striker', 'skirmisher'].includes(unitRole(u))).length;
+                if (moveGood < n) reasons.push('Для Light Striker все юниты должны иметь Move 10+');
+                if (hasSize3Plus) reasons.push('В Light Striker нельзя Size 3+');
+                if (longOver0 < 2) reasons.push('Нужно минимум 2 юнита с Long Damage > 0');
+                if (roleGood < 2) reasons.push('Нужно минимум 2 юнита ролей Striker/Skirmisher');
+            } else if (type === 'Heavy Striker') {
+                const moveGood = members.filter(u => parseMoveInfo(u.move).ground >= 8).length;
+                const size3plus = members.filter(u => unitSize(u) >= 3).length;
+                const hasSize1 = members.some(u => unitSize(u) <= 1);
+                const longOver1 = members.filter(u => parseDamageValue(u.damage_long) > 1).length;
+                const roleGood = members.filter(u => ['striker', 'skirmisher'].includes(unitRole(u))).length;
+                if (moveGood < n) reasons.push('Для Heavy Striker все юниты должны иметь Move 8+');
+                if (size3plus < 3) reasons.push('Нужно минимум 3 юнита Size 3+');
+                if (hasSize1) reasons.push('В Heavy Striker нельзя Size 1');
+                if (longOver1 < 1) reasons.push('Нужен минимум 1 юнит с Long Damage > 1');
+                if (roleGood < 2) reasons.push('Нужно минимум 2 юнита ролей Striker/Skirmisher');
+            } else if (type === 'Fire Support') {
+                const ifUnits = members.filter(u => unitAbilities(u).some(a => a.startsWith('IF'))).length;
+                if (ifUnits < 3) reasons.push('Для Fire Support нужно минимум 3 юнита с IF#');
+            } else if (type === 'Artillery Fire') {
+                const art = members.filter(u => unitAbilities(u).some(a => a.startsWith('ART'))).length;
+                if (art < 2) reasons.push('Для Artillery Fire нужно минимум 2 юнита с ART#');
+            } else if (type === 'Direct Fire') {
+                const size3plus = members.filter(u => unitSize(u) >= 3).length;
+                const long2 = members.filter(u => parseDamageValue(u.damage_long) >= 2).length;
+                if (size3plus < 2) reasons.push('Для Direct Fire нужно минимум 2 юнита Size 3+');
+                if (long2 < n) reasons.push('Все юниты должны иметь Long Damage 2+');
+            } else if (type === 'Anti-Air') {
+                const roleGood = members.filter(u => ['missile boat', 'sniper'].includes(unitRole(u))).length;
+                const aaUnits = members.filter(u => unitAbilities(u).some(a => a.startsWith('FLK') || a.startsWith('AC') || a.startsWith('ART'))).length;
+                if (roleGood < Math.ceil(n * 0.75)) reasons.push('Для Anti-Air минимум 75% должны быть Missile Boat/Sniper');
+                if (aaUnits < 2) reasons.push('Для Anti-Air нужно минимум 2 юнита с FLK/AC/ART');
+            } else if (type === 'Recon') {
+                const moveGood = members.filter(u => parseMoveInfo(u.move).ground >= 10).length;
+                const roleGood = members.filter(u => ['scout', 'striker'].includes(unitRole(u))).length;
+                if (moveGood < n) reasons.push('Все юниты должны иметь Move 10+');
+                if (roleGood < 2) reasons.push('Нужно минимум 2 юнита ролей Scout/Striker');
+            } else if (type === 'Light Recon') {
+                const size1 = members.filter(u => unitSize(u) === 1).length;
+                const move12 = members.filter(u => parseMoveInfo(u.move).ground >= 12).length;
+                const scouts = members.filter(u => unitRole(u) === 'scout').length;
+                if (size1 < n) reasons.push('Для Light Recon все юниты должны быть Size 1');
+                if (move12 < n) reasons.push('Для Light Recon все юниты должны иметь Move 12+');
+                if (scouts < n) reasons.push('Для Light Recon все юниты должны быть Scout');
+            } else if (type === 'Heavy Recon') {
+                const move8 = members.filter(u => parseMoveInfo(u.move).ground >= 8).length;
+                const move10 = members.filter(u => parseMoveInfo(u.move).ground >= 10).length;
+                const size3plus = members.filter(u => unitSize(u) >= 3).length;
+                const scouts = members.filter(u => unitRole(u) === 'scout').length;
+                if (move8 < n) reasons.push('Для Heavy Recon все юниты должны иметь Move 8+');
+                if (move10 < 2) reasons.push('Для Heavy Recon минимум 2 юнита должны иметь Move 10+');
+                if (size3plus < 1) reasons.push('Для Heavy Recon нужен минимум 1 юнит Size 3+');
+                if (scouts < 2) reasons.push('Для Heavy Recon нужно минимум 2 Scout');
+            } else if (type === 'Pursuit') {
+                const sizeGood = members.filter(u => unitSize(u) <= 2).length;
+                const fast = members.filter(u => parseMoveInfo(u.move).ground >= 12).length;
+                const mediumOver1 = members.filter(u => parseDamageValue(u.damage_medium) > 1).length;
+                if (sizeGood < n) reasons.push('Все юниты в Pursuit должны быть Size 2 или меньше');
+                if (fast < Math.round(n * 0.75)) reasons.push('75% юнитов должны иметь Move 12+');
+                if (mediumOver1 < 1) reasons.push('Минимум 1 юнит должен иметь Medium Damage > 1');
+            } else if (type === 'Probe') {
+                const size3orLess = members.filter(u => unitSize(u) <= 3).length;
+                const fast10 = members.filter(u => parseMoveInfo(u.move).ground >= 10).length;
+                const med2plus = members.filter(u => parseDamageValue(u.damage_medium) >= 2).length;
+                if (size3orLess < n) reasons.push('Для Probe все юниты должны быть Size 3 или меньше');
+                if (fast10 < Math.round(n * 0.75)) reasons.push('Для Probe 75% юнитов должны иметь Move 10+');
+                if (med2plus < n) reasons.push('Для Probe все юниты должны иметь Medium Damage 2+');
+            } else if (type === 'Sweep') {
+                const size2orLess = members.filter(u => unitSize(u) <= 2).length;
+                const fast10 = members.filter(u => parseMoveInfo(u.move).ground >= 10).length;
+                const short2plus = members.filter(u => parseDamageValue(u.damage_short) >= 2).length;
+                if (size2orLess < n) reasons.push('Для Sweep все юниты должны быть Size 2 или меньше');
+                if (fast10 < n) reasons.push('Для Sweep все юниты должны иметь Move 10+');
+                if (short2plus < n) reasons.push('Для Sweep все юниты должны иметь Short Damage 2+');
+            } else if (type === 'Command') {
+                const roleSetA = ['sniper', 'missile boat', 'skirmisher', 'juggernaut'];
+                const roleSetB = ['brawler', 'striker', 'scout'];
+                const aCount = members.filter(u => roleSetA.includes(unitRole(u))).length;
+                const bCount = members.filter(u => roleSetB.includes(unitRole(u))).length;
+                if (aCount < Math.ceil(n * 0.5)) reasons.push('50% юнитов должны быть Sniper/Missile Boat/Skirmisher/Juggernaut');
+                if (bCount < 1) reasons.push('Нужен минимум 1 юнит роли Brawler/Striker/Scout');
+            } else if (type === 'Vehicle Command') {
+                const roleSetA = ['sniper', 'missile boat', 'skirmisher', 'juggernaut'];
+                const aCount = members.filter(u => roleSetA.includes(unitRole(u))).length;
+                const allVehicles = members.every(u => String(u.unit_type || '').toLowerCase().includes('vehicle'));
+                if (!allVehicles) reasons.push('Vehicle Command доступна только для юнитов типа Vehicle');
+                if (aCount < 2) reasons.push('Для Vehicle Command нужен минимум один парный набор ролей Sniper/Missile Boat/Skirmisher/Juggernaut (2 юнита)');
+            } else if (type === 'Support') {
+                // No strict requirements in source, always valid by composition size.
+            }
+
+            return { valid: reasons.length === 0, reasons };
         }
 
         function removeFormation(formationId) {
+            const removed = state.formations.find(f => f.id === formationId);
+            if (!removed) return;
             state.formations = state.formations.filter(f => f.id !== formationId);
+            if (removed.members && removed.members.length > 0) {
+                const bucket = ensureNoFormationBucket();
+                removed.members.forEach(m => {
+                    if (!bucket.members.some(x => String(x.id) === String(m.id))) {
+                        bucket.members.push({ ...m });
+                    }
+                });
+            }
             displayFormations();
+        }
+
+        function getAllowedFormationTypesForCurrentRoster() {
+            const onlyBattleMechs = state.roster.every(u => String(u.unit_type || '').toLowerCase() === 'battlemech');
+            if (!onlyBattleMechs) {
+                const side = getRosterFormationSide();
+                if (side === 'clan') return ['No Formation', 'Support Star'];
+                if (side === 'comstar') return ['No Formation', 'Support Level'];
+                return ['No Formation', 'Support Lance'];
+            }
+            const side = getRosterFormationSide();
+            const lanceTypes = ['No Formation', ...FORMATION_BATTLEMECH_LANCE_TYPES];
+            if (side === 'clan') {
+                return ['No Formation', ...FORMATION_BATTLEMECH_LANCE_TYPES.map(lanceFormationToStar)];
+            }
+            if (side === 'comstar') {
+                return ['No Formation', ...FORMATION_BATTLEMECH_LANCE_TYPES.map(lanceFormationToLevel)];
+            }
+            if (side === 'inner_sphere') {
+                return lanceTypes;
+            }
+            return lanceTypes;
+        }
+
+        function getFormationDisplayType(formationType, side) {
+            return formationType;
+        }
+
+        function changeFormationType(formationId) {
+            const formation = state.formations.find(f => f.id === formationId);
+            if (!formation) return;
+            const modal = document.getElementById('formationTypeModal');
+            const select = document.getElementById('formationTypeModalSelect');
+            const applyBtn = document.getElementById('formationTypeModalApply');
+            const cancelBtn = document.getElementById('formationTypeModalCancel');
+            if (!modal || !select || !applyBtn || !cancelBtn) return;
+
+            const allowedByRoster = getAllowedFormationTypesForCurrentRoster();
+            const allowed = allowedByRoster.filter(type => {
+                if (type === 'No Formation') return true;
+                const candidate = { ...formation, formationType: type };
+                return validateFormation(candidate).valid;
+            });
+            const oldValue = formation.formationType;
+            select.innerHTML = allowed.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(getFormationDisplayType(v, getRosterFormationSide()))}</option>`).join('');
+            select.value = allowed.includes(oldValue) ? oldValue : 'No Formation';
+            modal.classList.add('active');
+
+            const cleanup = () => {
+                modal.classList.remove('active');
+                applyBtn.removeEventListener('click', onApply);
+                cancelBtn.removeEventListener('click', onCancel);
+                modal.removeEventListener('click', onOverlay);
+                document.removeEventListener('keydown', onKeyDown);
+            };
+            const onApply = () => {
+                const newType = select.value;
+                formation.formationType = newType;
+                const side = getRosterFormationSide();
+                const displayType = getFormationDisplayType(newType, side);
+                formation.name = newType === 'No Formation' ? 'No Formation' : `${displayType} ${formation.id + 1}`;
+                cleanup();
+                displayFormations();
+            };
+            const onCancel = () => {
+                cleanup();
+            };
+            const onOverlay = (e) => {
+                if (e.target === modal) cleanup();
+            };
+            const onKeyDown = (e) => {
+                if (e.key === 'Escape') cleanup();
+            };
+            applyBtn.addEventListener('click', onApply);
+            cancelBtn.addEventListener('click', onCancel);
+            modal.addEventListener('click', onOverlay);
+            document.addEventListener('keydown', onKeyDown);
         }
 
         function allowDrop(event) {
@@ -1443,6 +3481,12 @@ function dropMechToFormation(event, toFormationId) {
         return;
     }
 
+    const cap = getFormationSize(toFormation.formationType);
+    if (cap > 0 && toFormation.members.length >= cap) {
+        alert('Формация заполнена (максимум ' + cap + ' юнитов).');
+        return;
+    }
+
     const mechIndex = fromFormation.members.findIndex(m => m.id === mechCardId);  //   Сравниваем числа с числами
     if (mechIndex === -1) {
         console.log('Mech not found. Looking for id:', mechCardId, 'types:', fromFormation.members.map(m => ({id: m.id, type: typeof m.id})));
@@ -1467,7 +3511,7 @@ function dropMechToFormation(event, toFormationId) {
 
         function updateStats() {
             const totalMechs = state.roster.length;
-            const totalPV = state.roster.reduce((sum, r) => sum + r.pv, 0);
+            const totalPV = state.roster.reduce((sum, r) => sum + getUnitEffectivePV(r), 0);
             const avgPV = totalMechs > 0 ? (totalPV / totalMechs).toFixed(1) : 0;
             const clans = state.roster.filter(r => r.faction.includes('Clan')).length;
             const is = state.roster.filter(r => r.faction.includes('Inner Sphere')).length;
@@ -1482,9 +3526,10 @@ function dropMechToFormation(event, toFormationId) {
         function updateExportPreview() {
             const data = {
                 faction: state.selectedFaction,
-                totalMechs: state.roster.length,
-                totalPV: state.roster.reduce((sum, r) => sum + r.pv, 0),
-                mechs: state.roster.map(r => ({ name: r.name, pv: r.pv, faction: r.faction })),
+                era: state.selectedEra,
+                totalUnits: state.roster.length,
+                totalPV: state.roster.reduce((sum, r) => sum + getUnitEffectivePV(r), 0),
+                units: state.roster.map(r => ({ name: r.name, pv: getUnitEffectivePV(r), skill: ensureSkillValue(r.skill), faction: r.faction })),
                 formations: state.formations.map(f => ({ 
                     name: f.name, 
                     type: f.formationType, 
@@ -1497,10 +3542,11 @@ function dropMechToFormation(event, toFormationId) {
         function exportToJSON() {
             const data = {
                 faction: state.selectedFaction,
-                totalMechs: state.roster.length,
-                totalPV: state.roster.reduce((sum, r) => sum + r.pv, 0),
+                era: state.selectedEra,
+                totalUnits: state.roster.length,
+                totalPV: state.roster.reduce((sum, r) => sum + getUnitEffectivePV(r), 0),
                 exportDate: new Date().toLocaleString('ru-RU'),
-                mechs: state.roster,
+                units: state.roster,
                 formations: state.formations
             };
             const json = JSON.stringify(data, null, 2);
@@ -1513,6 +3559,173 @@ function dropMechToFormation(event, toFormationId) {
             URL.revokeObjectURL(url);
         }
 
+        function setPrintIncludeImages(enabled) {
+            state.printIncludeImages = !!enabled;
+        }
+
+        function getPrintImageHtml(unit) {
+            if (!state.printIncludeImages) return '';
+            const url = String(unit.image_url || '').trim();
+            if (!url) return '';
+            return `<div style="text-align:center; margin:0;">
+                <img src="${escapeHtml(url)}" alt="${escapeHtml(unit.name || 'unit')}" style="width:100%; max-height:28mm; object-fit:contain; border:1px solid #ddd; border-radius:3px; display:block; margin:0 auto;" referrerpolicy="no-referrer" />
+            </div>`;
+        }
+
+        function getPrintCriticalRows(unit) {
+            const unitType = String(unit.unit_type || '').toLowerCase();
+            if (unitType.includes('infantry') || unitType.includes('battle armor')) return [];
+            if (unitType.includes('aerospace') || unitType.includes('fighter')) {
+                return [['Engine', 2], ['Fire Control', 4], ['Weapons', 4]];
+            }
+            if (unitType.includes('vehicle') || unitType.includes('combat vehicle')) {
+                return [['Weapons', 4], ['Fire Control', 4], ['Engine', 2], ['Motive -2 MV', 4], ['Motive 1/2 MV', 4], ['Motive 0 MV', 4]];
+            }
+            return [['Engine', 2], ['Fire Control', 4], ['MP', 4], ['Weapons', 4]];
+        }
+
+        function getPrintCriticalTableHtml(unit) {
+            const rows = getPrintCriticalRows(unit);
+            if (!rows.length) return '';
+            const track = (count) => Array.from({ length: count }, () => '<span style="display:inline-block;width:10px;height:10px;border:1px solid #666;margin-right:3px;border-radius:2px;"></span>').join('');
+            return `<div style="margin-top:1.2mm;">
+                <div style="font-size:6pt;font-weight:bold;margin-bottom:0.6mm;">Критические попадания</div>
+                <table style="width:100%;border-collapse:collapse;font-size:5.8pt;">
+                    ${rows.map(r => `<tr><td style="border:1px solid #ddd;padding:1mm 1.2mm;">${escapeHtml(r[0])}</td><td style="border:1px solid #ddd;padding:1mm 1.2mm;">${track(r[1])}</td></tr>`).join('')}
+                </table>
+            </div>`;
+        }
+
+        function renderPrintCardHtml(unit, formationName) {
+            const armor = parseInt(unit.armor) || 0;
+            const structure = parseInt(unit.structure) || 0;
+            const dmgShort = parseInt(unit.damage_short) || 0;
+            const dmgMed = parseInt(unit.damage_medium) || 0;
+            const dmgLong = parseInt(unit.damage_long) || 0;
+            const move = unit.move || '-';
+            const abilities = unit.abilities || [];
+            const abilitiesText = Array.isArray(abilities) ? abilities.join(', ') : String(abilities || '');
+            const armorCircles = Array.from({ length: Math.max(armor, 0) }, () => '<span style="display:inline-block;width:9px;height:9px;border:1px solid #555;border-radius:50%;margin-right:2px;margin-bottom:2px;"></span>').join('');
+            const structureCircles = Array.from({ length: Math.max(structure, 0) }, () => '<span style="display:inline-block;width:9px;height:9px;border:1px solid #555;border-radius:50%;margin-right:2px;margin-bottom:2px;"></span>').join('');
+            const heatScale = ['1', '2', '3', 'S'].map(v => `<span style="display:inline-block;min-width:14px;text-align:center;border:1px solid #555;border-radius:2px;padding:1px 2px;margin-right:3px;">${v}</span>`).join('');
+            const imageHtml = state.printIncludeImages ? `<div style="border:1px solid #ddd;border-radius:4px;padding:1mm;background:#fff;">${getPrintImageHtml(unit)}</div>` : '';
+            const skill = ensureSkillValue(unit.skill);
+            const effectivePV = getUnitEffectivePV(unit);
+            return `<div class="card">
+                <div class="card-header"><div class="card-name">${escapeHtml(unit.name)}</div><div class="card-pv">PV: ${effectivePV}</div></div>
+                <div style="display:grid;grid-template-columns:${state.printIncludeImages ? '1fr 36mm' : '1fr'};gap:2mm;align-items:start;">
+                    <div>
+                        <div style="font-size:6pt;border:1px solid #ddd;padding:1mm 1.2mm;margin-bottom:0.8mm;"><strong>Броня:</strong> ${armor}<div style="margin-top:0.6mm;">${armorCircles || '-'}</div></div>
+                        <div style="font-size:6pt;border:1px solid #ddd;padding:1mm 1.2mm;margin-bottom:0.8mm;"><strong>Структура:</strong> ${structure}<div style="margin-top:0.6mm;">${structureCircles || '-'}</div></div>
+                        <div style="font-size:6pt;border:1px solid #ddd;padding:1mm 1.2mm;margin-bottom:0.8mm;">
+                            <strong>УРОН</strong>
+                            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:0.6mm;">
+                                <div><strong>S: ${dmgShort}</strong></div>
+                                <div><strong>M: ${dmgMed}</strong></div>
+                                <div><strong>L: ${dmgLong}</strong></div>
+                                <div style="color:#666;">+0</div>
+                                <div style="color:#666;">+2</div>
+                                <div style="color:#666;">+4</div>
+                            </div>
+                        </div>
+                        <div style="font-size:6pt;border:1px solid #ddd;padding:1mm 1.2mm;margin-bottom:0.8mm;"><strong>Движение:</strong> ${escapeHtml(move)} | <strong>TMM:</strong> ${unit.tmm || 0}</div>
+                        <div style="font-size:6pt;border:1px solid #ddd;padding:1mm 1.2mm;margin-bottom:0.8mm;"><strong>Тип:</strong> ${escapeHtml(unit.unit_type || '-')} | <strong>Size:</strong> ${escapeHtml(unit.size || '-')} | <strong>Роль:</strong> ${escapeHtml(unit.role || '-')} | <strong>Skill:</strong> ${skill}</div>
+                    </div>
+                    ${state.printIncludeImages ? `<div>${imageHtml}</div>` : ''}
+                    <div style="grid-column:1 / -1;">
+                        <div style="font-size:6pt;border:1px solid #ddd;padding:1mm 1.2mm;margin-bottom:0.8mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><strong>OV:</strong> ${unit.overheat || 0} &nbsp; <strong>Heat Scale</strong> ${heatScale}</div>
+                        ${abilitiesText ? `<div style="font-size:5.8pt;border:1px solid #ddd;padding:1mm 1.2mm;margin-bottom:0.8mm;"><strong>Способности:</strong> ${escapeHtml(abilitiesText)}</div>` : ''}
+                        ${getPrintCriticalTableHtml(unit)}
+                    </div>
+                </div>
+                <div class="card-footer">${escapeHtml(formationName || 'No Formation')}</div>
+            </div>`;
+        }
+
+        function getFormationBonusText(formationType) {
+            const t = normalizeFormationType(formationType);
+            const bonuses = {
+                'Battle': 'Даёт свойство Lucky: значение равно количеству мехов в формации + 2.',
+                'Light Battle': 'Бонус как у Battle Lance.',
+                'Medium Battle': 'Бонус как у Battle Lance.',
+                'Heavy Battle': 'Бонус как у Battle Lance.',
+                'Assault': 'Выбор Demoralizer или Multi-Tasker для части юнитов каждый ход.',
+                'Fast Assault': 'Бонус Assault Lance + Stand Aside до 2 юнитам/ход.',
+                'Striker': 'Speed Demon для 75% юнитов.',
+                'Light Striker': 'Бонус как у Striker/Cavalry Lance.',
+                'Heavy Striker': 'Бонус как у Striker/Cavalry Lance.',
+                'Fire Support': 'Oblique Attacker до 1/2 юнитов/ход.',
+                'Artillery Fire': 'Oblique Artilleryman до 1/2 юнитов/ход.',
+                'Direct Fire': 'Weapon Specialist до 1/2 юнитов/ход.',
+                'Anti-Air': 'Anti-Aircraft Specialists для части юнитов/ход.',
+                'Recon': 'Выбор Eagle’s Eyes / Forward Observer / Maneuvering Ace для формации.',
+                'Light Recon': 'Бонус как у Recon Lance (возможны разные SPA по юнитам).',
+                'Heavy Recon': 'Бонус как у Recon Lance (до половины юнитов).',
+                'Pursuit': 'Blood Stalker для 75% юнитов (по правилам формации).',
+                'Probe': 'Бонус как у Pursuit Lance.',
+                'Sweep': 'Бонус как у Pursuit Lance.',
+                'Command': 'Набор SPA для части юнитов + Tactical Genius командиру.',
+                'Vehicle Command': 'Бонус как у Command Lance.',
+                'Support': 'Копирует бонусы поддерживаемой формации (при выполнении условий).',
+                'No Formation': ''
+            };
+            return bonuses[t] || '';
+        }
+
+        function getSelectedFormationBonuses() {
+            const bonuses = [];
+            const seen = new Set();
+            state.formations.forEach(f => {
+                if (!f || !f.formationType || f.formationType === 'No Formation') return;
+                const key = `${f.name}|${f.formationType}`;
+                if (seen.has(key)) return;
+                seen.add(key);
+                const bonus = getFormationBonusText(f.formationType);
+                bonuses.push({
+                    name: f.name,
+                    type: f.formationType,
+                    bonus
+                });
+            });
+            return bonuses;
+        }
+
+        function getExpandedRosterUnits() {
+            const fullUnits = state.roster.flatMap(item => {
+                const fullCard = state.allCards.find(c => String(c.id) === String(item.id)) || item;
+                const qty = Number(item.quantity || 1);
+                const unit = { ...fullCard, ...item };
+                return Array.from({ length: qty }, (_, idx) => ({
+                    ...unit,
+                    __instanceKey: `${item.id}-${idx + 1}`
+                }));
+            });
+
+            const formationCounts = {};
+            state.formations.forEach(f => {
+                formationCounts[f.name] = {};
+                (f.members || []).forEach(m => {
+                    const key = String(m.id);
+                    formationCounts[f.name][key] = (formationCounts[f.name][key] || 0) + 1;
+                });
+            });
+
+            fullUnits.forEach(unit => {
+                unit.formationName = 'No Formation';
+                const key = String(unit.id);
+                for (const formation of state.formations) {
+                    const count = formationCounts[formation.name]?.[key] || 0;
+                    if (count > 0) {
+                        unit.formationName = formation.name;
+                        formationCounts[formation.name][key] = count - 1;
+                        break;
+                    }
+                }
+            });
+
+            return fullUnits;
+        }
+
         function printFormationPDF(formationId) {
     const formation = state.formations.find(f => f.id === formationId);
     if (!formation) {
@@ -1520,9 +3733,9 @@ function dropMechToFormation(event, toFormationId) {
         return;
     }
     
-    const fullMechs = formation.members.map(m => {
+    const fullUnits = formation.members.map(m => {
         const fullCard = state.allCards.find(c => c.id === m.id);
-        return fullCard ? { ...m, ...fullCard } : m;
+        return fullCard ? { ...fullCard, ...m } : m;
     });
     
     const printContent = `
@@ -1540,16 +3753,17 @@ function dropMechToFormation(event, toFormationId) {
                     display: grid;
                     grid-template-columns: 1fr 1fr;
                     grid-template-rows: 1fr 1fr 1fr 1fr;
-                    gap: 5mm;
-                    padding: 8mm;
+                    gap: 3.5mm;
+                    padding: 6mm;
                     page-break-after: always;
                 }
+                .page:last-child { page-break-after: auto; }
                 .card {
                     border: 2px solid black;
-                    padding: 5mm;
+                    padding: 3mm;
                     display: flex;
                     flex-direction: column;
-                    font-size: 7pt;
+                    font-size: 6pt;
                     page-break-inside: avoid;
                 }
                 .card-header {
@@ -1560,7 +3774,7 @@ function dropMechToFormation(event, toFormationId) {
                     padding-bottom: 1mm;
                     font-weight: bold;
                 }
-                .card-name { font-size: 10pt; flex: 1; }
+                .card-name { font-size: 8.5pt; flex: 1; }
                 .card-pv { border: 1px solid black; padding: 1mm 3mm; font-weight: bold; background: #f0f0f0; }
                 .armor-circle { width: 4mm; height: 4mm; border: 1px solid black; border-radius: 50%; display: inline-block; margin: 0.5mm; }
                 .info-row { margin: 1mm 0; padding: 1mm; border: 1px solid #999; font-size: 6pt; }
@@ -1570,50 +3784,17 @@ function dropMechToFormation(event, toFormationId) {
         </head>
         <body>
             <div class="page">
-                ${fullMechs.map(mech => {
-                    const armor = parseInt(mech.armor) || 0;
-                    const structure = parseInt(mech.structure) || 0;
-                    const dmgShort = parseInt(mech.damage_short) || 0;
-                    const dmgMed = parseInt(mech.damage_medium) || 0;
-                    const dmgLong = parseInt(mech.damage_long) || 0;
-                    const armorCircles = Array(armor).fill(0).map(() => '<div class="armor-circle"></div>').join('');
-                    const structureCircles = Array(structure).fill(0).map(() => '<div class="armor-circle"></div>').join('');
-                    
-                    return `
-                        <div class="card">
-                            <div class="card-header">
-                                <div class="card-name">${escapeHtml(mech.name)}</div>
-                                <div class="card-pv">PV: ${mech.point_value || mech.pv}</div>
-                            </div>
-                            <div style="font-size: 6pt; color: #666; margin-bottom: 1mm;">
-                                ${escapeHtml(mech.tech_base || '')} ${escapeHtml(mech.faction || '')}
-                            </div>
-                            <div class="info-row"><strong>Броня (${armor}):</strong></div>
-                            <div style="display: flex; gap: 0.5mm; margin: 1mm 0;">${armorCircles}</div>
-                            <div class="info-row"><strong>Структура (${structure}):</strong></div>
-                            <div style="display: flex; gap: 0.5mm; margin: 1mm 0;">${structureCircles}</div>
-                            <div class="damage-row">
-                                <div>Сбл: ${dmgShort}</div>
-                                <div>Сред: ${dmgMed}</div>
-                                <div>Дальн: ${dmgLong}</div>
-                            </div>
-                            <div class="info-row">Движение: ${escapeHtml(mech.move || '-')}</div>
-                            <div class="info-row">Роль: ${mech.role || '-'}</div>
-                            <div style="flex-grow: 1; border: 1px dashed #999; margin-top: 1mm; padding: 1mm; font-size: 6pt; color: #999;">
-                                Заметки: __________________
-                            </div>
-                            <div style="text-align: center; font-size: 8pt; border-top: 1px solid #999; padding-top: 1mm; margin-top: auto;">
-                                ${escapeHtml(formation.name)}
-                            </div>
-                        </div>
-                    `;
-                }).join('')}
+                ${fullUnits.map(unit => renderPrintCardHtml(unit, formation.name)).join('')}
             </div>
         </body>
         </html>
     `;
     
     const printWindow = window.open('', '', 'width=900,height=700');
+    if (!printWindow) {
+        alert('Не удалось открыть окно печати. Разрешите всплывающие окна для этого сайта.');
+        return;
+    }
     printWindow.document.write(printContent);
     printWindow.document.close();
     setTimeout(() => printWindow.print(), 250);
@@ -1622,30 +3803,16 @@ function dropMechToFormation(event, toFormationId) {
 
 
          function printToPDF() {
-    const fullMechs = state.roster.map(m => {
-        const fullCard = state.allCards.find(c => c.id == m.id) || m;
-        
-        let formationName = 'Ростер';
-        for (let formation of state.formations) {
-            if (formation.members.find(member => member.id == m.id)) {
-                formationName = formation.name;
-                break;
-            }
-        }
-        
-        return {
-            ...m,
-            ...fullCard,
-            formationName: formationName
-        };
-    });
+    const fullUnits = getExpandedRosterUnits();
 
     const data = {
         faction: state.selectedFaction,
-        totalMechs: fullMechs.length,
-        totalPV: fullMechs.reduce((sum, r) => sum + (r.pv || 0), 0),
+        era: state.selectedEra,
+        totalUnits: fullUnits.length,
+        totalPV: fullUnits.reduce((sum, r) => sum + getUnitEffectivePV(r), 0),
         exportDate: new Date().toLocaleString('ru-RU'),
-        mechs: fullMechs
+        units: fullUnits,
+        formationBonuses: getSelectedFormationBonuses()
     };
 
     let printContent = `
@@ -1657,24 +3824,25 @@ function dropMechToFormation(event, toFormationId) {
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body { font-family: Arial, sans-serif; background: white; }
-                .page { page-break-after: always; padding: 20mm; background: white; }
+                .page { page-break-after: always; padding: 10mm; background: white; }
+                .page:last-child { page-break-after: auto; }
                 .header-page { page-break-after: always; }
                 h1 { color: #1e3c72; border-bottom: 2px solid #2a5298; padding-bottom: 10px; margin-bottom: 20px; font-size: 24pt; }
                 .roster-header { margin-bottom: 30px; padding: 15px; background: #f9f9f9; border-left: 4px solid #2a5298; }
                 .stat-row { display: flex; gap: 30px; margin: 8px 0; font-size: 12pt; }
                 .stat-label { font-weight: bold; color: #333; min-width: 120px; }
                 .stat-value { color: #2a5298; font-weight: bold; }
-                .roster-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto auto; gap: 8mm; page-break-inside: avoid; }
-                .card { border: 2px solid black; padding: 5mm; display: flex; flex-direction: column; font-size: 7pt; page-break-inside: avoid; background: white; height: 100%; }
+                .roster-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto auto; gap: 5mm; page-break-inside: avoid; }
+                .card { border: 2px solid black; padding: 3mm; display: flex; flex-direction: column; font-size: 6pt; page-break-inside: avoid; background: white; height: 100%; }
                 .card-header { display: flex; justify-content: space-between; margin-bottom: 2mm; border-bottom: 1px solid black; padding-bottom: 1mm; }
-                .card-name { font-size: 10pt; font-weight: bold; flex: 1; }
-                .card-pv { border: 1px solid black; padding: 1mm 3mm; font-weight: bold; font-size: 9pt; background: #f0f0f0; }
+                .card-name { font-size: 8.5pt; font-weight: bold; flex: 1; }
+                .card-pv { border: 1px solid black; padding: 1mm 3mm; font-weight: bold; font-size: 8pt; background: #f0f0f0; }
                 .armor-bar { display: flex; gap: 0.5mm; margin: 1mm 0; flex-wrap: wrap; }
                 .armor-circle { width: 3mm; height: 3mm; border: 1px solid black; border-radius: 50%; }
                 .armor-label { font-weight: bold; font-size: 6pt; margin-bottom: 0.5mm; }
                 .card-content { flex: 1; }
                 .card-footer { font-size: 7pt; padding: 2mm; border-top: 1px solid #999; color: #333; font-weight: bold; background: #f0f0f0; text-align: center; margin-top: 2mm; }
-                @media print { body { padding: 0; } .page { padding: 20mm; } }
+                @media print { body { padding: 0; } .page { padding: 10mm; } }
             </style>
         </head>
         <body>
@@ -1683,32 +3851,21 @@ function dropMechToFormation(event, toFormationId) {
                 <div class="roster-header">
                     <div class="stat-row"><span class="stat-label">Дата:</span><span class="stat-value">${data.exportDate}</span></div>
                     <div class="stat-row"><span class="stat-label">Фракция:</span><span class="stat-value">${data.faction}</span></div>
-                    <div class="stat-row"><span class="stat-label">Мехов:</span><span class="stat-value">${data.totalMechs}</span></div>
+                    <div class="stat-row"><span class="stat-label">Эпоха:</span><span class="stat-value">${data.era || 'Все эпохи'}</span></div>
+                    <div class="stat-row"><span class="stat-label">Юнитов:</span><span class="stat-value">${data.totalUnits}</span></div>
                     <div class="stat-row"><span class="stat-label">Всего PV:</span><span class="stat-value">${data.totalPV}</span></div>
                 </div>
+                ${data.formationBonuses.length ? `<div class="roster-header"><div class="stat-row"><span class="stat-label">Бонусы формаций:</span></div>${data.formationBonuses.map(f => `<div class="stat-row" style="display:block;margin:4px 0;"><span class="stat-label">${escapeHtml(f.name)} (${escapeHtml(getFormationDisplayType(f.type, getRosterFormationSide()))}):</span> <span class="stat-value" style="font-weight:500;">${escapeHtml(f.bonus || 'См. правила выбранной формации')}</span></div>`).join('')}</div>` : ''}
             </div>
             
             <div class="page">
                 <div class="roster-grid">
-                ${data.mechs.map((mech, pageIdx) => {
+                ${data.units.map((unit, pageIdx) => {
                     let pageBreak = '';
                     if (pageIdx > 0 && pageIdx % 8 === 0) {
                         pageBreak = '</div></div><div class="page"><div class="roster-grid">';
                     }
-                    
-                    const armor = parseInt(mech.armor) || 0;
-                    const structure = parseInt(mech.structure) || 0;
-                    const armorCircles = Array(armor).fill(0).map(() => '<div class="armor-circle"></div>').join('');
-                    const structureCircles = Array(structure).fill(0).map(() => '<div class="armor-circle"></div>').join('');
-                    const dmgShort = parseInt(mech.damage_short) || 0;
-                    const dmgMed = parseInt(mech.damage_medium) || 0;
-                    const dmgLong = parseInt(mech.damage_long) || 0;
-                    const move = mech.move || '-';
-                    
-                    const abilities = mech.abilities || [];
-                    const abilitiesText = Array.isArray(abilities) ? abilities.join(', ') : String(abilities || '');
-                    
-                    return pageBreak + '<div class="card"><div class="card-header"><div class="card-name">' + escapeHtml(mech.name) + '</div><div class="card-pv">PV: ' + (mech.pv || 0) + '</div></div><div class="card-content"><div style="font-size: 6pt; color: #666; margin-bottom: 1mm">' + escapeHtml(mech.faction || mech.tech_base || '') + '</div>' + (abilitiesText ? '<div style="font-size: 6pt; color: #333; margin-bottom: 1mm; max-height: 3mm; overflow: hidden;">Способности: ' + escapeHtml(abilitiesText) + '</div>' : '') + '<div style="margin-bottom: 1mm;"><div class="armor-label">Броня (' + armor + '):</div><div class="armor-bar">' + armorCircles + '</div></div><div style="margin-bottom: 1mm;"><div class="armor-label">Структура (' + structure + '):</div><div class="armor-bar">' + structureCircles + '</div></div><div style="display: flex; justify-content: space-around; border: 1px solid black; padding: 1mm; margin-bottom: 1mm; font-weight: bold; font-size: 6pt;"><div>Сбл: ' + dmgShort + '</div><div>Сред: ' + dmgMed + '</div><div>Дальн: ' + dmgLong + '</div></div><div style="font-size: 6pt; margin-bottom: 1mm;">Движение: ' + escapeHtml(move) + '</div><div style="font-size: 6pt; margin-bottom: 1mm;">Роль: ' + (mech.role || '-') + '</div><div style="margin-top: 1mm; padding: 1mm; border: 1px dashed #999; flex-grow: 1; font-size: 6pt; color: #999;">Плюсы: __________________</div></div><div class="card-footer">' + escapeHtml(mech.formationName) + '</div></div>';
+                    return pageBreak + renderPrintCardHtml(unit, unit.formationName);
                 }).join('')}
                 </div>
             </div>
@@ -1717,6 +3874,10 @@ function dropMechToFormation(event, toFormationId) {
     `;
 
     const printWindow = window.open('', '', 'height=400,width=800');
+    if (!printWindow) {
+        alert('Не удалось открыть окно печати. Разрешите всплывающие окна для этого сайта.');
+        return;
+    }
     printWindow.document.write(printContent);
     printWindow.document.close();
     setTimeout(() => printWindow.print(), 250);

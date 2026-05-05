@@ -19,7 +19,18 @@ func ValidateTechBaseForLance(lance *domain.Lance) error {
 			continue
 		}
 
+		unitType := strings.TrimSpace(member.Card.UnitType)
+		// Lance in your UI is designed for BattleMechs only.
+		if unitType != "" && unitType != "BATTLEMECH" {
+			return fmt.Errorf("Lance может содержать только BATTLEMECH (мехи), а не %s", unitType)
+		}
+
 		techBase := strings.TrimSpace(member.Card.TechBase)
+		// Some catalogs may not provide tech-base.
+		// Treat empty as "unknown" and skip strict validation.
+		if techBase == "" {
+			continue
+		}
 		// Lance может содержать: Inner Sphere, Mixed, Primitive
 		if techBase != "Inner Sphere" && techBase != "Mixed" && techBase != "Primitive" {
 			return fmt.Errorf("Lance может содержать только Inner Sphere/Mixed/Primitive, а не %s", techBase)
@@ -40,7 +51,18 @@ func ValidateTechBaseForStar(star *domain.Star) error {
 			continue
 		}
 
+		unitType := strings.TrimSpace(member.Card.UnitType)
+		// Star in your UI is designed for Clan BattleMechs only.
+		if unitType != "" && unitType != "BATTLEMECH" {
+			return fmt.Errorf("Star может содержать только BATTLEMECH (мехи), а не %s", unitType)
+		}
+
 		techBase := strings.TrimSpace(member.Card.TechBase)
+		// Some catalogs may not provide tech-base.
+		// Treat empty as "unknown" and skip strict validation.
+		if techBase == "" {
+			continue
+		}
 		// Star может содержать: Clan, Mixed
 		if techBase != "Clan" && techBase != "Mixed" {
 			return fmt.Errorf("Star может содержать только Clan/Mixed, а не %s", techBase)

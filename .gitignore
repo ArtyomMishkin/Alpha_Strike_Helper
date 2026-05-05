@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+
+*.exe
+*.log
+
+# Local runtime artifacts
+tmp_*.py
+tmp_*.txt
+tmp_*.tsv

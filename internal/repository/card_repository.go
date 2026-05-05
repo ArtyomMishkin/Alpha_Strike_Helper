@@ -36,15 +36,49 @@ func (r *CardRepository) List(filters map[string]interface{}, page, pageSize int
 	}
 
 	if faction, ok := filters["faction"].(string); ok && faction != "" {
-		query = query.Where("faction = ?", faction)
+		// Keep backward compatibility with legacy scalar `faction`,
+		// but also support new availability arrays loaded from MUL.
+		query = query.Where(
+			"faction = ? OR available_factions @> ?::jsonb",
+			faction,
+			`["`+faction+`"]`,
+		)
+	}
+
+	if availableFaction, ok := filters["available_faction"].(string); ok && availableFaction != "" {
+		query = query.Where("available_factions @> ?::jsonb", `["`+availableFaction+`"]`)
+	}
+
+	if factionGroup, ok := filters["faction_group"].(string); ok && factionGroup != "" {
+		query = query.Where(
+			"faction_group = ? OR available_faction_groups @> ?::jsonb",
+			factionGroup,
+			`["`+factionGroup+`"]`,
+		)
 	}
 
 	if typeVal, ok := filters["type"].(string); ok && typeVal != "" {
 		query = query.Where("type = ?", typeVal)
 	}
+	if unitType, ok := filters["unit_type"].(string); ok && unitType != "" {
+		query = query.Where("unit_type = ?", unitType)
+	}
 
 	if techBase, ok := filters["tech_base"].(string); ok && techBase != "" {
 		query = query.Where("tech_base = ?", techBase)
+	}
+
+	if era, ok := filters["era"].(string); ok && era != "" {
+		// Same compatibility behavior as faction.
+		query = query.Where(
+			"era = ? OR available_eras @> ?::jsonb",
+			era,
+			`["`+era+`"]`,
+		)
+	}
+
+	if availableEra, ok := filters["available_era"].(string); ok && availableEra != "" {
+		query = query.Where("available_eras @> ?::jsonb", `["`+availableEra+`"]`)
 	}
 
 	if name, ok := filters["name"].(string); ok && name != "" {
