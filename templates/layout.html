@@ -156,6 +156,18 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
         }
 
+        .cards-load-error {
+            display: none;
+            margin-bottom: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #ffd1d1;
+            background: #fff6f6;
+            color: #8f2d2d;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
         .filters-summary {
             margin-top: 10px;
             font-size: 11px;
@@ -1008,6 +1020,7 @@
                 </div>
                 <div>
                     <div id="activeFiltersSticky" class="sticky-filters"></div>
+                    <div id="cardsLoadError" class="cards-load-error"></div>
                     <div id="cardsContainer" class="cards-container"></div>
                 </div>
             </div>
@@ -1275,7 +1288,7 @@
                 }).join('');
         }
 
-        const API_BASE_URL = 'http://localhost:8080/api/v1';
+        const API_BASE_URL = `${window.location.origin}/api/v1`;
 
         document.addEventListener('DOMContentLoaded', () => {
             state.hangar = loadHangarStorage();
@@ -1314,8 +1327,16 @@
             else if (tabName === 'hangar') renderHangar();
         }
 
+        function setCardsLoadError(message) {
+            const el = document.getElementById('cardsLoadError');
+            if (!el) return;
+            el.textContent = message || '';
+            el.style.display = message ? 'block' : 'none';
+        }
+
         async function loadCards() {
             try {
+                setCardsLoadError('');
                 const pageSize = 5000;
                 let page = 1;
                 let totalPages = 1;
@@ -1341,10 +1362,19 @@
                 rebuildFormationTypeSelectOptions();
                 displayCards(state.allCards);
                 renderActiveFilters({ sortBy: 'name' }, state.allCards.length);
+                if (!allCards.length) {
+                    setCardsLoadError(`Карточки не загружены (0 шт.). Проверьте, что база заполнена импортом MUL, и что API отвечает: ${API_BASE_URL}/cards?page=1&pagesize=1`);
+                }
             } catch (error) {
                 console.error('Ошибка загрузки карточек:', error);
                 state.allCards = [];
+                initDynamicFilterOptions(state.allCards);
+                setupFactionAutocomplete(state.allCards);
+                refreshRosterFactionOptions();
+                refreshRosterEraOptions();
+                rebuildFormationTypeSelectOptions();
                 displayCards([]);
+                setCardsLoadError(`Не удалось загрузить карточки с ${API_BASE_URL}. Ошибка: ${error?.message || error}. Проверьте, что сервер запущен и URL совпадает с адресом страницы.`);
             }
         }
 
