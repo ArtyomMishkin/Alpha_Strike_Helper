@@ -24,7 +24,7 @@ func main() {
 		skipEraBootstrap   = flag.Bool("skip-era-bootstrap", false, "skip broad era-only requests (useful when an era endpoint is unstable)")
 		eraIDsCSV          = flag.String("era-ids", "", "comma-separated era IDs, e.g. 13,247,14")
 		factionIDsCSV      = flag.String("faction-ids", "", "comma-separated faction IDs, e.g. 24,29,27")
-		httpTimeout        = flag.Duration("http-timeout", 30*time.Second, "HTTP timeout per request")
+		httpTimeout        = flag.Duration("http-timeout", 120*time.Second, "HTTP timeout per request (MUL can be slow)")
 		batchSize          = flag.Int("batch-size", 300, "database upsert batch size")
 	)
 	flag.Parse()

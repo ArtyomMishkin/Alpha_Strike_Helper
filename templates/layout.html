@@ -1288,7 +1288,7 @@
                 }).join('');
         }
 
-        const API_BASE_URL = `${window.location.origin}/api/v1`;
+        const CARDS_API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:8082/api/v1`;
 
         document.addEventListener('DOMContentLoaded', () => {
             state.hangar = loadHangarStorage();
@@ -1343,7 +1343,7 @@
                 const allCards = [];
 
                 while (page <= totalPages) {
-                    const response = await fetch(`${API_BASE_URL}/cards?page=${page}&pagesize=${pageSize}`);
+                    const response = await fetch(`${CARDS_API_BASE_URL}/cards?page=${page}&pagesize=${pageSize}`);
                     if (!response.ok) {
                         throw new Error(`cards fetch failed on page ${page}: ${response.status}`);
                     }
@@ -1363,7 +1363,7 @@
                 displayCards(state.allCards);
                 renderActiveFilters({ sortBy: 'name' }, state.allCards.length);
                 if (!allCards.length) {
-                    setCardsLoadError(`Карточки не загружены (0 шт.). Проверьте, что база заполнена импортом MUL, и что API отвечает: ${API_BASE_URL}/cards?page=1&pagesize=1`);
+                    setCardsLoadError(`Карточки не загружены (0 шт.). Проверьте, что база заполнена импортом MUL, и что API отвечает: ${CARDS_API_BASE_URL}/cards?page=1&pagesize=1`);
                 }
             } catch (error) {
                 console.error('Ошибка загрузки карточек:', error);
@@ -1374,12 +1374,16 @@
                 refreshRosterEraOptions();
                 rebuildFormationTypeSelectOptions();
                 displayCards([]);
-                setCardsLoadError(`Не удалось загрузить карточки с ${API_BASE_URL}. Ошибка: ${error?.message || error}. Проверьте, что сервер запущен и URL совпадает с адресом страницы.`);
+                setCardsLoadError(`Не удалось загрузить карточки с ${CARDS_API_BASE_URL}. Ошибка: ${error?.message || error}. Проверьте, что сервер запущен и URL совпадает с адресом страницы.`);
             }
         }
 
         async function loadChassisSources() {
-            const urls = ['/static/data/chassis_sources.json', 'static/data/chassis_sources.json'];
+            const urls = [
+                `${CARDS_API_BASE_URL}/chassis-sources`,
+                '/static/data/chassis_sources.json',
+                'static/data/chassis_sources.json'
+            ];
             for (const url of urls) {
                 try {
                     const response = await fetch(url);
@@ -2913,9 +2917,8 @@ function displayFormations() {
             const missing = expectedSize - currentSize;
             if (missing <= 0) return '';
             if (!state.hangar || state.hangar.length === 0) return '';
-            if (!state.selectedFaction) return '';
-
-            const selectedFactionLower = String(state.selectedFaction).toLowerCase();
+            const selectedFactionRaw = state.selectedFaction || state.rosterCommonFactions?.[0] || state.roster?.[0]?.faction || '';
+            const selectedFactionLower = String(selectedFactionRaw || '').toLowerCase();
             const selectedEraLower = state.selectedEra ? String(state.selectedEra).toLowerCase() : null;
             const formationMemberIds = new Set((formation?.members || []).map(m => String(m.id)));
 
@@ -2937,8 +2940,10 @@ function displayFormations() {
                     .filter(c => normalizeChassisName(c.name).toLowerCase() === chassisLower)
                     .filter(c => {
                         const factions = Array.isArray(c.available_factions) ? c.available_factions : [];
-                        const hasExactFaction = factions.some(f => String(f).toLowerCase() === selectedFactionLower);
-                        if (!hasExactFaction) return false;
+                        if (selectedFactionLower) {
+                            const compatible = buildFactionCompatibilitySet(factions);
+                            if (!compatible.has(selectedFactionLower)) return false;
+                        }
                         if (selectedEraLower) {
                             const eras = Array.isArray(c.available_eras) ? c.available_eras : [];
                             if (!eras.some(e => String(e).toLowerCase() === selectedEraLower)) return false;

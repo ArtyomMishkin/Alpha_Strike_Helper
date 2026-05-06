@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -21,7 +22,8 @@ type Client struct {
 func NewClient(baseURL string, timeout time.Duration) *Client {
 	baseURL = strings.TrimRight(baseURL, "/")
 	if timeout <= 0 {
-		timeout = 30 * time.Second
+		// MUL can be slow; callers can override via flags.
+		timeout = 120 * time.Second
 	}
 	return &Client{
 		baseURL: baseURL,
@@ -29,6 +31,66 @@ func NewClient(baseURL string, timeout time.Duration) *Client {
 			Timeout: timeout,
 		},
 	}
+}
+
+func (c *Client) doGET(ctx context.Context, rawURL string, accept string) (*http.Response, error) {
+	const maxAttempts = 5
+	var lastErr error
+	backoff := 500 * time.Millisecond
+
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
+		if err != nil {
+			return nil, fmt.Errorf("new request: %w", err)
+		}
+		req.Header.Set("User-Agent", "alpha-strike-helper/masterunitlist-sync")
+		if strings.TrimSpace(accept) != "" {
+			req.Header.Set("Accept", accept)
+		}
+
+		resp, err := c.httpClient.Do(req)
+		if err != nil {
+			lastErr = err
+			if attempt < maxAttempts {
+				log.Printf("http retry %d/%d: GET %s err=%v", attempt, maxAttempts, rawURL, err)
+				select {
+				case <-ctx.Done():
+					return nil, ctx.Err()
+				case <-time.After(backoff):
+				}
+				if backoff < 8*time.Second {
+					backoff *= 2
+				}
+				continue
+			}
+			return nil, fmt.Errorf("request failed: %w", err)
+		}
+
+		if resp.StatusCode >= 500 && resp.StatusCode <= 599 {
+			_ = resp.Body.Close()
+			lastErr = fmt.Errorf("bad status: %d", resp.StatusCode)
+			if attempt < maxAttempts {
+				log.Printf("http retry %d/%d: GET %s status=%d", attempt, maxAttempts, rawURL, resp.StatusCode)
+				select {
+				case <-ctx.Done():
+					return nil, ctx.Err()
+				case <-time.After(backoff):
+				}
+				if backoff < 8*time.Second {
+					backoff *= 2
+				}
+				continue
+			}
+			return nil, lastErr
+		}
+
+		return resp, nil
+	}
+
+	if lastErr != nil {
+		return nil, lastErr
+	}
+	return nil, fmt.Errorf("request failed after retries")
 }
 
 func (c *Client) QuickList(ctx context.Context, params map[string]string) ([]Unit, error) {
@@ -46,16 +108,9 @@ func (c *Client) QuickList(ctx context.Context, params map[string]string) ([]Uni
 	}
 	u.RawQuery = q.Encode()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
+	resp, err := c.doGET(ctx, u.String(), "application/json")
 	if err != nil {
-		return nil, fmt.Errorf("new request: %w", err)
-	}
-	req.Header.Set("User-Agent", "alpha-strike-helper/masterunitlist-sync")
-	req.Header.Set("Accept", "application/json")
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("request failed: %w", err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 
@@ -79,16 +134,9 @@ func (c *Client) FactionAutocomplete(ctx context.Context, term string) ([]LabelV
 	q.Set("term", term)
 	u.RawQuery = q.Encode()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
+	resp, err := c.doGET(ctx, u.String(), "application/json")
 	if err != nil {
-		return nil, fmt.Errorf("new request: %w", err)
-	}
-	req.Header.Set("User-Agent", "alpha-strike-helper/masterunitlist-sync")
-	req.Header.Set("Accept", "application/json")
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("request failed: %w", err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 
@@ -109,16 +157,9 @@ func (c *Client) FactionGroups(ctx context.Context, factions []LabelValue) (map[
 		return nil, fmt.Errorf("parse url: %w", err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
+	resp, err := c.doGET(ctx, u.String(), "text/html")
 	if err != nil {
-		return nil, fmt.Errorf("new request: %w", err)
-	}
-	req.Header.Set("User-Agent", "alpha-strike-helper/masterunitlist-sync")
-	req.Header.Set("Accept", "text/html")
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("request failed: %w", err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {

@@ -18,13 +18,13 @@ import (
 func main() {
 	var (
 		baseURL            = flag.String("base-url", "https://masterunitlist.azurewebsites.net", "Master Unit List base URL")
-		unitTypeIDsCSV     = flag.String("unit-type-ids", "18,19,21,17", "comma-separated MUL type IDs")
+		unitTypeIDsCSV     = flag.String("unit-type-ids", "18,19,17,21", "comma-separated MUL type IDs")
 		eraIDsCSV          = flag.String("era-ids", "13,247,14", "comma-separated era IDs")
 		factionIDsCSV      = flag.String("faction-ids", "", "comma-separated faction IDs")
 		includeFactionEras = flag.Bool("include-faction-eras", true, "build detailed faction->eras availability map")
 		skipEraBootstrap   = flag.Bool("skip-era-bootstrap", true, "skip broad era-only requests")
 		replace            = flag.Bool("replace", false, "replace cards table before each import")
-		httpTimeout        = flag.Duration("http-timeout", 30*time.Second, "HTTP timeout per request")
+		httpTimeout        = flag.Duration("http-timeout", 120*time.Second, "HTTP timeout per request (MUL can be slow)")
 		batchSize          = flag.Int("batch-size", 300, "database upsert batch size")
 		interval           = flag.Duration("interval", 7*24*time.Hour, "sync interval")
 		runNow             = flag.Bool("run-now", true, "run one sync immediately on startup")
@@ -122,4 +122,3 @@ func parseCSVInts(v string) []int {
 	}
 	return out
 }
-

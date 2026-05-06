@@ -21,6 +21,22 @@ type ImportOptions struct {
 	BatchSize          int
 	EraIDs             []int
 	FactionIDs         []int
+	OnProgress         func(ImportProgress)
+}
+
+type ImportProgress struct {
+	Stage              string
+	UnitTypeID         int
+	EraID              int
+	EraName            string
+	FactionID          int
+	FactionName        string
+	UnitsFetched       int
+	PairsDone          int
+	PairsTotal         int
+	DiscoveredFactions int
+	SelectedEras       int
+	Error              string
 }
 
 type ImportStats struct {
@@ -44,6 +60,13 @@ func NewImporter(client *Client, db *gorm.DB) *Importer {
 
 func (imp *Importer) Import(ctx context.Context, opts ImportOptions) (ImportStats, error) {
 	var stats ImportStats
+	emitProgress := func(p ImportProgress) {
+		if opts.OnProgress == nil {
+			return
+		}
+		p.UnitTypeID = opts.UnitTypeID
+		opts.OnProgress(p)
+	}
 
 	if imp.client == nil || imp.db == nil {
 		return stats, fmt.Errorf("client or db is nil")
@@ -65,6 +88,14 @@ func (imp *Importer) Import(ctx context.Context, opts ImportOptions) (ImportStat
 	factions = filterFactionsByIDs(factions, opts.FactionIDs)
 	stats.Factions = len(factions)
 	log.Printf("discovered factions: %d", len(factions))
+	totalPairs := len(eras) * len(factions)
+	emitProgress(ImportProgress{
+		Stage:              "discovered",
+		PairsDone:          0,
+		PairsTotal:         totalPairs,
+		DiscoveredFactions: len(factions),
+		SelectedEras:       len(eras),
+	})
 
 	unitByID := make(map[int]Unit, 8192)
 	unitEras := make(map[int][]string, 8192)
@@ -86,6 +117,15 @@ func (imp *Importer) Import(ctx context.Context, opts ImportOptions) (ImportStat
 	for _, era := range eras {
 		activeFactions := 0
 		log.Printf("era start: %s (%d)", era.Name, era.ID)
+		emitProgress(ImportProgress{
+			Stage:              "era_start",
+			EraID:              era.ID,
+			EraName:            era.Name,
+			PairsDone:          stats.PairCalls,
+			PairsTotal:         totalPairs,
+			DiscoveredFactions: len(factions),
+			SelectedEras:       len(eras),
+		})
 		for _, f := range factions {
 			stats.PairCalls++
 			units, err := imp.client.QuickList(ctx, map[string]string{
@@ -94,8 +134,32 @@ func (imp *Importer) Import(ctx context.Context, opts ImportOptions) (ImportStat
 				"AvailableEras": eraIDString(era.ID),
 			})
 			if err != nil {
+				emitProgress(ImportProgress{
+					Stage:              "error",
+					EraID:              era.ID,
+					EraName:            era.Name,
+					FactionID:          f.Value,
+					FactionName:        f.Label,
+					PairsDone:          stats.PairCalls,
+					PairsTotal:         totalPairs,
+					DiscoveredFactions: len(factions),
+					SelectedEras:       len(eras),
+					Error:              err.Error(),
+				})
 				return stats, fmt.Errorf("quicklist faction=%d era=%d failed: %w", f.Value, era.ID, err)
 			}
+			emitProgress(ImportProgress{
+				Stage:              "pair_done",
+				EraID:              era.ID,
+				EraName:            era.Name,
+				FactionID:          f.Value,
+				FactionName:        f.Label,
+				UnitsFetched:       len(units),
+				PairsDone:          stats.PairCalls,
+				PairsTotal:         totalPairs,
+				DiscoveredFactions: len(factions),
+				SelectedEras:       len(eras),
+			})
 			if len(units) == 0 {
 				continue
 			}
@@ -115,6 +179,15 @@ func (imp *Importer) Import(ctx context.Context, opts ImportOptions) (ImportStat
 			}
 		}
 		log.Printf("era done: %s active_factions=%d", era.Name, activeFactions)
+		emitProgress(ImportProgress{
+			Stage:              "era_done",
+			EraID:              era.ID,
+			EraName:            era.Name,
+			PairsDone:          stats.PairCalls,
+			PairsTotal:         totalPairs,
+			DiscoveredFactions: len(factions),
+			SelectedEras:       len(eras),
+		})
 	}
 
 	cards := make([]domain.Card, 0, len(unitByID))
@@ -165,6 +238,14 @@ func (imp *Importer) Import(ctx context.Context, opts ImportOptions) (ImportStat
 		}
 	}
 	stats.Upserted = len(cards)
+	emitProgress(ImportProgress{
+		Stage:              "db_upsert_done",
+		UnitsFetched:       len(cards),
+		PairsDone:          stats.PairCalls,
+		PairsTotal:         totalPairs,
+		DiscoveredFactions: len(factions),
+		SelectedEras:       len(eras),
+	})
 
 	dupAfter, err := imp.countDuplicateModelNumbers()
 	if err != nil {
@@ -179,6 +260,14 @@ func (imp *Importer) Import(ctx context.Context, opts ImportOptions) (ImportStat
 		log.Printf("duplicates removed after import: %d", removed)
 	}
 
+	emitProgress(ImportProgress{
+		Stage:              "completed",
+		UnitsFetched:       len(cards),
+		PairsDone:          stats.PairCalls,
+		PairsTotal:         totalPairs,
+		DiscoveredFactions: len(factions),
+		SelectedEras:       len(eras),
+	})
 	return stats, nil
 }
 

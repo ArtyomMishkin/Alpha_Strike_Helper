@@ -39,5 +39,47 @@ services:
     ports:
       - "8080:8080"
 
+  sync-service:
+    build:
+      context: ..
+      dockerfile: docker/sync-service.dockerfile
+    container_name: alpha_strike_sync_service
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-change-me}
+      DB_NAME: ${DB_NAME:-alpha_strike}
+      SERVER_PORT: "8081"
+      JWT_SECRET: ${JWT_SECRET:-change-me}
+      RUN_ON_START: "true"
+      RUN_ON_START_UNIT_TYPE_IDS: "18,19,17,21"
+      RUN_ON_START_HTTP_TIMEOUT_SECONDS: "180"
+    ports:
+      - "8081:8081"
+
+  cards-service:
+    build:
+      context: ..
+      dockerfile: docker/cards-service.dockerfile
+    container_name: alpha_strike_cards_service
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-change-me}
+      DB_NAME: ${DB_NAME:-alpha_strike}
+      CARDS_SERVICE_PORT: "8082"
+    ports:
+      - "8082:8082"
+
 volumes:
   postgres_data:

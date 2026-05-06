@@ -21,7 +21,30 @@
 - `cmd/*` — исполняемые команды:
   - `cmd/server` (web/API сервер),
   - `cmd/masterunitlist_sync` (ручной/разовый импорт),
-  - `cmd/weekly_sync` (плановая периодическая синхронизация).
+  - `cmd/weekly_sync` (плановая периодическая синхронизация),
+  - `cmd/sync_service` (микросервис sync с HTTP API),
+  - `cmd/cards_service` (микросервис cards с read/admin API и chassis-sources).
+
+### 2.1 Схема сервисов и портов
+
+```mermaid
+flowchart LR
+    Browser["Browser UI (layout.html)"]
+    AppServer["app-service :8080"]
+    CardsService["cards-service :8082"]
+    SyncService["sync-service :8081"]
+    Postgres["PostgreSQL :5432"]
+    MulApi["MasterUnitList API"]
+
+    Browser -->|"GET /"| AppServer
+    Browser -->|"GET cards + chassis sources"| CardsService
+    Browser -->|"sync control (optional)"| SyncService
+
+    AppServer -->|"read/write domain data"| Postgres
+    CardsService -->|"read/admin cards"| Postgres
+    SyncService -->|"import upsert cards"| Postgres
+    SyncService -->|"QuickList/Faction API"| MulApi
+```
 
 ## 3. Backend и API
 
@@ -114,6 +137,40 @@
 - может выполнить синхронизацию сразу при старте (`--run-now=true`);
 - использует тот же импортный модуль `internal/sync/masterunitlist`.
 
+### 5.3 Sync Service (отдельный HTTP-процесс)
+
+Добавлен отдельный микросервис синхронизации:
+
+- `cmd/sync_service`
+- orchestration-слой: `internal/sync/service`
+
+HTTP-эндпоинты:
+
+- `GET /health` — проверка состояния процесса;
+- `GET /sync/status` — статус последнего запуска;
+- `POST /sync/run` — ручной запуск импорта (асинхронно).
+
+### 5.4 Cards Service (отдельный HTTP-процесс)
+
+Добавлен отдельный микросервис карточек:
+
+- `cmd/cards_service`
+
+HTTP-эндпоинты:
+
+- `GET /health`
+- `GET /api/v1/cards`
+- `GET /api/v1/cards/:id`
+- `GET /api/v1/cards/search`
+- `POST /api/v1/admin/cards`
+- `PUT /api/v1/admin/cards/:id`
+- `DELETE /api/v1/admin/cards/:id`
+- `GET /api/v1/chassis-sources`
+
+Примечание:
+
+- frontend (`templates/layout.html`) получает карточки и `chassis_sources` напрямую из cards-service (`:8082`).
+
 ## 6. Обновления фильтрации API карточек
 
 Добавлена поддержка фильтрации по новой структуре доступности:
@@ -186,6 +243,8 @@
 После запуска:
 
 - API: `http://localhost:8080`
+- Sync Service API: `http://localhost:8081`
+- Cards Service API: `http://localhost:8082`
 - PostgreSQL: `localhost:5432`
 
 ### 11.2 Запуск без Docker
@@ -204,6 +263,35 @@
 
 - `go run ./cmd/server`
 
+### 11.2.1 Запуск sync-сервиса без Docker
+
+Команда запуска:
+
+- `go run ./cmd/sync_service`
+
+Доступные HTTP-эндпоинты:
+
+- `GET /health`
+- `GET /sync/status`
+- `POST /sync/run`
+
+Пример body для `POST /sync/run`:
+
+```json
+{
+  "unit_type_ids": [18, 19, 17, 21],
+  "replace_first": true,
+  "include_faction_eras": true,
+  "http_timeout_seconds": 180
+}
+```
+
+### 11.2.2 Запуск cards-сервиса без Docker
+
+Команда запуска:
+
+- `go run ./cmd/cards_service`
+
 ### 11.3 Импорт карточек MUL (Master Unit List)
 
 Основная команда:
@@ -217,7 +305,7 @@
 - `--include-faction-eras=true|false`
 - `--era-ids=13,247,14` (ограничение эпох)
 - `--faction-ids=24,29,27` (ограничение фракций)
-- `--http-timeout=30s`
+- `--http-timeout=120s` (рекомендуется 180s+ при нестабильной сети)
 - `--batch-size=300`
 
 Примечание:
@@ -392,4 +480,163 @@
 - использован сценарий `masterunitlist_sync` с полным `era-ids`;
 - исправлен сценарий, при котором поэтапный импорт мог затирать агрегированные `available_eras`;
 - итоговая стратегия: импорт по каждому типу юнита сразу по всему списку эпох.
+
+### 12.12 Docker: команды для работы с проектом
+
+Базовые команды (выполняются из корня репозитория):
+
+- первый запуск/пересборка всех сервисов:
+  - `docker compose -f docker/docker-compose.yml up --build -d`
+- обычный запуск без пересборки:
+  - `docker compose -f docker/docker-compose.yml up -d`
+- запуск только одного сервиса с пересборкой:
+  - `docker compose -f docker/docker-compose.yml up --build -d sync-service`
+  - `docker compose -f docker/docker-compose.yml up --build -d cards-service`
+  - `docker compose -f docker/docker-compose.yml up --build -d app`
+
+Проверка состояния:
+
+- список контейнеров и статус:
+  - `docker compose -f docker/docker-compose.yml ps`
+- просмотр логов всех сервисов:
+  - `docker compose -f docker/docker-compose.yml logs -f`
+- просмотр логов конкретного сервиса:
+  - `docker compose -f docker/docker-compose.yml logs -f sync-service`
+  - `docker compose -f docker/docker-compose.yml logs -f cards-service`
+  - `docker compose -f docker/docker-compose.yml logs -f app`
+
+Остановка и очистка:
+
+- остановить сервисы:
+  - `docker compose -f docker/docker-compose.yml down`
+- остановить и удалить volume БД (полный сброс данных):
+  - `docker compose -f docker/docker-compose.yml down -v`
+
+Полезные проверки API после запуска:
+
+- health main app: `http://localhost:8080/health`
+- health sync-service: `http://localhost:8081/health`
+- health cards-service: `http://localhost:8082/health`
+- статус/прогресс импорта:
+  - `http://localhost:8081/sync/status`
+  - `http://localhost:8081/sync/progress`
+
+Пример точечного импорта (пехота + aerospace, все эпохи, все фракции):
+
+- PowerShell:
+  - ```powershell
+    $body = @{
+      unit_type_ids = @(21,17)           # 21 = Infantry, 17 = Aerospace
+      replace_first = $false             # не очищать текущую базу
+      include_faction_eras = $true
+      http_timeout_seconds = 180
+      batch_size = 300
+    } | ConvertTo-Json
+
+    irm -Method Post -Uri http://localhost:8081/sync/run -ContentType "application/json" -Body $body
+    ```
+- Проверка прогресса:
+  - `irm http://localhost:8081/sync/progress | ConvertTo-Json -Depth 10`
+
+### 12.13 Admin CRUD карточек (cards-service)
+
+Админские операции по карточкам выполняются через `cards-service`:
+
+- `POST http://localhost:8082/api/v1/admin/cards` — создать карточку
+- `PUT http://localhost:8082/api/v1/admin/cards/:id` — обновить карточку
+- `DELETE http://localhost:8082/api/v1/admin/cards/:id` — удалить карточку
+
+#### Как получить токен для admin-эндпоинтов
+
+В текущей реализации `cards-service` использует JWT-проверку, а сам логин выполняется через основной сервис (`app`, порт `8080`):
+
+- `POST http://localhost:8080/api/v1/auth/login`
+
+PowerShell пример:
+
+```powershell
+$loginBody = @{
+  username = "admin"
+  password = "admin123"
+} | ConvertTo-Json
+
+$loginResp = irm -Method Post -Uri "http://localhost:8080/api/v1/auth/login" -ContentType "application/json" -Body $loginBody
+$token = $loginResp.token
+```
+
+#### Пример создания карточки (Create)
+
+```powershell
+$body = @{
+  name = "Viper A"
+  model_number = "VPR-A-EXAMPLE"
+  unit_type = "BattleMech"
+  type = "Striker"
+  size = 1
+  move = "16\"j"
+  tmm = 4
+  point_value = 34
+  armor = 4
+  structure = 2
+  damage_short = "3"
+  damage_medium = "3"
+  damage_long = "0"
+  overheat = 0
+  abilities = "JMPS1"
+  tech_base = "Clan"
+  role = "Striker"
+  source = "Manual"
+  faction = "Clan Wolf"
+  era = "Clan Invasion"
+  available_factions = @("Clan Wolf")
+  available_faction_groups = @("HW Clan")
+  available_eras = @("Clan Invasion")
+  faction_era_availability = @{
+    "Clan Wolf" = @("Clan Invasion")
+  }
+} | ConvertTo-Json -Depth 10
+
+irm -Method Post `
+  -Uri "http://localhost:8082/api/v1/admin/cards" `
+  -Headers @{ Authorization = "Bearer $token" } `
+  -ContentType "application/json" `
+  -Body $body
+```
+
+#### Пример обновления карточки (Update)
+
+```powershell
+$cardId = 123
+$updateBody = @{
+  name = "Viper A (Updated)"
+  point_value = 35
+  overheat = 1
+} | ConvertTo-Json -Depth 10
+
+irm -Method Put `
+  -Uri "http://localhost:8082/api/v1/admin/cards/$cardId" `
+  -Headers @{ Authorization = "Bearer $token" } `
+  -ContentType "application/json" `
+  -Body $updateBody
+```
+
+Примечание: текущий `Update` использует `Save` на полной модели, поэтому на практике рекомендуется отправлять полный объект карточки (не только частичный патч), чтобы не перезаписать поля нулевыми значениями.
+
+#### Пример удаления карточки (Delete)
+
+```powershell
+$cardId = 123
+irm -Method Delete `
+  -Uri "http://localhost:8082/api/v1/admin/cards/$cardId" `
+  -Headers @{ Authorization = "Bearer $token" }
+```
+
+#### Как сейчас определяется "админ"
+
+На текущем этапе отдельной роли администратора (`is_admin`, `role=admin`) в модели пользователя нет.
+
+- `cards-service` проверяет только валидность JWT (`Authorization: Bearer <token>`);
+- значит фактически "админ" сейчас = любой аутентифицированный пользователь с корректным токеном.
+
+Для строгого разграничения прав нужен отдельный флаг/роль в `users` и проверка этой роли в middleware.
 

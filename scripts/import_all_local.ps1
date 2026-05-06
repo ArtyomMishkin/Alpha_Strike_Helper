@@ -47,10 +47,10 @@ if (-not $env:DB_PASSWORD) { $env:DB_PASSWORD = "change-me" }
 if (-not $env:DB_NAME) { $env:DB_NAME = "alpha_strike" }
 if (-not $env:JWT_SECRET) { $env:JWT_SECRET = "change-me-local" }
 
-# 18 BattleMech, 16 Combat Vehicle, 15 Infantry, 17 Aerospace
-go run ./cmd/masterunitlist_sync --unit-type-id=18 --replace=true --include-faction-eras=true
-go run ./cmd/masterunitlist_sync --unit-type-id=16 --replace=false --include-faction-eras=true
-go run ./cmd/masterunitlist_sync --unit-type-id=15 --replace=false --include-faction-eras=true
-go run ./cmd/masterunitlist_sync --unit-type-id=17 --replace=false --include-faction-eras=true
+# 18 BattleMech, 19 Combat Vehicle, 17 Aerospace, 21 Infantry
+go run ./cmd/masterunitlist_sync --http-timeout=180s --unit-type-id=18 --replace=true --include-faction-eras=true
+go run ./cmd/masterunitlist_sync --http-timeout=180s --unit-type-id=19 --replace=false --include-faction-eras=true
+go run ./cmd/masterunitlist_sync --http-timeout=180s --unit-type-id=17 --replace=false --include-faction-eras=true
+go run ./cmd/masterunitlist_sync --http-timeout=180s --unit-type-id=21 --replace=false --include-faction-eras=true
 
 Write-Host "Import finished." -ForegroundColor Green
