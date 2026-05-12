@@ -14,13 +14,71 @@ import (
 
 var moveFirstNumberRe = regexp.MustCompile(`\d+`)
 
+// FactionQueryHit is one QuickList discovery: faction filter label + MUL group for that faction.
+type FactionQueryHit struct {
+	Faction string
+	Group   string
+}
+
+func argMaxCount(counts map[string]int) string {
+	if len(counts) == 0 {
+		return ""
+	}
+	var best string
+	bestN := -1
+	for g, n := range counts {
+		if n > bestN || (n == bestN && g < best) {
+			best, bestN = g, n
+		}
+	}
+	return best
+}
+
+// DominantGroupForFaction returns the most common non-empty group among hits for the given faction label.
+func DominantGroupForFaction(hits []FactionQueryHit, label string) string {
+	label = strings.TrimSpace(label)
+	if label == "" {
+		return ""
+	}
+	counts := make(map[string]int)
+	for _, h := range hits {
+		if strings.TrimSpace(h.Faction) != label {
+			continue
+		}
+		g := strings.TrimSpace(h.Group)
+		if g == "" {
+			continue
+		}
+		counts[g]++
+	}
+	return argMaxCount(counts)
+}
+
+// DominantGroupOverall returns the most common non-empty group across all hits (fallback).
+func DominantGroupOverall(hits []FactionQueryHit) string {
+	counts := make(map[string]int)
+	for _, h := range hits {
+		g := strings.TrimSpace(h.Group)
+		if g == "" {
+			continue
+		}
+		counts[g]++
+	}
+	return argMaxCount(counts)
+}
+
 func MapUnitToCard(
 	u Unit,
 	availableFactions []string,
 	availableFactionGroups []string,
 	availableEras []string,
 	factionEra map[string][]string,
+	primaryFactionGroup string,
 ) domain.Card {
+	fg := strings.TrimSpace(primaryFactionGroup)
+	if fg == "" {
+		fg = firstOrEmpty(availableFactionGroups)
+	}
 	return domain.Card{
 		ModelNumber:            strconv.Itoa(u.ID),
 		Name:                   u.Name,
@@ -42,7 +100,7 @@ func MapUnitToCard(
 		Role:                   u.Role.Name,
 		Source:                 u.TRO,
 		Faction:                firstOrEmpty(availableFactions),
-		FactionGroup:           firstOrEmpty(availableFactionGroups),
+		FactionGroup:           fg,
 		Era:                    firstOrEmpty(availableEras),
 		AvailableFactions:      datatypes.JSONSlice[string](availableFactions),
 		AvailableFactionGroups: datatypes.JSONSlice[string](availableFactionGroups),

@@ -7,7 +7,7 @@ function Import-DotEnv {
     if (-not (Test-Path -LiteralPath $Path)) { return }
 
     Get-Content -LiteralPath $Path | ForEach-Object {
-        $line = $_.Trim()
+        $line = $_.Trim().TrimStart([char]0xFEFF)
         if (-not $line) { return }
         if ($line.StartsWith("#")) { return }
         if ($line.StartsWith(";")) { return }

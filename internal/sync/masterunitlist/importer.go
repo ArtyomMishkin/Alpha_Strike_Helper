@@ -102,6 +102,7 @@ func (imp *Importer) Import(ctx context.Context, opts ImportOptions) (ImportStat
 	unitFactions := make(map[int][]string, 8192)
 	unitFactionGroups := make(map[int][]string, 8192)
 	unitFactionEra := make(map[int]map[string][]string, 8192)
+	unitFQHits := make(map[int][]FactionQueryHit, 8192)
 
 	factionGroups, err := imp.client.FactionGroups(ctx, factions)
 	if err != nil {
@@ -176,6 +177,10 @@ func (imp *Importer) Import(ctx context.Context, opts ImportOptions) (ImportStat
 					unitFactionEra[u.ID] = make(map[string][]string)
 				}
 				unitFactionEra[u.ID][f.Label] = append(unitFactionEra[u.ID][f.Label], era.Name)
+				unitFQHits[u.ID] = append(unitFQHits[u.ID], FactionQueryHit{
+					Faction: f.Label,
+					Group:   strings.TrimSpace(f.Group),
+				})
 			}
 		}
 		log.Printf("era done: %s active_factions=%d", era.Name, activeFactions)
@@ -199,7 +204,16 @@ func (imp *Importer) Import(ctx context.Context, opts ImportOptions) (ImportStat
 		for factionName, eraList := range unitFactionEra[id] {
 			factionEra[factionName] = sortUnique(eraList)
 		}
-		cards = append(cards, MapUnitToCard(u, factionsList, factionGroupsList, erasList, factionEra))
+		hits := unitFQHits[id]
+		displayFaction := firstOrEmpty(factionsList)
+		primaryGroup := DominantGroupForFaction(hits, displayFaction)
+		if primaryGroup == "" {
+			primaryGroup = DominantGroupOverall(hits)
+		}
+		if primaryGroup == "" {
+			primaryGroup = firstOrEmpty(factionGroupsList)
+		}
+		cards = append(cards, MapUnitToCard(u, factionsList, factionGroupsList, erasList, factionEra, primaryGroup))
 	}
 	stats.UnitsTotal = len(cards)
 

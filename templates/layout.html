@@ -486,6 +486,39 @@
             max-width: 820px;
         }
 
+        .validation-modal-card {
+            max-width: 720px;
+            width: 100%;
+        }
+
+        .validation-filters {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 12px 0 14px;
+            padding: 12px 14px;
+            background: #fafcff;
+            border: 1px solid #e5ecfb;
+            border-radius: 8px;
+        }
+
+        .validation-filters label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: #333;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .validation-filters input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #2a5298;
+            cursor: pointer;
+        }
+
         .availability-meta {
             font-size: 12px;
             color: #666;
@@ -720,6 +753,8 @@
             border-radius: 8px;
             padding: 15px;
             transition: all 0.3s;
+            min-width: 0;
+            overflow: hidden;
         }
         
         .formation-card.lance { border-color: #3498db; }
@@ -755,6 +790,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
+            min-width: 0;
         }
         
         .formation-member {
@@ -764,13 +800,29 @@
             border-left: 3px solid #2a5298;
             font-size: 12px;
             display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+            min-width: 0;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .formation-member-top {
+            display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
+            gap: 8px;
+            min-width: 0;
         }
         
         .formation-member-name {
             font-weight: 600;
             color: #1e3c72;
+            flex: 1;
+            min-width: 0;
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
         
         .formation-member-pv {
@@ -779,6 +831,31 @@
             border-radius: 3px;
             font-weight: 600;
             color: #2a5298;
+            flex-shrink: 0;
+        }
+
+        .formation-member-abilities {
+            font-size: 7pt;
+            color: #666;
+            line-height: 1.3;
+            max-height: 5.2em;
+            overflow-y: auto;
+            overflow-x: hidden;
+            word-break: break-word;
+            min-width: 0;
+        }
+
+        .formation-member-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .formation-member .btn-danger {
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 0;
         }
         
         .formation-stats {
@@ -938,7 +1015,6 @@
         <div class="tabs">
             <button class="tab-button active" data-tab="cards">Список мехов</button>
             <button class="tab-button" data-tab="hangar">Ангар</button>
-            <button class="tab-button" data-tab="roster">Ростер</button>
             <button class="tab-button" data-tab="formations">Формации</button>
             <button class="tab-button" data-tab="export">Экспорт</button>
         </div>
@@ -1040,47 +1116,29 @@
             </div>
         </div>
 
-        <!-- Tab 2: Roster -->
-        <div id="roster" class="tab-content">
-            <div class="roster-section">
-                <div class="roster-controls">
-                    <h3 style="margin-bottom: 15px; color: #1e3c72">Управление</h3>
-                    <div class="faction-selector">
-                        <label for="rosterFactionSelect" style="display:block;font-size:12px;color:#666;margin-bottom:6px;">Фракция ростера</label>
-                        <select id="rosterFactionSelect" class="search-mech" style="margin-bottom:0;" onchange="selectFaction(this.value)">
-                            <option value="">Все доступные</option>
-                        </select>
-                        <div id="rosterFactionHint" style="font-size:11px;color:#666;margin-top:6px;"></div>
-                        <label for="rosterEraSelect" style="display:block;font-size:12px;color:#666;margin:10px 0 6px;">Эпоха ростера</label>
-                        <select id="rosterEraSelect" class="search-mech" style="margin-bottom:0;" onchange="selectRosterEra(this.value, true)">
-                            <option value="">Все эпохи</option>
-                        </select>
-                    </div>
-                    <h3 style="margin: 20px 0 15px; color: #1e3c72">Поиск</h3>
-                    <input type="text" class="search-mech" id="mechSearch" placeholder="Введите имя юнита..." onkeyup="searchMechs()">
-                    <div id="mechSearchResults" class="mech-search-results"></div>
-                    <h3 style="margin: 20px 0 15px; color: #1e3c72">Ростер</h3>
-                    <div style="font-size: 12px; color: #999; margin-bottom: 10px">Юнитов в ростере: <span id="rosterCount">0</span></div>
-                </div>
-                <div class="roster-list">
-                    <div id="rosterList">
-                        <div class="roster-empty">
-                            <div style="font-size: 48px; margin-bottom: 10px">📋</div>
-                            <p>Ростер пуст</p>
-                            <p style="font-size: 12px">Добавьте юнитов через вкладку "Список мехов"</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tab 3: Formations -->
+        <!-- Tab 2: Formations -->
         <div id="formations" class="tab-content">
             <div class="formations-section">
                 <div class="formations-control">
                     <h3 style="margin-bottom: 15px; color: #1e3c72">Формации</h3>
-                    <div id="formationsContextInfo" style="font-size:12px;color:#666;background:#f5f8ff;border:1px solid #dbe7ff;border-radius:8px;padding:8px;margin-bottom:12px;">
-                        Фракция: не выбрана
+                    <div style="font-size:12px;color:#555;margin:-6px 0 12px;">Юнитов в наборе: <strong id="rosterCount">0</strong></div>
+                    <div class="faction-selector" style="margin-bottom:14px;padding:12px;background:#f5f8ff;border:1px solid #dbe7ff;border-radius:8px;">
+                        <label for="rosterFactionSelect" style="display:block;font-size:12px;color:#666;margin-bottom:6px;">Фракция ростера</label>
+                        <select id="rosterFactionSelect" class="search-mech" style="margin-bottom:0;width:100%;box-sizing:border-box;" onchange="selectFaction(this.value)">
+                            <option value="">Все доступные</option>
+                        </select>
+                        <div id="rosterFactionHint" style="font-size:11px;color:#666;margin-top:6px;"></div>
+                        <label for="rosterEraSelect" style="display:block;font-size:12px;color:#666;margin:10px 0 6px;">Эпоха ростера</label>
+                        <select id="rosterEraSelect" class="search-mech" style="margin-bottom:0;width:100%;box-sizing:border-box;" onchange="selectRosterEra(this.value, true)">
+                            <option value="">Все эпохи</option>
+                        </select>
+                        <div id="formationsContextInfo" style="font-size:11px;color:#666;margin-top:8px;line-height:1.35;"></div>
+                    </div>
+                    <div style="margin-bottom:14px;">
+                        <h3 style="margin:0 0 8px; color: #1e3c72; font-size: 15px;">Добавить юнита в набор</h3>
+                        <p style="font-size:11px;color:#666;margin:0 0 8px;line-height:1.35;">Поиск по каталогу; клик по строке добавляет в ростер. Skill и удаление — на карточках формаций справа.</p>
+                        <input type="text" class="search-mech" id="mechSearch" placeholder="Введите имя юнита..." onkeyup="searchMechs()" style="width:100%;box-sizing:border-box;">
+                        <div id="mechSearchResults" class="mech-search-results"></div>
                     </div>
                     <div class="formation-type-selector">
                         <h3 style="margin-bottom: 15px; color: #1e3c72">Выбор типа</h3>
@@ -1088,6 +1146,23 @@
                             <option value="">-- Выбрать --</option>
                             <option value="No Formation">No Formation</option>
                         </select>
+                    </div>
+                    <div style="margin-top: 8px;">
+                        <h3 style="margin-bottom: 10px; color: #1e3c72; font-size: 15px;">Валидация ростера</h3>
+                        <div class="validation-filters" id="rosterValidationFilters">
+                            <label><input type="checkbox" id="valFilterEra" checked> Эпоха (выбранная выше)</label>
+                            <div style="display:flex;flex-direction:column;gap:6px;">
+                                <label><input type="checkbox" id="valFilterPvLimit"> Суммарная стоимость ростера (PV)</label>
+                                <div style="margin-left:26px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                                    <span style="font-size:12px;color:#555;">Не больше:</span>
+                                    <input type="number" id="valFilterPvLimitValue" min="1" step="1" placeholder="напр. 400" style="width:110px;padding:6px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
+                                </div>
+                            </div>
+                            <label title="При включении в ростере не должно быть юнитов со способностями или ключевыми словами Unique или Custom."><input type="checkbox" id="valFilterNoUniqueCustom" checked> Наличие Unique / Custom (должны отсутствовать)</label>
+                            <label><input type="checkbox" id="valFilterFaction" checked> Доступность для выбранной фракции</label>
+                            <label><input type="checkbox" id="valFilterFormations"> Правила формаций (состав каждой формации по AS)</label>
+                        </div>
+                        <button type="button" class="btn btn-primary" style="width: 100%;" onclick="openRosterValidationFromFormations()">Валидация</button>
                     </div>
                 </div>
                 <div>
@@ -1102,7 +1177,7 @@
             </div>
         </div>
 
-        <!-- Tab 4: Export -->
+        <!-- Tab 3: Export -->
         <div id="export" class="tab-content">
             <div class="export-section">
                 <div class="roster-stats">
@@ -1190,6 +1265,18 @@
         </div>
     </div>
 
+    <div id="rosterValidationModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="rosterValidationModalTitle">
+        <div class="modal-card validation-modal-card">
+            <div id="rosterValidationModalTitle" class="modal-header">Результат валидации</div>
+            <div id="rosterValidationModalBody" class="modal-body" style="white-space: normal; max-height: 62vh; overflow-y: auto;"></div>
+            <div class="modal-actions" id="rosterValidationModalActions">
+                <button type="button" id="rosterValidationModalNo" class="btn btn-secondary" style="width:auto; min-width:96px; display:none;">Нет, оставить</button>
+                <button type="button" id="rosterValidationModalYes" class="btn btn-primary" style="width:auto; min-width:96px; display:none;">Да, заменить</button>
+                <button type="button" id="rosterValidationModalClose" class="btn btn-primary" style="width:auto; min-width:96px;">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const state = {
             allCards: [],
@@ -1208,6 +1295,183 @@
             factionToPrimaryGroup: {},
             groupToGeneralFactions: {}
         };
+
+        function mulFactionRollupKey(s) {
+            return String(s || '')
+                .trim()
+                .toLowerCase()
+                .replace(/\u2019/g, "'")
+                .normalize('NFKD')
+                .replace(/[\u0300-\u036f]/g, '');
+        }
+
+        const IS_CLAN_GENERAL_FACTIONS = [
+                'IS Clan',
+                'IS Clan General',
+                'Alyina Mercantile League',
+                'Clan Diamond Shark',
+                'Clan Ghost Bear',
+                "Clan Hell's Horses",
+                'Clan Jade Falcon',
+                'Clan Nova Cat',
+                'Clan Protectorate',
+                'Clan Sea Fox',
+                'Clan Smoke Jaguar',
+                'Clan Snow Raven',
+                'Clan Wolf',
+                'Clan Wolf (in Exile)',
+                'Rasalhague Dominion',
+                'Raven Alliance',
+                'Star League (Clan Jade Falcon)',
+                'Star League (Clan Smoke Jaguar)',
+                'Star League (Clan Wolf)',
+                'Wolf Empire'
+        ];
+        const IS_CLAN_GENERAL_FACTION_KEYS = new Set(IS_CLAN_GENERAL_FACTIONS.map(mulFactionRollupKey));
+
+        const HW_CLAN_GENERAL_FACTIONS = [
+                'HW Clan',
+                'HW Clan General',
+                'Clan Blood Spirit',
+                'Clan Burrock',
+                'Clan Cloud Cobra',
+                'Clan Coyote',
+                'Clan Fire Mandrill',
+                'Clan Goliath Scorpion',
+                'Clan Ice Hellion',
+                'Clan Mongoose',
+                'Clan Star Adder',
+                'Clan Steel Viper',
+                'Clan Stone Lion',
+                'Clan Widowmaker',
+                'Clan Wolverine',
+                'Society',
+                'Star League in Exile'
+        ];
+        const HW_CLAN_GENERAL_FACTION_KEYS = new Set(HW_CLAN_GENERAL_FACTIONS.map(mulFactionRollupKey));
+
+        function getClanGeneralMulBucket(factionName) {
+            const k = mulFactionRollupKey(factionName);
+            if (!k) return '';
+            if (IS_CLAN_GENERAL_FACTION_KEYS.has(k)) return 'is_clan_general';
+            if (HW_CLAN_GENERAL_FACTION_KEYS.has(k)) return 'hw_clan_general';
+            return '';
+        }
+
+        const NO_GENERAL_ROLLUP_FACTIONS = [
+                'Wolf Dragoons',
+                "Wolf's Dragoons",
+                "Kell's Hounds",
+                'Kell Hounds',
+                'Kells Hounds'
+        ];
+        const NO_GENERAL_ROLLUP_FACTION_KEYS = new Set(NO_GENERAL_ROLLUP_FACTIONS.map(mulFactionRollupKey));
+
+        const MERCENARY_GENERAL_FACTIONS = ['Mercenary', 'Mercenary General'];
+        const MERCENARY_GENERAL_FACTION_KEYS = new Set(MERCENARY_GENERAL_FACTIONS.map(mulFactionRollupKey));
+
+        const PERIPHERY_GENERAL_FACTIONS = [
+                'Calderon Protectorate',
+                'Circinus Federation',
+                'Escorpión Imperio',
+                'Filtvelt Coalition',
+                'Fronc Reaches',
+                'Magistracy of Canopus',
+                'Marian Hegemony',
+                'Outworlds Alliance',
+                'Periphery General',
+                'Periphery',
+                'Pirates',
+                'Rim Worlds Republic - Home Guard',
+                'Rim Worlds Republic - Terran Corps',
+                'Scorpion Empire',
+                'Taurian Concordat'
+        ];
+        const PERIPHERY_GENERAL_FACTION_KEYS = new Set(PERIPHERY_GENERAL_FACTIONS.map(mulFactionRollupKey));
+
+        const INNER_SPHERE_GENERAL_FACTIONS = [
+                'Inner Sphere',
+                'Inner Sphere General',
+                'Capellan Confederation',
+                'ComStar',
+                'Draconis Combine',
+                'Federated Commonwealth',
+                'Federated Suns',
+                'Free Rasalhague Republic',
+                'Free Worlds League',
+                'Free Worlds League (Duchy of Andurien)',
+                'Free Worlds League (Duchy of Tamarind-Abbey)',
+                'Free Worlds League (Marik-Stewart Commonwealth)',
+                'Free Worlds League (Non-Aligned Worlds)',
+                'Free Worlds League (Oriente Protectorate)',
+                'Free Worlds League (Regulan Fiefs)',
+                'Free Worlds League (Rim Commonality)',
+                'Lyran Alliance',
+                'Lyran Commonwealth',
+                'Republic of the Sphere',
+                'St. Ives Compact',
+                'Solaris 7',
+                'Tamar Pact',
+                'Terran Hegemony',
+                'Vesper Marches',
+                'Word of Blake'
+        ];
+        const INNER_SPHERE_GENERAL_FACTION_KEYS = new Set(INNER_SPHERE_GENERAL_FACTIONS.map(mulFactionRollupKey));
+
+        function getNonClanGeneralMulBucket(factionName) {
+            const k = mulFactionRollupKey(factionName);
+            if (!k) return '';
+            if (NO_GENERAL_ROLLUP_FACTION_KEYS.has(k)) return 'no_rollup';
+            if (MERCENARY_GENERAL_FACTION_KEYS.has(k)) return 'mercenary';
+            if (PERIPHERY_GENERAL_FACTION_KEYS.has(k)) return 'periphery';
+            if (INNER_SPHERE_GENERAL_FACTION_KEYS.has(k)) return 'inner_sphere';
+            return '';
+        }
+
+        /** Dedupe by mulFactionRollupKey, preserve first spelling, sort for UI. */
+        function uniqFactionLabelsSorted(list) {
+            const seen = new Set();
+            const out = [];
+            (list || []).forEach(s => {
+                const t = String(s || '').trim();
+                if (!t) return;
+                const k = mulFactionRollupKey(t);
+                if (seen.has(k)) return;
+                seen.add(k);
+                out.push(t);
+            });
+            out.sort((a, b) => a.localeCompare(b, 'ru'));
+            return out;
+        }
+
+        /** Replace card-derived faction lists for MUL «группа» filters with canonical bucket rosters. */
+        function applyCanonicalFactionGroupMaps() {
+            const map = state.factionGroupToFactions;
+            if (!map) return;
+            const isClanCanon = uniqFactionLabelsSorted([...IS_CLAN_GENERAL_FACTIONS]);
+            const hwClanCanon = uniqFactionLabelsSorted([...HW_CLAN_GENERAL_FACTIONS]);
+            const clanCanon = uniqFactionLabelsSorted([...IS_CLAN_GENERAL_FACTIONS, ...HW_CLAN_GENERAL_FACTIONS]);
+            const innerCanon = uniqFactionLabelsSorted([...INNER_SPHERE_GENERAL_FACTIONS]);
+            const peripheryCanon = uniqFactionLabelsSorted([...PERIPHERY_GENERAL_FACTIONS]);
+            const mercCanon = uniqFactionLabelsSorted([...MERCENARY_GENERAL_FACTIONS]);
+
+            Object.keys(map).forEach(key => {
+                const nk = mulFactionRollupKey(key);
+                if (nk.startsWith('hw clan')) {
+                    map[key] = hwClanCanon;
+                } else if (nk.startsWith('is clan')) {
+                    map[key] = isClanCanon;
+                } else if (nk === 'clan') {
+                    map[key] = clanCanon;
+                } else if (nk === 'inner sphere' || nk === 'innersphere') {
+                    map[key] = innerCanon;
+                } else if (nk === 'periphery') {
+                    map[key] = peripheryCanon;
+                } else if (nk === 'mercenary') {
+                    map[key] = mercCanon;
+                }
+            });
+        }
 
         const ERA_CHRONOLOGY = [
             'Age of War',
@@ -1311,14 +1575,17 @@
         }
 
         function switchTab(tabName) {
+            const tabEl = document.getElementById(tabName);
+            const tabBtn = document.querySelector(`[data-tab="${tabName}"]`);
+            if (!tabEl || !tabBtn) return;
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
             document.querySelectorAll('.tab-button').forEach(button => {
                 button.classList.remove('active');
             });
-            document.getElementById(tabName).classList.add('active');
-            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            tabEl.classList.add('active');
+            tabBtn.classList.add('active');
             if (tabName === 'formations') {
                 updateFormationsContextInfo();
                 displayFormations();
@@ -1509,6 +1776,75 @@
             return result;
         }
 
+        function resolveFactionEraMatrixRowKey(matrix, label) {
+            const keys = Object.keys(matrix || {});
+            const want = mulFactionRollupKey(label);
+            const hit = keys.find((k) => mulFactionRollupKey(k) === want);
+            return hit || '';
+        }
+
+        /** MUL matrix rows named * General apply to whole buckets; map filter substring to those row keys present on this card's matrix. */
+        function matrixGeneralRowKeysForFactionFilter(matrix, factionFilterLower) {
+            if (!factionFilterLower || !matrix || typeof matrix !== 'object') return [];
+            const canon = [
+                ...IS_CLAN_GENERAL_FACTIONS,
+                ...HW_CLAN_GENERAL_FACTIONS,
+                ...INNER_SPHERE_GENERAL_FACTIONS,
+                ...PERIPHERY_GENERAL_FACTIONS,
+                ...MERCENARY_GENERAL_FACTIONS,
+            ];
+            const extra = new Set();
+            for (const F of canon) {
+                const fl = String(F || '').toLowerCase();
+                if (!fl.includes(factionFilterLower)) continue;
+                const non = getNonClanGeneralMulBucket(F);
+                if (non === 'no_rollup') continue;
+                const labels = [];
+                if (non === 'mercenary') {
+                    labels.push('Mercenary General', 'Mercenary');
+                } else if (non === 'periphery') {
+                    labels.push('Periphery General', 'Periphery');
+                } else if (non === 'inner_sphere') {
+                    labels.push('Inner Sphere General', 'Inner Sphere');
+                } else {
+                    const b = getClanGeneralMulBucket(F);
+                    if (b === 'is_clan_general') labels.push('IS Clan General', 'IS Clan');
+                    else if (b === 'hw_clan_general') labels.push('HW Clan General', 'HW Clan');
+                }
+                for (const L of labels) {
+                    const rk = resolveFactionEraMatrixRowKey(matrix, L);
+                    if (rk) extra.add(rk);
+                }
+            }
+            return Array.from(extra);
+        }
+
+        function matrixRowHasEraNorm(matrix, rowKey, eraNorm) {
+            const list = Array.isArray(matrix[rowKey]) ? matrix[rowKey] : [];
+            return list.some((e) => String(e || '').trim().toLowerCase() === eraNorm);
+        }
+
+        /** When both «доступная фракция» and «доступная эпоха» are set and card has faction_era_availability rows, require a matrix cell: explicit faction rows plus MUL bucket rows (e.g. IS Clan General for Clan Diamond Shark). */
+        function cardMatchesAvailableFactionAndEraMatrix(card, factionFilterLower, eraFilter, matrix) {
+            const eraNorm = String(eraFilter || '').trim().toLowerCase();
+            if (!eraNorm || !matrix || typeof matrix !== 'object') return false;
+
+            const factionSet = new Set([
+                ...(Array.isArray(card?.available_factions) ? card.available_factions : []),
+                ...Object.keys(matrix)
+            ].map(v => String(v || '').trim()).filter(Boolean));
+
+            for (const k of factionSet) {
+                const kLower = k.toLowerCase();
+                if (!kLower.includes(factionFilterLower)) continue;
+                if (matrixRowHasEraNorm(matrix, k, eraNorm)) return true;
+            }
+            for (const rk of matrixGeneralRowKeysForFactionFilter(matrix, factionFilterLower)) {
+                if (matrixRowHasEraNorm(matrix, rk, eraNorm)) return true;
+            }
+            return false;
+        }
+
         function buildAvailabilityModalHtml(card) {
             const matrix = parseFactionEraAvailability(card?.faction_era_availability);
             const factionSet = new Set([
@@ -1662,10 +1998,10 @@
             let rows = [];
             if (unitType.includes('battlemech')) {
                 rows = [
-                    ['Engine', 3],
-                    ['Fire Control', 2],
-                    ['MP', 2],
-                    ['Weapons', 3]
+                    ['Engine', 2],
+                    ['Fire Control', 4],
+                    ['MP', 4],
+                    ['Weapons', 4]
                 ];
             } else if (unitType.includes('vehicle') || unitType.includes('combat vehicle')) {
                 rows = [
@@ -1864,6 +2200,7 @@
             state.groupToGeneralFactions = Object.fromEntries(
                 Object.entries(generalByGroup).map(([group, set]) => [group, Array.from(set).sort()])
             );
+            applyCanonicalFactionGroupMaps();
         }
 
         function fillSelect(id, values) {
@@ -1972,7 +2309,7 @@
                 }
             }
 
-            // Auto-sync roster faction from "Список мехов" filter unless user selected it manually in Roster.
+            // Auto-sync roster faction from "Список мехов" filter unless user selected it manually on the Formations tab.
             if (filters.availableFactionRaw && !state.rosterFactionManuallySelected) {
                 const allFactions = Array.from(new Set(state.allCards.flatMap(c => c.available_factions || [])));
                 const raw = filters.availableFactionRaw.toLowerCase();
@@ -2014,6 +2351,11 @@
                     ? card.abilities.join(',').toLowerCase()
                     : String(card.abilities || '').toLowerCase();
 
+                const factionEraMatrix = parseFactionEraAvailability(card?.faction_era_availability);
+                const strictFactionEra =
+                    Boolean(filters.availableFaction && filters.availableEra) &&
+                    Object.keys(factionEraMatrix).length > 0;
+
                 if (filters.name && !card.name.toLowerCase().includes(filters.name)) 
                     return false;
 
@@ -2023,14 +2365,20 @@
                 }
 
                 if (filters.availableFaction) {
-                    const cardFactionCompat = buildFactionCompatibilitySet(card.available_factions || []);
-                    if (!Array.from(cardFactionCompat).some(f => f.includes(filters.availableFaction))) return false;
                     if (allowedFactionsByGroup.length > 0 && !allowedFactionsByGroup.includes(filters.availableFaction)) return false;
+                    if (strictFactionEra) {
+                        if (!cardMatchesAvailableFactionAndEraMatrix(card, filters.availableFaction, filters.availableEra, factionEraMatrix)) return false;
+                    } else {
+                        const cardFactionCompat = buildFactionCompatibilitySet(card.available_factions || []);
+                        if (!Array.from(cardFactionCompat).some(f => f.includes(filters.availableFaction))) return false;
+                    }
                 }
 
                 if (filters.availableEra) {
                     const fae = filters.availableEra.toLowerCase();
-                    if (!availableEras.includes(fae)) return false;
+                    if (strictFactionEra) {
+                        /* era already tied to a concrete matrix row in cardMatchesAvailableFactionAndEraMatrix */
+                    } else if (!availableEras.includes(fae)) return false;
                 }
                 if (filters.unitType && cardUnitType !== filters.unitType.toLowerCase()) {
                     return false;
@@ -2193,7 +2541,7 @@ async function addToRoster(cardId, cardName, pv, techBase, opts = {}) {
     const cardEras = Array.isArray(fullCard?.available_eras) ? fullCard.available_eras : [];
     const selectedFactionUnavailable = state.selectedFaction
         && !buildFactionCompatibilitySet(cardFactions).has(String(state.selectedFaction).toLowerCase());
-    if (selectedFactionUnavailable) {
+    if (selectedFactionUnavailable && !opts.skipFactionDialogs) {
         const confirmed = await showConfirmDialog(
             'Данный юнит недоступен вашей фракции, вы всё равно хотите его добавить?\n' +
             'При его добавлении список доступных фракций изменится'
@@ -2218,7 +2566,7 @@ async function addToRoster(cardId, cardName, pv, techBase, opts = {}) {
     } else if (cardFactions.length > 0 && state.rosterCommonFactions.length > 0) {
         const cardFactionSet = buildFactionCompatibilitySet(cardFactions);
         const intersection = state.rosterCommonFactions.filter(f => cardFactionSet.has(String(f).toLowerCase()));
-        if (intersection.length === 0) {
+        if (intersection.length === 0 && !opts.skipFactionDialogs) {
             const confirmed = await showConfirmDialog(
                 'Данный юнит недоступен вашей фракции, вы всё равно хотите его добавить?\n' +
                 'При его добавлении список доступных фракций изменится'
@@ -2279,7 +2627,7 @@ async function addToRoster(cardId, cardName, pv, techBase, opts = {}) {
 
 
 
-        function removeFromRoster(cardId) {
+        function removeFromRoster(cardId, opts = {}) {
         state.roster = state.roster.filter(r => String(r.id) !== String(cardId));
         if (state.roster.length === 0) {
             state.rosterCommonFactions = [];
@@ -2300,46 +2648,25 @@ async function addToRoster(cardId, cardName, pv, techBase, opts = {}) {
         updateFormationsContextInfo();
         updateRosterDisplay();
         updateStats();
-        autoFormFormations();
+        if (!opts.skipAutoFormations) {
+            autoFormFormations();
+        }
+        }
+
+        function deleteRosterUnitFromFormation(cardId) {
+            (state.formations || []).forEach(f => {
+                if (f.members) f.members = f.members.filter(m => String(m.id) !== String(cardId));
+            });
+            removeFromRoster(cardId, { skipAutoFormations: true });
+            displayFormations();
+            updateExportPreview();
+            renderHangar();
         }
 
 
        function updateRosterDisplay() {
-    const rosterList = document.getElementById('rosterList');
     const rosterCount = document.getElementById('rosterCount');
-    rosterCount.textContent = state.roster.length;
-
-    if (state.roster.length === 0) {
-        rosterList.innerHTML = `
-            <div class="roster-empty">
-                <div style="font-size: 48px; margin-bottom: 10px">📋</div>
-                <p>Ростер пуст</p>
-                <p style="font-size: 12px">Добавьте юнитов через вкладку "Список мехов"</p>
-            </div>
-        `;
-        return;
-    }
-
-    rosterList.innerHTML = state.roster.map(item => {
-        const pvValue = getUnitEffectivePV(item);
-        const skill = ensureSkillValue(item.skill);
-        
-        const factionDisplay = (item.available_factions && item.available_factions.length > 0)
-            ? item.available_factions.slice(0, 2).join(', ') + (item.available_factions.length > 2 ? ' ...' : '')
-            : item.faction;
-        
-        return `
-            <div class="roster-item">
-                <div class="roster-item-info">
-                    <div class="roster-item-name">${escapeHtml(item.name)}${item.quantity > 1 ? ` x${item.quantity}` : ''}</div>
-                    <div class="roster-item-details">${escapeHtml(item.unit_type || '-')} | ${escapeHtml(item.move || '-')} | TMM ${item.tmm || 0} | OV ${item.overheat || 0} | Skill ${skill}</div>
-                    <div class="roster-item-details">${escapeHtml(factionDisplay)}</div>
-                </div>
-                <div class="roster-item-pv">${pvValue}PV</div>
-                <button class="btn btn-danger" style="width: auto; padding: 6px 10px" onclick="removeFromRoster('${item.id}')">✕</button>
-            </div>
-        `;
-    }).join('');
+    if (rosterCount) rosterCount.textContent = String(state.roster.length);
     rebuildFormationTypeSelectOptions();
 }
 
@@ -2390,12 +2717,94 @@ function selectRosterEra(era, isManual = false) {
     searchMechs();
 }
 
+        /** MUL «General» rows share a faction_group; pick compatible General labels per faction bucket. */
+        function filterGeneralsForExpansion(primaryGroup, selectedFaction, generals) {
+            const raw = generals || [];
+            const sf = String(selectedFaction || '').trim();
+            const sel = sf.toLowerCase();
+            const pg = String(primaryGroup || '').toLowerCase();
+
+            const mulNonClan = getNonClanGeneralMulBucket(sf);
+            if (mulNonClan === 'no_rollup') return [];
+
+            let side = '';
+            if (pg === 'clan' || (pg.includes('clan') && !pg.includes('inner sphere'))) side = 'clan';
+            else if (pg.includes('inner') && pg.includes('sphere')) side = 'is';
+            else if (pg.includes('periphery')) side = 'periphery';
+            else if (pg.includes('mercenary')) side = 'mercenary';
+
+            if (!side && sel.includes('clan') && !sel.includes('inner sphere')) side = 'clan';
+            if (!side && sel.includes('inner sphere')) side = 'is';
+            if (!side && mulNonClan === 'periphery') side = 'periphery';
+            if (!side && mulNonClan === 'inner_sphere') side = 'is';
+            if (!side && mulNonClan === 'mercenary') side = 'mercenary';
+
+            if (mulNonClan === 'mercenary' || side === 'mercenary') {
+                return raw.filter(n => {
+                    const x = String(n || '').toLowerCase();
+                    return x === 'mercenary general' || x === 'mercenary';
+                });
+            }
+            if (mulNonClan === 'periphery' || side === 'periphery') {
+                return raw.filter(n => {
+                    const x = String(n || '').toLowerCase();
+                    if (x === 'inner sphere general' || x === 'inner sphere') return false;
+                    if (x.includes('hw clan') || x === 'is clan general' || x === 'is clan') return false;
+                    if (x === 'mercenary general' || x === 'mercenary') return false;
+                    return x === 'periphery general' || x === 'periphery';
+                });
+            }
+            if (mulNonClan === 'inner_sphere') {
+                return raw.filter(n => {
+                    const x = String(n || '').toLowerCase();
+                    if (x.includes('hw clan')) return false;
+                    if (x === 'is clan general' || x === 'is clan') return false;
+                    if (x === 'periphery general' || x === 'periphery') return false;
+                    if (x === 'mercenary general' || x === 'mercenary') return false;
+                    return x === 'inner sphere general' || x === 'inner sphere';
+                });
+            }
+
+            if (side === 'clan') {
+                let out = raw.filter(name => {
+                    const n = String(name || '').toLowerCase();
+                    if (n === 'inner sphere general' || n === 'inner sphere') return false;
+                    if (n.includes('inner sphere') && n.includes('general') && !n.includes('clan')) return false;
+                    if (n === 'periphery general' || n === 'periphery') return false;
+                    if (n === 'mercenary general' || n === 'mercenary') return false;
+                    return true;
+                });
+                const bucket = getClanGeneralMulBucket(sf);
+                if (bucket === 'is_clan_general') {
+                    out = out.filter(n => String(n || '').toLowerCase() !== 'hw clan general');
+                } else if (bucket === 'hw_clan_general') {
+                    out = out.filter(n => {
+                        const x = String(n || '').toLowerCase();
+                        return x !== 'is clan general' && x !== 'is clan';
+                    });
+                }
+                return out;
+            }
+            if (side === 'is') {
+                return raw.filter(n => {
+                    const x = String(n || '').toLowerCase();
+                    if (x.includes('hw clan general')) return false;
+                    if (x === 'is clan general' || x === 'is clan') return false;
+                    if (x === 'periphery general' || x === 'periphery') return false;
+                    if (x === 'mercenary general' || x === 'mercenary') return false;
+                    return true;
+                });
+            }
+            return raw;
+        }
+
 function getExpandedFactionFilter(selectedFaction) {
     if (!selectedFaction) return [];
     const expanded = new Set([selectedFaction]);
     const primaryGroup = state.factionToPrimaryGroup[selectedFaction];
     if (primaryGroup) {
-        const generals = state.groupToGeneralFactions[primaryGroup] || [];
+        const raw = state.groupToGeneralFactions[primaryGroup] || [];
+        const generals = filterGeneralsForExpansion(primaryGroup, selectedFaction, raw);
         generals.forEach(g => expanded.add(g));
     }
     return Array.from(expanded);
@@ -2425,7 +2834,8 @@ function buildFactionCompatibilitySet(factions) {
         if (name.toLowerCase().includes('general')) {
             (state.factionGroupToFactions[group] || []).forEach(x => out.add(String(x).toLowerCase()));
         } else {
-            (state.groupToGeneralFactions[group] || []).forEach(x => out.add(String(x).toLowerCase()));
+            const raw = state.groupToGeneralFactions[group] || [];
+            filterGeneralsForExpansion(group, name, raw).forEach(x => out.add(String(x).toLowerCase()));
         }
     });
     return out;
@@ -2434,8 +2844,9 @@ function buildFactionCompatibilitySet(factions) {
 function renderRosterFactionHint() {
     const hint = document.getElementById('rosterFactionHint');
     if (!hint) return;
+    hint.removeAttribute('title');
     if (!state.selectedFaction) {
-        hint.textContent = 'Выберите фракцию, чтобы увидеть связанные General-категории.';
+        hint.textContent = 'Выберите фракцию: к фильтру поиска и проверкам добавляются совместимые категории General из MUL (не все General подходят каждой стороне).';
         return;
     }
     const expanded = getExpandedFactionFilter(state.selectedFaction).filter(f => f !== state.selectedFaction);
@@ -2444,6 +2855,7 @@ function renderRosterFactionHint() {
         return;
     }
     hint.textContent = `Также учитываются: ${expanded.join(', ')}`;
+    hint.title = "MUL группирует фракции под General-строками: Inner Sphere / Periphery / Mercenary, плюс отдельно IS Clan General и HW Clan General. К выбранной фракции подмешивается только «своя» General-метка. Wolf Dragoons и Kell's Hounds без General-rollup; у Mercenary — только Mercenary General.";
 }
 
 function refreshRosterEraOptions() {
@@ -2463,9 +2875,11 @@ function refreshRosterEraOptions() {
 
 
         function searchMechs() {
-    const searchTerm = document.getElementById('mechSearch').value.toLowerCase();
+    const searchEl = document.getElementById('mechSearch');
     const resultsContainer = document.getElementById('mechSearchResults');
-    
+    if (!searchEl || !resultsContainer) return;
+    const searchTerm = searchEl.value.toLowerCase();
+
     if (!searchTerm) {
         resultsContainer.classList.remove('active');
         return;
@@ -2515,7 +2929,7 @@ function refreshRosterEraOptions() {
         const safeTechBase = (techBase || '').replace(/'/g, "\\'");
         
         return `
-            <div class="search-result-item" onclick="addToRoster('${mech.id}', '${safeName}', ${pv}, '${safeTechBase}'); document.getElementById('mechSearch').value = ''; document.getElementById('mechSearchResults').classList.remove('active');">
+            <div class="search-result-item" onclick="addToRoster('${mech.id}', '${safeName}', ${pv}, '${safeTechBase}'); const ms=document.getElementById('mechSearch'); const mr=document.getElementById('mechSearchResults'); if(ms)ms.value=''; if(mr)mr.classList.remove('active');">
                 <strong>${escapeHtml(mech.name)}</strong> (${escapeHtml(mech.unit_type || '-')}) - ${pv}PV
             </div>
         `;
@@ -2726,10 +3140,11 @@ function autoFormFormations() {
 
 function updateFormationsContextInfo() {
     const el = document.getElementById('formationsContextInfo');
-    if (!el) return;
-    const faction = state.selectedFaction || 'не выбрана';
-    const era = state.selectedEra || 'все эпохи';
-    el.textContent = `Фракция: ${faction} | Эпоха: ${era}`;
+    if (el) {
+        const faction = state.selectedFaction || 'не выбрана';
+        const era = state.selectedEra || 'все эпохи';
+        el.textContent = `Контекст: фракция «${faction}», эпоха «${era}». От этого зависят типы формаций и фильтры при добавлении юнитов.`;
+    }
     rebuildFormationTypeSelectOptions();
 }
 
@@ -2869,14 +3284,17 @@ function displayFormations() {
                                  ondragstart="dragMechStart(event, ${m.id}, ${formation.id})" 
                                  ondragend="dragMechEnd(event)" 
                                  style="cursor: move;">
-                                <div class="formation-member-name">${escapeHtml(m.name)}</div>
-                                <div class="formation-member-pv">${memberPV}PV</div>
-                                <div style="display:flex;align-items:center;gap:4px;margin-top:4px;">
+                                <div class="formation-member-top">
+                                    <div class="formation-member-name">${escapeHtml(m.name)}</div>
+                                    <div class="formation-member-pv">${memberPV}PV</div>
+                                </div>
+                                <div class="formation-member-actions">
                                     <span style="font-size:11px;color:#555;">Skill ${skill}</span>
                                     <button class="btn btn-secondary" style="flex:0 0 auto;width:auto;min-width:20px;padding:2px 5px;font-size:10px;" onclick="changeRosterUnitSkill(${m.id}, 1)">+</button>
                                     <button class="btn btn-primary" style="flex:0 0 auto;width:auto;min-width:20px;padding:2px 5px;font-size:10px;" onclick="changeRosterUnitSkill(${m.id}, -1)">-</button>
                                 </div>
-                                ${abilitiesText ? `<div style="font-size: 6pt; color: #666;">${escapeHtml(abilitiesText)}</div>` : ''}
+                                ${abilitiesText ? `<div class="formation-member-abilities">${escapeHtml(abilitiesText)}</div>` : ''}
+                                <button type="button" class="btn btn-danger" onclick="event.stopPropagation(); event.preventDefault(); deleteRosterUnitFromFormation(${m.id})">Удалить</button>
                             </div>
                         `;
                     }).join('')}
@@ -2915,6 +3333,20 @@ function displayFormations() {
             if (!expectedSize) return '';
             const currentSize = Array.isArray(formation?.members) ? formation.members.length : 0;
             const missing = expectedSize - currentSize;
+            const val = validateFormation(formation);
+
+            if (missing <= 0 && !val.valid && state.hangar && state.hangar.length > 0) {
+                const active = getActiveRosterValidationFilters();
+                const hintLines = describeFormationManualSwapHints(formation, active);
+                if (hintLines) {
+                    return `
+                <div style="margin-top:8px;padding:8px;border:1px solid #ffe8c9;background:#fffaf2;border-radius:8px;font-size:11px;">
+                    <div style="font-weight:700;color:#8a5a00;margin-bottom:4px;">Подсказка по ангару</div>
+                    <div style="color:#553;line-height:1.45;">${hintLines}</div>
+                </div>`;
+                }
+            }
+
             if (missing <= 0) return '';
             if (!state.hangar || state.hangar.length === 0) return '';
             const selectedFactionRaw = state.selectedFaction || state.rosterCommonFactions?.[0] || state.roster?.[0]?.faction || '';
@@ -3541,8 +3973,767 @@ function dropMechToFormation(event, toFormationId) {
     displayFormations();
 }
 
+        function mergeRosterRowWithCard(r) {
+            const card = state.allCards.find(c => String(c.id) === String(r.id));
+            if (!card) return { ...r };
+            return { ...card, ...r };
+        }
 
+        function hangarStorageKeyFromCard(card) {
+            const chassisName = String(card.name || '').replace(/\s+[A-Za-z0-9\-]+$/, '').trim() || String(card.name || '').trim();
+            return `${chassisName}|${String(card.unit_type || '')}`;
+        }
 
+        function getSpecialsBlobForValidation(u) {
+            const parts = [];
+            if (Array.isArray(u.abilities)) parts.push(...u.abilities.map(a => String(a)));
+            else if (u.abilities) parts.push(String(u.abilities));
+            if (Array.isArray(u.keywords)) parts.push(...u.keywords.map(k => String(k)));
+            else if (u.keywords) parts.push(String(u.keywords));
+            return parts.join(',').toLowerCase();
+        }
+
+        function hasUniqueOrCustomOnCard(u) {
+            const t = getSpecialsBlobForValidation(u);
+            return /\bunique\b/i.test(t) || /\bcustom\b/i.test(t);
+        }
+
+        function rosterTotalEffectivePV() {
+            return (state.roster || []).reduce((sum, r) => {
+                const q = Number(r.quantity || 1) || 1;
+                return sum + getUnitEffectivePV(r) * q;
+            }, 0);
+        }
+
+        function getActiveRosterValidationFilters() {
+            const pvCb = !!document.getElementById('valFilterPvLimit')?.checked;
+            const pvRaw = document.getElementById('valFilterPvLimitValue')?.value;
+            const pvParsed = pvRaw === '' || pvRaw === undefined || pvRaw === null
+                ? NaN
+                : Number(String(pvRaw).trim().replace(',', '.'));
+            return {
+                era: !!document.getElementById('valFilterEra')?.checked,
+                pvLimit: pvCb,
+                pvLimitValue: pvParsed,
+                noUniqueCustom: !!document.getElementById('valFilterNoUniqueCustom')?.checked,
+                faction: !!document.getElementById('valFilterFaction')?.checked,
+                formations: !!document.getElementById('valFilterFormations')?.checked
+            };
+        }
+
+        function cardPassesAllActiveRosterFilters(card, active) {
+            if (!card || Number(card.point_value || 0) <= 0) return false;
+            if (active.era) {
+                if (!state.selectedEra) return false;
+                const eras = Array.isArray(card.available_eras) ? card.available_eras : [];
+                if (!eras.some(e => String(e).toLowerCase() === String(state.selectedEra).toLowerCase())) return false;
+            }
+            if (active.noUniqueCustom && hasUniqueOrCustomOnCard(card)) return false;
+            if (active.faction) {
+                if (!state.selectedFaction) return false;
+                const factions = Array.isArray(card.available_factions) ? card.available_factions : [];
+                if (!buildFactionCompatibilitySet(factions).has(String(state.selectedFaction).toLowerCase())) return false;
+            }
+            return true;
+        }
+
+        function computeApplicableRowFailures(merged, active) {
+            const reasons = [];
+            if (active.era && state.selectedEra) {
+                const eras = Array.isArray(merged.available_eras) ? merged.available_eras : [];
+                const ok = eras.some(e => String(e).toLowerCase() === String(state.selectedEra).toLowerCase());
+                if (!ok) reasons.push('эпоха');
+            }
+            if (active.noUniqueCustom && hasUniqueOrCustomOnCard(merged)) reasons.push('Unique/Custom');
+            if (active.faction && state.selectedFaction) {
+                const factions = Array.isArray(merged.available_factions) ? merged.available_factions : [];
+                if (!buildFactionCompatibilitySet(factions).has(String(state.selectedFaction).toLowerCase())) reasons.push('фракция');
+            }
+            return reasons;
+        }
+
+        function buildHangarSpareAfterRemovingFailures(failingRows) {
+            const bonus = new Map();
+            for (const fr of failingRows) {
+                const k = fr.rosterRow.hangar_key;
+                if (!k) continue;
+                const q = Number(fr.rosterRow.hangar_used_qty ?? fr.rosterRow.quantity ?? 1) || 1;
+                bonus.set(String(k), (bonus.get(String(k)) || 0) + q);
+            }
+            const spare = new Map();
+            for (const h of state.hangar || []) {
+                const key = String(h.key || '');
+                const base = Number(h.qty || 0) - getHangarUsedQtyForKey(key) + (bonus.get(key) || 0);
+                spare.set(key, base);
+            }
+            return spare;
+        }
+
+        function findCardsForHangarRow(h) {
+            const hk = String(h.key || '');
+            return (state.allCards || []).filter(c =>
+                Number(c?.point_value || 0) > 0 &&
+                hangarStorageKeyFromCard(c) === hk
+            );
+        }
+
+        function buildRosterReplacementPlan(active, failingRows) {
+            const prereqOk = !(active.era && !state.selectedEra) && !(active.faction && !state.selectedFaction);
+            if (!prereqOk || !(state.hangar || []).length) {
+                return { ok: false, adds: [], removeIds: [], incomplete: true };
+            }
+            if (!failingRows.length) {
+                return { ok: true, adds: [], removeIds: [], incomplete: false };
+            }
+            const removeIds = [...new Set(failingRows.map(fr => String(fr.rosterRow.id)))];
+            const slots = [];
+            failingRows.forEach(fr => {
+                const n = Number(fr.rosterRow.quantity || 1) || 1;
+                const basePv = Number(fr.merged.point_value || fr.rosterRow.base_pv || fr.rosterRow.pv || 0);
+                for (let i = 0; i < n; i++) slots.push({ basePv, rosterRow: fr.rosterRow });
+            });
+            const spare = buildHangarSpareAfterRemovingFailures(failingRows);
+            const adds = [];
+            let incomplete = false;
+            for (const slot of slots) {
+                let best = null;
+                let bestScore = Infinity;
+                const skipId = String(slot.rosterRow.id);
+                for (const h of state.hangar) {
+                    const key = String(h.key || '');
+                    if ((spare.get(key) || 0) <= 0) continue;
+                    const candidates = findCardsForHangarRow(h).filter(c =>
+                        String(c.id) !== skipId && cardPassesAllActiveRosterFilters(c, active)
+                    );
+                    for (const c of candidates) {
+                        const pv = Number(c.point_value || 0);
+                        const score = Math.abs(pv - slot.basePv);
+                        if (score < bestScore) {
+                            bestScore = score;
+                            best = { card: c, hangarKey: key };
+                        }
+                    }
+                }
+                if (!best) {
+                    incomplete = true;
+                    break;
+                }
+                const c = best.card;
+                adds.push({
+                    id: c.id,
+                    name: c.name,
+                    pv: Number(c.point_value || 0),
+                    techBase: c.tech_base || 'Unknown',
+                    hangarKey: best.hangarKey
+                });
+                spare.set(best.hangarKey, (spare.get(best.hangarKey) || 0) - 1);
+            }
+            return { ok: !incomplete && adds.length === slots.length, adds, removeIds, incomplete };
+        }
+
+        function activeForRosterCardFilters(active) {
+            return {
+                era: active.era,
+                pvLimit: active.pvLimit,
+                pvLimitValue: active.pvLimitValue,
+                noUniqueCustom: active.noUniqueCustom,
+                faction: active.faction
+            };
+        }
+
+        function buildFormationMemberFromCardForSwap(card, oldMember) {
+            const skill = ensureSkillValue(oldMember.skill);
+            const basePv = Number(card.point_value || 0);
+            const row = {
+                ...card,
+                ...oldMember,
+                id: parseInt(String(card.id), 10),
+                name: card.name,
+                base_pv: basePv,
+                skill,
+                available_factions: card.available_factions || oldMember.available_factions || [],
+                available_eras: card.available_eras || oldMember.available_eras || []
+            };
+            row.pv = getUnitEffectivePV(row);
+            return row;
+        }
+
+        function replaceMemberInAllFormations(oldId, mergedMember) {
+            const nid = parseInt(String(mergedMember.id), 10);
+            (state.formations || []).forEach(f => {
+                (f.members || []).forEach((m, i) => {
+                    if (String(m.id) === String(oldId)) {
+                        f.members[i] = { ...mergedMember, id: nid };
+                    }
+                });
+            });
+        }
+
+        function orderMembersForFormationSwapAttempt(formation, validationResult) {
+            const members = [...(formation.members || [])];
+            const type = normalizeFormationType(formation.formationType);
+            const reasons = (validationResult.reasons || []).join(' ');
+            if ((type === 'Medium Battle' || type === 'Light Battle') && reasons.includes('Size 4+')) {
+                members.sort((a, b) => (unitSize(b) >= 4 ? 1 : 0) - (unitSize(a) >= 4 ? 1 : 0));
+            } else if (type === 'Medium Battle' && (reasons.includes('50%') || reasons.includes('Size 2'))) {
+                members.sort((a, b) => {
+                    const pri = (u) => {
+                        const s = unitSize(u);
+                        if (s >= 4) return 0;
+                        if (s === 3) return 1;
+                        if (s <= 1) return 2;
+                        return 3;
+                    };
+                    return pri(a) - pri(b);
+                });
+            } else if (type === 'Heavy Battle' && reasons.includes('Size 1')) {
+                members.sort((a, b) => (unitSize(a) === 1 ? 1 : 0) - (unitSize(b) === 1 ? 1 : 0));
+            } else if ((type === 'Striker' || type === 'Light Striker') && reasons.includes('Size 4+')) {
+                members.sort((a, b) => (unitSize(b) >= 4 ? 1 : 0) - (unitSize(a) >= 4 ? 1 : 0));
+            } else if (type === 'Light Striker' && reasons.includes('Size 3+')) {
+                members.sort((a, b) => (unitSize(b) >= 3 ? 1 : 0) - (unitSize(a) >= 3 ? 1 : 0));
+            } else if (type === 'Heavy Striker' && reasons.includes('Size 1')) {
+                members.sort((a, b) => (unitSize(a) <= 1 ? 1 : 0) - (unitSize(b) <= 1 ? 1 : 0));
+            }
+            return members;
+        }
+
+        function rosterRowForFormationSwapMember(m) {
+            const row = state.roster.find(r => String(r.id) === String(m.id));
+            if (row) return row;
+            const card = state.allCards.find(c => String(c.id) === String(m.id));
+            if (!card) return null;
+            const hk = m.hangar_key || hangarStorageKeyFromCard(card);
+            const qty = Number(m.quantity || 1) || 1;
+            const used = Number(m.hangar_used_qty ?? qty) || qty;
+            return {
+                id: m.id,
+                name: m.name || card.name,
+                hangar_key: hk,
+                quantity: qty,
+                hangar_used_qty: used,
+                base_pv: getBasePV(m),
+                pv: m.pv,
+                skill: m.skill
+            };
+        }
+
+        function sortCatalogPoolForFormationSwap(typeN, reasonsJoined, catalogPool) {
+            const pool = [...(catalogPool || [])];
+            const rj = String(reasonsJoined || '');
+            if (typeN === 'Medium Battle' && /size\s*4|size\s*4\+/i.test(rj)) {
+                pool.sort((a, b) => {
+                    const rank = (u) => {
+                        const z = unitSize(u);
+                        if (z === 2) return 0;
+                        if (z <= 1) return 1;
+                        if (z === 3) return 2;
+                        return 3;
+                    };
+                    const ra = rank(a);
+                    const rb = rank(b);
+                    if (ra !== rb) return ra - rb;
+                    return unitSize(a) - unitSize(b);
+                });
+            } else if ((typeN === 'Medium Battle' || typeN === 'Light Battle') && /size\s*4/i.test(rj)) {
+                pool.sort((a, b) => unitSize(a) - unitSize(b));
+            } else if (typeN === 'Medium Battle' && (/size\s*2/i.test(rj) || /50%/i.test(rj))) {
+                pool.sort((a, b) => {
+                    const s2 = (u) => (unitSize(u) === 2 ? 1 : 0);
+                    return s2(b) - s2(a) || unitSize(a) - unitSize(b);
+                });
+            }
+            return pool;
+        }
+
+        /** True if this card id is already taken by another slot (not swapOutMemberId). When swapOutMemberId is omitted, any formation slot counts. */
+        function isFormationCardIdOccupiedByOtherSlot(formation, cardId, swapOutMemberId) {
+            const cid = String(cardId);
+            const out = swapOutMemberId === undefined || swapOutMemberId === null ? null : String(swapOutMemberId);
+            return (formation?.members || []).some((mem) => {
+                const mid = String(mem.id);
+                if (out === null) return mid === cid;
+                return mid !== out && mid === cid;
+            });
+        }
+
+        function formationOtherMemberChassisKeys(formation, swapOutMemberId) {
+            const out = String(swapOutMemberId ?? '');
+            const keys = new Set();
+            (formation?.members || []).forEach((mem) => {
+                if (out && String(mem.id) === out) return;
+                const k = normalizeChassisName(mem.name || '').toLowerCase();
+                if (k) keys.add(k);
+            });
+            return keys;
+        }
+
+        function describeFormationManualSwapHints(formation, activeCardFilters) {
+            const v = validateFormation(formation);
+            if (v.valid) return '';
+            const typeN = normalizeFormationType(formation.formationType);
+            const joined = (v.reasons || []).join(' ');
+            const lines = [];
+            if ((typeN === 'Medium Battle' || typeN === 'Light Battle') && /size\s*4|size\s*4\+/i.test(joined)) {
+                const bad = (formation.members || []).filter(u => unitSize(u) >= 4);
+                if (bad.length) {
+                    lines.push(`Замените юнит(ы) Size 4+: ${bad.map(b => `${escapeHtml(b.name || '')} (Size ${unitSize(b)})`).join(', ')}.`);
+                }
+                if (typeN === 'Medium Battle') {
+                    lines.push('В Medium Battle не менее половины слотов должны быть ровно Size 2 — чаще всего выгодно поставить вместо тяжёлого меха вариант Size 2 из ангара.');
+                } else {
+                    lines.push('В Light Battle нужны в основном Size 1 и запрет Size 4+.');
+                }
+            }
+            const filterStrip = activeForRosterCardFilters(activeCardFilters || {});
+            const hangarPick = [];
+            const seen = new Set();
+            const occupiedIds = new Set((formation.members || []).map((mem) => String(mem.id)));
+            const occupiedChassis = formationOtherMemberChassisKeys(formation, null);
+            for (const h of state.hangar || []) {
+                const key = String(h.key || '');
+                if (Number(h.qty || 0) - getHangarUsedQtyForKey(key) <= 0) continue;
+                let cands = findCardsForHangarRow(h).filter(c =>
+                    cardPassesAllActiveRosterFilters(c, filterStrip) &&
+                    !occupiedIds.has(String(c.id)) &&
+                    !occupiedChassis.has(normalizeChassisName(c.name || '').toLowerCase())
+                );
+                cands = sortCatalogPoolForFormationSwap(typeN, joined, cands);
+                for (const c of cands) {
+                    const id = String(c.id);
+                    if (seen.has(id)) continue;
+                    seen.add(id);
+                    hangarPick.push(c);
+                    if (hangarPick.length >= 6) break;
+                }
+                if (hangarPick.length >= 6) break;
+            }
+            if (hangarPick.length) {
+                lines.push(`Из ангара под отмеченные фильтры проверки можно попробовать: ${hangarPick.map(c => `${escapeHtml(c.name)} (Size ${unitSize(c)}, ${Number(c.point_value || 0)} PV)`).join('; ')}.`);
+            } else if ((activeCardFilters?.era && state.selectedEra) || (activeCardFilters?.faction && state.selectedFaction)) {
+                lines.push('Нет свободных единиц в ангаре под выбранные в проверке эпоху/фракцию — снимите эти галочки или добавьте подходящие модели в ангар.');
+            }
+            return lines.length ? lines.join('<br>') : '';
+        }
+
+        function findOneFormationSwapFix(formation, activeCardFilters) {
+            const v0 = validateFormation(formation);
+            if (v0.valid) return null;
+            const members = formation.members || [];
+            const expected = getFormationSize(formation.formationType);
+            if (members.length !== expected) return null;
+
+            const ordered = orderMembersForFormationSwapAttempt(formation, v0);
+            const filterStrip = activeForRosterCardFilters(activeCardFilters);
+            const typeN = normalizeFormationType(formation.formationType);
+            const reasonsJoined = (v0.reasons || []).join(' ');
+
+            function buildSwapResult(m, c, hangarKeyForAdd) {
+                return {
+                    formationId: formation.id,
+                    formationName: formation.name || formation.formationType || '—',
+                    removeMemberId: m.id,
+                    add: {
+                        id: c.id,
+                        name: c.name,
+                        pv: Number(c.point_value || 0),
+                        techBase: c.tech_base || 'Unknown',
+                        hangarKey: hangarKeyForAdd || null
+                    },
+                    fromName: m.name || '',
+                    toName: c.name || ''
+                };
+            }
+
+            function trySwapMember(m, c, hangarKeyForAdd) {
+                const newMember = buildFormationMemberFromCardForSwap(c, m);
+                const newMembers = members.map(x => (String(x.id) === String(m.id) ? newMember : x));
+                const vf = validateFormation({ ...formation, members: newMembers });
+                if (!vf.valid) return null;
+                return buildSwapResult(m, c, hangarKeyForAdd);
+            }
+
+            for (const m of ordered) {
+                const rosterRow = rosterRowForFormationSwapMember(m);
+                if (!rosterRow) continue;
+                const synthetic = [{ rosterRow, merged: mergeRosterRowWithCard(rosterRow), reasons: ['formation-fix'] }];
+                const spareMap = buildHangarSpareAfterRemovingFailures(synthetic);
+                const otherChassis = formationOtherMemberChassisKeys(formation, m.id);
+
+                for (const h of state.hangar || []) {
+                    const key = String(h.key || '');
+                    if ((spareMap.get(key) || 0) <= 0) continue;
+                    let candidates = findCardsForHangarRow(h).filter(c =>
+                        String(c.id) !== String(m.id) &&
+                        !isFormationCardIdOccupiedByOtherSlot(formation, c.id, m.id) &&
+                        !otherChassis.has(normalizeChassisName(c.name || '').toLowerCase()) &&
+                        cardPassesAllActiveRosterFilters(c, filterStrip)
+                    );
+                    candidates = sortCatalogPoolForFormationSwap(typeN, reasonsJoined, candidates);
+                    for (const c of candidates) {
+                        const hit = trySwapMember(m, c, key);
+                        if (hit) return hit;
+                    }
+                }
+
+                const spareAfter = buildHangarSpareAfterRemovingFailures(synthetic);
+                let catalogPool = (state.allCards || []).filter(c =>
+                    Number(c?.point_value || 0) > 0 &&
+                    String(c.id) !== String(m.id) &&
+                    !isFormationCardIdOccupiedByOtherSlot(formation, c.id, m.id) &&
+                    !otherChassis.has(normalizeChassisName(c.name || '').toLowerCase()) &&
+                    cardPassesAllActiveRosterFilters(c, filterStrip)
+                );
+                catalogPool = sortCatalogPoolForFormationSwap(typeN, reasonsJoined, catalogPool);
+                for (const c of catalogPool) {
+                    const hk = hangarStorageKeyFromCard(c);
+                    if ((spareAfter.get(hk) || 0) <= 0) continue;
+                    const hit = trySwapMember(m, c, hk);
+                    if (hit) return hit;
+                }
+                for (const c of catalogPool) {
+                    const hit = trySwapMember(m, c, null);
+                    if (hit) return hit;
+                }
+            }
+            return null;
+        }
+
+        function buildFormationHangarFixPlan(active) {
+            if (!active.formations) return { swaps: [], ok: true };
+            const invalids = (state.formations || []).filter(f => {
+                if (!f || f.formationType === 'No Formation') return false;
+                return !validateFormation(f).valid;
+            });
+            if (!invalids.length) return { swaps: [], ok: true };
+            const swaps = [];
+            for (const formation of invalids) {
+                const sw = findOneFormationSwapFix(formation, active);
+                if (!sw) return { swaps: [], ok: false };
+                swaps.push(sw);
+            }
+            return { swaps, ok: true };
+        }
+
+        function buildRosterValidationResult(active) {
+            const rows = state.roster || [];
+            const details = [];
+
+            if (active.era) {
+                if (!state.selectedEra) {
+                    details.push({ key: 'era', label: 'Эпоха', passed: false, html: '<strong>Не пройдено:</strong> не выбрана эпоха ростера (вкладка «Формации», блок фракции/эпохи).' });
+                } else if (!rows.length) {
+                    details.push({ key: 'era', label: 'Эпоха', passed: true, html: '<strong>Пройдено:</strong> ростер пуст, конфликтов по эпохе нет.' });
+                } else {
+                    const bad = rows.filter(r => {
+                        const m = mergeRosterRowWithCard(r);
+                        const eras = Array.isArray(m.available_eras) ? m.available_eras : [];
+                        return !eras.some(e => String(e).toLowerCase() === String(state.selectedEra).toLowerCase());
+                    });
+                    details.push({
+                        key: 'era',
+                        label: 'Эпоха',
+                        passed: bad.length === 0,
+                        html: bad.length === 0
+                            ? '<strong>Пройдено:</strong> все юниты доступны в выбранной эпохе.'
+                            : `<strong>Не пройдено:</strong> не подходят по эпохе (${bad.length}): ${bad.map(b => escapeHtml(b.name)).join(', ')}.`
+                    });
+                }
+            }
+
+            if (active.pvLimit) {
+                const lim = Number(active.pvLimitValue);
+                if (!Number.isFinite(lim) || lim <= 0) {
+                    details.push({
+                        key: 'pv',
+                        label: 'Суммарный PV ростера',
+                        passed: false,
+                        html: '<strong>Не пройдено:</strong> введите положительное число в поле «Не больше» (лимит PV).'
+                    });
+                } else if (!rows.length) {
+                    details.push({
+                        key: 'pv',
+                        label: 'Суммарный PV ростера',
+                        passed: true,
+                        html: `<strong>Пройдено:</strong> ростер пуст (0 PV ≤ ${lim}).`
+                    });
+                } else {
+                    const total = rosterTotalEffectivePV();
+                    const passed = total <= lim;
+                    details.push({
+                        key: 'pv',
+                        label: 'Суммарный PV ростера',
+                        passed,
+                        html: passed
+                            ? `<strong>Пройдено:</strong> суммарно <strong>${total}</strong> PV (учёт skill и количества) ≤ лимита <strong>${lim}</strong>.`
+                            : `<strong>Не пройдено:</strong> суммарно <strong>${total}</strong> PV &gt; лимита <strong>${lim}</strong>.`
+                    });
+                }
+            }
+
+            if (active.noUniqueCustom) {
+                if (!rows.length) {
+                    details.push({ key: 'uc', label: 'Unique / Custom', passed: true, html: '<strong>Пройдено:</strong> ростер пуст.' });
+                } else {
+                    const bad = rows.filter(r => hasUniqueOrCustomOnCard(mergeRosterRowWithCard(r)));
+                    details.push({
+                        key: 'uc',
+                        label: 'Unique / Custom',
+                        passed: bad.length === 0,
+                        html: bad.length === 0
+                            ? '<strong>Пройдено:</strong> в способностях/ключевых словах нет Unique или Custom.'
+                            : `<strong>Не пройдено:</strong> (${bad.length}): ${bad.map(b => escapeHtml(b.name)).join(', ')}.`
+                    });
+                }
+            }
+
+            if (active.faction) {
+                if (!state.selectedFaction) {
+                    details.push({ key: 'faction', label: 'Фракция', passed: false, html: '<strong>Не пройдено:</strong> не выбрана фракция ростера (вкладка «Формации»).' });
+                } else if (!rows.length) {
+                    details.push({ key: 'faction', label: 'Фракция', passed: true, html: '<strong>Пройдено:</strong> ростер пуст.' });
+                } else {
+                    const bad = rows.filter(r => {
+                        const m = mergeRosterRowWithCard(r);
+                        const factions = Array.isArray(m.available_factions) ? m.available_factions : [];
+                        return !buildFactionCompatibilitySet(factions).has(String(state.selectedFaction).toLowerCase());
+                    });
+                    details.push({
+                        key: 'faction',
+                        label: 'Доступность для фракции',
+                        passed: bad.length === 0,
+                        html: bad.length === 0
+                            ? `<strong>Пройдено:</strong> все юниты доступны для «${escapeHtml(state.selectedFaction)}».`
+                            : `<strong>Не пройдено:</strong> не в списке доступных фракций (${bad.length}): ${bad.map(b => escapeHtml(b.name)).join(', ')}.`
+                    });
+                }
+            }
+
+            if (active.formations) {
+                const formations = state.formations || [];
+                if (!formations.length) {
+                    details.push({
+                        key: 'formations',
+                        label: 'Правила формаций',
+                        passed: true,
+                        html: '<strong>Пройдено:</strong> формаций нет (или список пуст).'
+                    });
+                } else {
+                    const invalid = [];
+                    formations.forEach(f => {
+                        const v = validateFormation(f);
+                        if (!v.valid) {
+                            invalid.push({
+                                name: f.name || f.formationType || '—',
+                                type: f.formationType || '—',
+                                reasons: v.reasons || []
+                            });
+                        }
+                    });
+                    const passed = invalid.length === 0;
+                    const html = passed
+                        ? `<strong>Пройдено:</strong> все <strong>${formations.length}</strong> формаций удовлетворяют правилам (размер слота и состав).`
+                        : `<strong>Не пройдено:</strong> проблемы в <strong>${invalid.length}</strong> из <strong>${formations.length}</strong>:<br>` +
+                          invalid.map(inv =>
+                              `• <strong>${escapeHtml(inv.name)}</strong> (${escapeHtml(inv.type)}): ${(inv.reasons || []).map(r => escapeHtml(r)).join('; ')}`
+                          ).join('<br>');
+                    details.push({ key: 'formations', label: 'Правила формаций', passed, html });
+                }
+            }
+
+            const failingRows = [];
+            rows.forEach(r => {
+                const merged = mergeRosterRowWithCard(r);
+                const reasons = computeApplicableRowFailures(merged, active);
+                if (reasons.length) failingRows.push({ rosterRow: r, merged, reasons });
+            });
+
+            const anySectionFailed = details.some(d => !d.passed);
+            const anyRowFails = failingRows.length > 0;
+            const needReplace = anySectionFailed || anyRowFails;
+            const plan = needReplace ? buildRosterReplacementPlan(active, failingRows) : { ok: false, adds: [], removeIds: [], incomplete: true };
+
+            const formDetail = details.find(d => d.key === 'formations');
+            let formationSwaps = [];
+            let formationPlanOk = true;
+            if (active.formations && formDetail && !formDetail.passed) {
+                const fp = buildFormationHangarFixPlan(active);
+                formationSwaps = fp.swaps || [];
+                formationPlanOk = fp.ok;
+            }
+            const planOut = { ...plan, formationSwaps, formationPlanOk };
+
+            return { details, failingRows, plan: planOut, needReplace };
+        }
+
+        function openRosterValidationFromFormations() {
+            const active = getActiveRosterValidationFilters();
+            if (!active.era && !active.pvLimit && !active.noUniqueCustom && !active.faction && !active.formations) {
+                alert('Отметьте хотя бы один пункт проверки.');
+                return;
+            }
+            const res = buildRosterValidationResult(active);
+            showRosterValidationModal(res);
+        }
+
+        function showRosterValidationModal(res) {
+            const modal = document.getElementById('rosterValidationModal');
+            const body = document.getElementById('rosterValidationModalBody');
+            const btnClose = document.getElementById('rosterValidationModalClose');
+            const btnYes = document.getElementById('rosterValidationModalYes');
+            const btnNo = document.getElementById('rosterValidationModalNo');
+            if (!modal || !body || !btnClose) return;
+
+            const linesHtml = res.details.map(d => `
+                <div style="margin-bottom:12px;padding:10px;border-radius:8px;border:1px solid ${d.passed ? '#c8e6c9' : '#ffcdd2'};background:${d.passed ? '#f4fff4' : '#fff8f8'};">
+                    <div style="font-weight:700;color:#1e3c72;margin-bottom:4px;">${escapeHtml(d.label)} — ${d.passed ? 'пройдено' : 'не пройдено'}</div>
+                    <div style="font-size:13px;color:#333;">${d.html}</div>
+                </div>
+            `).join('');
+
+            let suggestHtml = '';
+            const plan = res.plan || {};
+            const hasRosterAuto = !!(plan.ok && plan.adds && plan.adds.length);
+            const formationSwaps = plan.formationSwaps || [];
+            const hasFormationAuto = !!(plan.formationPlanOk && formationSwaps.length);
+
+            if (hasRosterAuto) {
+                const rows = res.failingRows.map(fr =>
+                    `<tr><td style="text-align:left;">${escapeHtml(fr.rosterRow.name)}</td><td>${escapeHtml(fr.reasons.join(', '))}</td></tr>`
+                ).join('');
+                const repl = plan.adds.map((a, i) =>
+                    `<tr><td style="text-align:left;">${i + 1}. ${escapeHtml(a.name)}</td><td>${a.pv} PV</td><td style="font-size:11px;color:#666;">ангар</td></tr>`
+                ).join('');
+                suggestHtml += `
+                    <div style="margin-top:16px;padding-top:12px;border-top:1px solid #e0e0e0;">
+                        <div style="font-weight:700;color:#1e3c72;margin-bottom:8px;">Замена из ангара (ростер)</div>
+                        <p style="font-size:12px;color:#555;margin-bottom:8px;">Снимем с ростера неподходящие записи и добавим варианты из ангара (все отмеченные фильтры для новых карт соблюдены).</p>
+                        <div class="availability-table-wrap" style="margin-bottom:10px;">
+                            <table class="availability-table"><thead><tr><th style="text-align:left;">Сейчас не подходит</th><th style="text-align:left;">Причины</th></tr></thead><tbody>${rows}</tbody></table>
+                        </div>
+                        <div class="availability-table-wrap">
+                            <table class="availability-table"><thead><tr><th style="text-align:left;">Добавим</th><th>PV</th><th></th></tr></thead><tbody>${repl}</tbody></table>
+                        </div>
+                    </div>`;
+            }
+            if (hasFormationAuto) {
+                const frows = formationSwaps.map((sw, i) =>
+                    `<tr><td style="text-align:left;">${escapeHtml(sw.formationName || '—')}</td><td style="text-align:left;">${escapeHtml(sw.fromName)} → ${escapeHtml(sw.toName)}</td><td>${sw.add.pv} PV</td></tr>`
+                ).join('');
+                suggestHtml += `
+                    <div style="margin-top:16px;padding-top:12px;border-top:1px solid #e0e0e0;">
+                        <div style="font-weight:700;color:#1e3c72;margin-bottom:8px;">Замена из ангара (формации)</div>
+                        <p style="font-size:12px;color:#555;margin-bottom:8px;">Один юнит в каждой проблемной формации будет заменён подходящей моделью из ангара с учётом отмеченных фильтров; skill сохраняется с заменяемой записи.</p>
+                        <div class="availability-table-wrap">
+                            <table class="availability-table"><thead><tr><th style="text-align:left;">Формация</th><th style="text-align:left;">Замена</th><th>база PV</th></tr></thead><tbody>${frows}</tbody></table>
+                        </div>
+                    </div>`;
+            }
+            if (!hasRosterAuto && !hasFormationAuto && res.needReplace) {
+                const rosterMismatch = (res.failingRows && res.failingRows.length > 0);
+                const formDetail = res.details.find(d => d.key === 'formations');
+                const formationChecked = !!getActiveRosterValidationFilters().formations;
+                let hint;
+                if (rosterMismatch) {
+                    hint = `Не удалось полностью подобрать замены из ангара под все отмеченные фильтры${plan.incomplete ? ' (не хватает подходящих моделей или свободных единиц).' : '.'}`;
+                } else if (formationChecked && formDetail && !formDetail.passed && !plan.formationPlanOk) {
+                    hint = 'Не удалось подобрать из ангара подходящую замену юнита в проблемной формации (нет свободной единицы или нет карты, проходящей фильтры). Исправьте вручную на вкладке «Формации».';
+                    const active = getActiveRosterValidationFilters();
+                    const inv = (state.formations || []).filter(f => f && f.formationType !== 'No Formation' && !validateFormation(f).valid);
+                    const extraHints = inv
+                        .map(f => {
+                            const htm = describeFormationManualSwapHints(f, active);
+                            return htm ? `<div style="margin-top:8px;text-align:left;"><strong>${escapeHtml(f.name || f.formationType || 'Формация')}</strong><br>${htm}</div>` : '';
+                        })
+                        .filter(Boolean)
+                        .join('');
+                    if (extraHints) hint += `<div style="margin-top:6px;">${extraHints}</div>`;
+                } else {
+                    hint = 'Автозамена из ангара относится только к несоответствиям по юнитам в ростере и к исправимым нарушениям правил формаций. Остальные случаи — вручную на вкладке «Формации» (перетаскивание, смена типа, состав).';
+                }
+                suggestHtml += `
+                    <div style="margin-top:16px;padding:10px;border-radius:8px;border:1px solid #ffe0b2;background:#fffaf0;font-size:13px;color:#664d00;">
+                        ${hint}
+                    </div>`;
+            }
+
+            body.innerHTML = linesHtml + suggestHtml;
+
+            const showApply = hasRosterAuto || hasFormationAuto;
+            btnYes.style.display = showApply ? 'inline-block' : 'none';
+            btnNo.style.display = showApply ? 'inline-block' : 'none';
+            btnClose.textContent = showApply ? 'Закрыть' : 'Закрыть';
+
+            state._rosterValidationApply = showApply ? { plan: res.plan, active: getActiveRosterValidationFilters() } : null;
+
+            const close = () => {
+                modal.classList.remove('active');
+                state._rosterValidationApply = null;
+                btnClose.onclick = null;
+                btnYes.onclick = null;
+                btnNo.onclick = null;
+                modal.onclick = null;
+            };
+
+            btnClose.onclick = (e) => { e.stopPropagation(); close(); };
+            btnNo.onclick = (e) => { e.stopPropagation(); close(); };
+            btnYes.onclick = async (e) => {
+                e.stopPropagation();
+                const payload = state._rosterValidationApply;
+                if (!payload || !payload.plan) { close(); return; }
+                const { plan } = payload;
+                const snap = {
+                    faction: state.selectedFaction,
+                    era: state.selectedEra,
+                    rfm: state.rosterFactionManuallySelected,
+                    rem: state.rosterEraManuallySelected,
+                    rcf: [...(state.rosterCommonFactions || [])]
+                };
+                for (const id of plan.removeIds) {
+                    removeFromRoster(id, { skipAutoFormations: true });
+                }
+                if (state.roster.length === 0 && plan.adds.length) {
+                    state.selectedFaction = snap.faction;
+                    state.selectedEra = snap.era;
+                    state.rosterFactionManuallySelected = snap.rfm;
+                    state.rosterEraManuallySelected = snap.rem;
+                    state.rosterCommonFactions = snap.rcf.length ? [...snap.rcf] : [];
+                }
+                for (const a of plan.adds) {
+                    await addToRoster(a.id, a.name, a.pv, a.techBase, { skipFactionDialogs: true, skipAutoFormations: true, hangarKey: a.hangarKey });
+                }
+                const formationSwaps = plan.formationSwaps || [];
+                for (const sw of formationSwaps) {
+                    const oldRow = state.roster.find(r => String(r.id) === String(sw.removeMemberId));
+                    const oldSkill = oldRow ? ensureSkillValue(oldRow.skill) : 4;
+                    await addToRoster(sw.add.id, sw.add.name, sw.add.pv, sw.add.techBase, { skipFactionDialogs: true, skipAutoFormations: true, hangarKey: sw.add.hangarKey });
+                    const newRow = state.roster.find(r => String(r.id) === String(sw.add.id));
+                    if (newRow) {
+                        newRow.skill = oldSkill;
+                        newRow.pv = getUnitEffectivePV(newRow);
+                    }
+                    if (newRow) {
+                        const merged = mergeRosterRowWithCard(newRow);
+                        replaceMemberInAllFormations(sw.removeMemberId, merged);
+                    }
+                    removeFromRoster(sw.removeMemberId, { skipAutoFormations: true });
+                }
+                if (!formationSwaps.length) {
+                    autoFormFormations();
+                }
+                updateRosterDisplay();
+                displayFormations();
+                updateStats();
+                updateExportPreview();
+                renderHangar();
+                refreshRosterFactionOptions();
+                refreshRosterEraOptions();
+                close();
+            };
+            modal.onclick = (e) => { if (e.target === modal) close(); };
+
+            modal.classList.add('active');
+        }
 
         function updateStats() {
             const totalMechs = state.roster.length;
