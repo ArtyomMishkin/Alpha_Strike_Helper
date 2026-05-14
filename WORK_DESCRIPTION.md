@@ -2,7 +2,7 @@
 
 ## 1. Цель приложения
 
-Разработано веб-приложение для управления карточками юнитов BattleTech: Alpha Strike, формирования отрядов (Lance/Star), расчета суммарных параметров и подготовки данных к экспорту/печати.
+Разработано веб-приложение для управления карточками юнитов BattleTech: Alpha Strike, формирования отрядов и формаций (**Lance / Star / Level / Century**), расчёта суммарных параметров, предигровой валидации и подготовки данных к экспорту/печати.
 
 Основная задача приложения: упростить подбор юнитов, фильтрацию по характеристикам и сборку игровых формаций с проверкой ограничений.
 
@@ -12,7 +12,7 @@
 
 - `internal/domain` — доменные модели (`Card`, `User`, `Collection`, `Lance`, `Star`).
 - `internal/repository` — доступ к PostgreSQL через GORM.
-- `internal/service` — бизнес-логика (авторизация, карточки, коллекции, расчет статистики Lance/Star).
+- `internal/service` — бизнес-логика (авторизация, карточки, коллекции, расчёт статистики Lance / Star и валидация на сервере).
 - `internal/handler` — HTTP-обработчики API на Gin.
 - `internal/middleware` — middleware для CORS, JWT и логирования.
 - `internal/sync` — модуль синхронизации внешних источников (в т.ч. Master Unit List: клиент, маппинг, импорт).
@@ -29,21 +29,21 @@
 
 ```mermaid
 flowchart LR
-    Browser["Browser UI (layout.html)"]
+    Browser["Браузер, UI (layout.html)"]
     AppServer["app-service :8080"]
     CardsService["cards-service :8082"]
     SyncService["sync-service :8081"]
     Postgres["PostgreSQL :5432"]
-    MulApi["MasterUnitList API"]
+    MulApi["API Master Unit List"]
 
     Browser -->|"GET /"| AppServer
-    Browser -->|"GET cards + chassis sources"| CardsService
-    Browser -->|"sync control (optional)"| SyncService
+    Browser -->|"карточки и источники шасси"| CardsService
+    Browser -->|"управление синхронизацией (по желанию)"| SyncService
 
-    AppServer -->|"read/write domain data"| Postgres
-    CardsService -->|"read/admin cards"| Postgres
-    SyncService -->|"import upsert cards"| Postgres
-    SyncService -->|"QuickList/Faction API"| MulApi
+    AppServer -->|"чтение и запись доменных данных"| Postgres
+    CardsService -->|"чтение и админ-операции с картами"| Postgres
+    SyncService -->|"импорт  карт"| Postgres
+    SyncService -->|"QuickList / Faction API"| MulApi
 ```
 
 ## 3. Backend и API
@@ -59,7 +59,7 @@ flowchart LR
 
 Примечание:
 
-- ключевые пользовательские сценарии текущего UI (каталог карточек, ростер, формации Lance/Star) работают по публичным маршрутам и не требуют токена.
+- ключевые пользовательские сценарии текущего UI (каталог карточек, ростер, формации **Lance / Star / Level / Century**) работают по публичным маршрутам и не требуют токена.
 
 ### 3.2 Карточки юнитов
 
@@ -71,11 +71,11 @@ flowchart LR
 - получение карточки по ID;
 - админские операции CRUD (создание/редактирование/удаление).
 
-### 3.3 Формации Lance/Star
+### 3.3 Формации Lance / Star / Level / Century
 
 Реализованы:
 
-- создание и редактирование Lance/Star;
+- создание и редактирование формаций (на стороне API — сущности **Lance** и **Star**; в UI дополнительно типы **Level** (ComStar / Word of Blake) и **Century** для **Marian Hegemony**, 5 юнитов);
 - управление составом формаций;
 - базовая валидация комплектности;
 - расчет агрегированных характеристик;
@@ -187,7 +187,7 @@ HTTP-эндпоинты:
 Реализован интерфейс на Vanilla JS:
 
 - каталог карточек;
-- формации Lance/Star;
+- формации **Lance / Star / Level / Century**;
 - модальные окна для CRUD операций;
 - базовая интеграция с backend API;
 - подготовка данных к печати/экспорту.
@@ -421,14 +421,16 @@ HTTP-эндпоинты:
 - в фильтрации списка;
 - в поиске добавления в ростер.
 
-### 12.7 Рефактор и доработка формаций Clan/IS
+### 12.7 Рефактор и доработка формаций Clan / IS / ComStar / Marian Hegemony
 
 Обновлена логика формирования и выбора типов:
 
-- для Clan добавлены Star-аналоги Lance-типов (`Battle Lance -> Battle Star` и т.д.);
-- размер Star-формаций зафиксирован как 5;
+- для Clan добавлены Star-аналоги Lance-типов (`Battle Lance` → `Battle Star` и т.д.);
+- для ComStar / Word of Blake — Level-аналоги (`Battle Lance` → `Battle Level` и т.д.; размер **6**);
+- для **Marian Hegemony** — **Century**-аналоги (`Battle Lance` → `Battle Century` и т.д.; размер **5**, как у Star);
+- размер Star- и Century-формаций зафиксирован как **5**;
 - `Omni Star` удален из активных типов (и мигрируется в `Battle Star` для старых данных UI);
-- исправлено определение стороны ростера с приоритетом выбранной фракции (например, `Clan Sea Fox`);
+- исправлено определение стороны ростера с приоритетом выбранной фракции (например, `Clan Sea Fox`, **Marian Hegemony**);
 - ограничено переполнение формации при drag&drop (проверка капа по размеру).
 
 ### 12.8 Skill юнитов (формации + печать)
@@ -647,76 +649,54 @@ irm -Method Delete `
 
 ### 13.1 Схема «портов»: входы, блоки, выходы
 
-Условные **порты** — это данные и флаги, которые подаются на блок или выходят из него.
+Условные **порты** — это данные и флаги на границах блоков. Ниже — **линейная** схема без пересечения стрелок от всех входов сразу; детали ангара и клонирования формации — во второй мини-схеме.
+
+```mermaid
+flowchart LR
+    A["Входы: чекбоксы проверки + state.roster, formations, hangar, allCards, selectedEra, selectedFaction"]
+    B["buildRosterValidationResult"]
+    C["Секции details для модалки"]
+    D["buildRosterReplacementPlan при needReplace"]
+    E["buildFormationHangarFixPlan при галочке формаций"]
+    F["Подсказки: describeFormationManualSwapHints, renderHangarSuggestionsForFormation"]
+    G["Выход: модалка проверки + карточки формаций"]
+
+    A --> B
+    B --> C
+    B --> D
+    B --> E
+    B --> F
+    C --> G
+    D --> G
+    E --> G
+    F --> G
+```
+
+Цепочка исправления **одной** формации (внутри плана, без мутации `state` до «Применить»):
 
 ```mermaid
 flowchart TB
-    subgraph IN["Входы (порты данных)"]
-        CB["Чекбоксы проверки: эпоха, фракция, PV-лимит, Unique/Custom, правила формаций"]
-        R["state.roster"]
-        F["state.formations"]
-        H["state.hangar"]
-        C["state.allCards"]
-        SE["state.selectedEra"]
-        SF["state.selectedFaction"]
-    end
+    S["sim = клон формации; simSpare = базовый spare ангара"]
+    L{"validateFormation(sim) ?"}
+    O["findOneFormationSwapFix(sim, spareMapBase: simSpare)"]
+    U["Обновить sim участником с новой карты; simSpare += освобождённый ключ − ключ добавления"]
+    N["Добавить swap в цепочку"]
 
-    subgraph V["buildRosterValidationResult()"]
-        D1["details[] — секции: эпоха, PV, Unique/Custom, фракция, формации"]
-        FR["failingRows — строки ростера, не прошедшие отмеченные фильтры"]
-        RP["plan ростера: buildRosterReplacementPlan"]
-    end
-
-    subgraph VF["validateFormation(formation)"]
-        VR["valid + reasons[] по типу формации"]
-    end
-
-    subgraph FF["Исправление формаций из ангара"]
-        FP["buildFormationHangarFixPlan"]
-        FO["findOneFormationSwapFix — один swap на невалидную формацию"]
-    end
-
-    subgraph HINT["Подсказки в UI"]
-        MH["describeFormationManualSwapHints — текст под модалкой / карточкой"]
-        RS["renderHangarSuggestionsForFormation — кнопки из ангара в неполную формацию"]
-    end
-
-    subgraph OUT["Выходы"]
-        MOD["Модалка проверки: секции + план замен + кнопка Применить"]
-        FC["Карточка формации: ошибки validateFormation + блок подсказки"]
-    end
-
-    CB --> V
-    R --> V
-    SE --> V
-    SF --> V
-    F --> V
-    F --> VF
-    VF --> FP
-    H --> RP
-    H --> FO
-    C --> RP
-    C --> FO
-    R --> FO
-    F --> HINT
-    H --> HINT
-    C --> HINT
-    CB --> HINT
-    SE --> HINT
-    SF --> HINT
-    V --> MOD
-    FP --> MOD
-    RP --> MOD
-    HINT --> FC
-    HINT --> MOD
+    S --> L
+    L -->|да| OK["Конец цепочки для этой формации"]
+    L -->|нет| O
+    O -->|нет хода| FAIL["План формаций неуспешен"]
+    O -->|есть swap| U
+    U --> N
+    N --> L
 ```
 
 Кратко по потокам:
 
 1. Пользователь открывает проверку с вкладки «Формации» → `getActiveRosterValidationFilters()` считывает **только отмеченные** пункты.
 2. `buildRosterValidationResult()` собирает **детализацию по секциям** и при необходимости план замены **ростера** из ангара.
-3. Если отмечены «Правила формаций» и есть невалидные формации → `buildFormationHangarFixPlan()` пытается для **каждой** невалидной формации найти **ровно один** обмен участника на карту из ангара/каталога (`findOneFormationSwapFix`). Если хотя бы для одной формации план не найден → `formationPlanOk = false`.
-4. Подсказки на карточке и расширенный текст при неудаче авто-исправления формаций строятся через `describeFormationManualSwapHints` (ручные рекомендации, не обязательно равные авто-swap).
+3. Если отмечены «Правила формаций» → `buildFormationHangarFixPlan()` в цикле выбирает **любую** текущую невалидную формацию и для неё строит **цепочку** `findOneFormationSwapFix` на **клоне** состава, пока `validateFormation` не станет валидной или пока не исчерпается лимит шагов; между формациями ведётся **накопительная** модель `simSpare` ангара (учёт уже запланированных расходов и освобождений ключей). Если для очередной формации цепочку собрать нельзя → `formationPlanOk = false`.
+4. Подсказки на карточке и расширенный текст при неудаче авто-исправления формаций строятся через `describeFormationManualSwapHints` (ручные рекомендации; логика не обязана совпадать с каждым шагом цепочки).
 
 ### 13.2 Входные флаги проверки (`getActiveRosterValidationFilters`)
 
@@ -744,18 +724,25 @@ flowchart TB
 
 ### 13.4 Валидация состава формации (`validateFormation`)
 
-- Сначала проверяется число участников: ожидаемый размер из `getFormationSize` (Lance = 4, Star = 5, Level = 6). Иначе сразу `invalid` с причиной про размер.
+- Сначала проверяется число участников: ожидаемый размер из `getFormationSize` (**Lance = 4**, **Star / Century = 5**, **Level = 6**). Иначе сразу `invalid` с причиной про размер.
 - `formationType` нормализуется (`normalizeFormationType`) до логического семейства (`Medium Battle`, `Light Battle`, `Heavy Battle`, `Striker`, …).
 - Для каждого семейства набор правил на поля участников: `unitSize`, `unitRole`, `parseMoveInfo`, `parseDamageValue`, способности (`IF`, `ART`, …), тип юнита (например, Vehicle Command).
 - Результат: `{ valid: boolean, reasons: string[] }` — все причины перечисляются в UI на карточке формации.
 
 Пример (Medium Battle): не менее половины юнитов с **ровно** Size 2; запрет любого участника с Size ≥ 4.
 
-### 13.5 Авто-подбор одной замены в формации (`findOneFormationSwapFix`)
+### 13.5 Авто-подбор замен в формации (`findOneFormationSwapFix` + цепочка)
 
-Цель: при невалидной, но **уже заполненной по слотам** формации найти **одну** замену участника `m` на карту `c`, после чего `validateFormation` снова даёт `valid`.
+Один шаг: при невалидной, **заполненной по слотам** формации найти **одну** замену участника `m` на карту `c`, после чего `validateFormation` снова даёт `valid`.
 
-**Порядок перебора участников** (`orderMembersForFormationSwapAttempt`):
+**Цепочка до минимально целой формации** (`findFormationSwapFixesUntilValid` + `buildFormationHangarFixPlan`):
+
+- состав формации копируется в `sim` (без изменения `state` до применения плана);
+- в цикле до лимита шагов вызывается `findOneFormationSwapFix(sim, …)`; при успехе `sim` и накопительная карта **`simSpare`** ангара обновляются (`applyPlannedSwapToSimSpare`: −1 по ключу добавленной карты, +1 по ключу снятого участника, если ключ известен);
+- цикл прерывается, когда `validateFormation(sim)` валидна;
+- **глобально** `buildFormationHangarFixPlan` в внешнем `while` снова ищет **любую** невалидную формацию в `state.formations` и добавляет её цепочку в общий список `swaps`, передавая в следующую итерацию обновлённый `simSpare`, чтобы учесть пересечение по ангару между формациями.
+
+**Порядок перебора участников** на одном шаге (`orderMembersForFormationSwapAttempt`):
 
 - Medium / Light Battle + причина про Size 4+ → в начале кандидаты на замену — юниты с Size ≥ 4.
 - Medium Battle + причины про нехватку Size 2 / «50%» → приоритет сначала Size 3, затем ≤1, затем 2 (чтобы не выкидывать «опорные» Size 2 раньше времени).
@@ -775,10 +762,12 @@ flowchart TB
 
 **Источники кандидатов:**
 
-1. По каждой строке `state.hangar` с положительным spare после `buildHangarSpareAfterRemovingFailures(synthetic)` — карты с тем же ключом, что и ангар (`findCardsForHangarRow`), список сортируется `sortCatalogPoolForFormationSwap` (для Medium Battle + Size 4+ сначала Size 2, затем 1, 3, 4+).
+1. По каждой строке `state.hangar` с положительным spare после расчёта для текущего шага (базовый `simSpare` + освобождение строки ростера заменяемого `m`, см. `hangarSpareWithExtraRelease`) — карты с тем же ключом, что и ангар (`findCardsForHangarRow`), список сортируется `sortCatalogPoolForFormationSwap` (для Medium Battle + Size 4+ сначала Size 2, затем 1, 3, 4+).
 2. Общий `catalogPool` из `allCards` с теми же фильтрами и сортировкой; сначала тратуется spare по `hangarStorageKeyFromCard`, затем допускается кандидат без привязки к ключу (теоретический добор из каталога при нулевом spare).
 
-Первый успешный `trySwapMember` возвращается; для **всех** невалидных формаций в `buildFormationHangarFixPlan` требуется по одному успешному swap — иначе весь план формаций считается неуспешным.
+Если третий аргумент `opts.spareMapBase` не передан, spare для шага считается как раньше: `hangarSpareAfterReleasingRosterRow(rosterRow)` (эквивалент `buildHangarSpareAfterRemovingFailures` для одной строки ростера заменяемого участника).
+
+Первый успешный `trySwapMember` завершает **один** шаг; серия шагов доводит формацию до валидной или приводит к отказу плана.
 
 ### 13.6 Текстовые подсказки (`describeFormationManualSwapHints`)
 
@@ -803,8 +792,8 @@ flowchart TB
 ### 13.8 Модалка проверки и применение (`showRosterValidationModal` / apply)
 
 - Секции рендерятся из `res.details`.
-- Если есть успешный план ростера и/или план swaps формаций — показываются таблицы и кнопки подтверждения.
+- Если есть успешный план ростера и/или план swaps формаций — показываются таблицы и кнопки подтверждения (в таблице формаций может быть **несколько строк** на одну формацию — цепочка замен).
 - Если план формаций не собран (`!formationPlanOk`), к общему предупреждению добавляются HTML-блоки с подсказками по каждой проблемной формации (`describeFormationManualSwapHints`).
 
-При применении: сначала снимаются записи ростера по `removeIds`, затем добавляются предложенные карты, затем выполняются swaps формаций (замена участника, сохранение skill с заменяемой записи, пересборка отображения).
+При применении: сначала снимаются записи ростера по `removeIds`, затем добавляются предложенные карты, затем **последовательно** выполняются все swaps формаций из `formationSwaps` (каждый: добавить новую карту в ростер, заменить участника во всех формациях, снять старую запись; skill переносится с заменяемой записи).
 

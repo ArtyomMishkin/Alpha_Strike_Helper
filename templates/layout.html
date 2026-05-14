@@ -1522,6 +1522,14 @@
             return String(lanceType || '').replace(/Lance/g, 'Level');
         }
 
+        function lanceFormationToCentury(lanceType) {
+            return String(lanceType || '').replace(/Lance/g, 'Century');
+        }
+
+        function starFormationToCentury(starType) {
+            return String(starType || '').replace(/\bStar\b/g, 'Century');
+        }
+
         function rebuildFormationTypeSelectOptions() {
             const select = document.getElementById('formationTypeSelect');
             if (!select) return;
@@ -1533,6 +1541,8 @@
                     types.push('Support Star');
                 } else if (side === 'comstar') {
                     types.push('Support Level');
+                } else if (side === 'marian') {
+                    types.push('Support Century');
                 } else {
                     types.push('Support Lance');
                 }
@@ -1540,6 +1550,8 @@
                 types.push(...FORMATION_BATTLEMECH_LANCE_TYPES.map(lanceFormationToStar));
             } else if (side === 'comstar') {
                 types.push(...FORMATION_BATTLEMECH_LANCE_TYPES.map(lanceFormationToLevel));
+            } else if (side === 'marian') {
+                types.push(...FORMATION_BATTLEMECH_LANCE_TYPES.map(lanceFormationToCentury));
             } else {
                 types.push(...FORMATION_BATTLEMECH_LANCE_TYPES);
             }
@@ -3026,6 +3038,37 @@ function autoFormFormations() {
                 formationIndex++;
             }
         }
+    } else if (formationSide === 'marian') {
+        const mechsPerCentury = 5;
+        let mechIndex = 0;
+        let formationIndex = 0;
+
+        while (mechIndex < state.roster.length) {
+            let members = [];
+            for (let j = 0; j < mechsPerCentury && mechIndex < state.roster.length; j++) {
+                const rosterMech = state.roster[mechIndex];
+                const fullCard = state.allCards.find(c => c.id == rosterMech.id) || rosterMech;
+
+                members.push({
+                    ...fullCard,
+                    ...rosterMech,
+                    id: parseInt(rosterMech.id)
+                });
+                mechIndex++;
+            }
+
+            if (members.length > 0) {
+                const formationName = members.length === 5 ? `Battle Century ${formationIndex + 1}` : 'No Formation';
+                state.formations.push({
+                    id: formationIndex,
+                    name: formationName,
+                    formationType: members.length === 5 ? 'Battle Century' : 'No Formation',
+                    faction: currentFaction,
+                    members: members
+                });
+                formationIndex++;
+            }
+        }
     } else if (formationSide === 'comstar') {
         const mechsPerLevel = 6;
         let mechIndex = 0;
@@ -3111,16 +3154,24 @@ function autoFormFormations() {
             }
             const onlyBattleMechs = state.roster.every(u => String(u.unit_type || '').toLowerCase() === 'battlemech');
             if (!onlyBattleMechs && selectedType !== 'No Formation') {
-                alert('Формации Lance/Star/Level доступны только для BattleMech. Для текущего состава можно выбрать только No Formation.');
+                alert('Формации Lance / Star / Level / Century доступны только для BattleMech. Для текущего состава можно выбрать только No Formation.');
                 return;
             }
             const formationSide = getRosterFormationSide();
-            if (selectedType.includes('Star') && formationSide === 'inner_sphere') {
-                alert('Star-формации доступны для Clan-состава.');
+            if (selectedType.includes('Star') && formationSide !== 'clan') {
+                alert('Star-формации доступны только для Clan-состава.');
+                return;
+            }
+            if (selectedType.includes('Century') && formationSide !== 'marian') {
+                alert('Century-формации доступны только для Marian Hegemony.');
                 return;
             }
             if (selectedType.includes('Level') && formationSide !== 'comstar') {
-                alert('Level-формации доступны для ComStar/Word of Blake.');
+                alert('Level-формации доступны только для ComStar / Word of Blake.');
+                return;
+            }
+            if (selectedType.includes('Lance') && formationSide !== 'inner_sphere') {
+                alert('Lance-формации доступны только для состава Inner Sphere (не Clan, не ComStar / WoB и не Marian Hegemony).');
                 return;
             }
 
@@ -3170,7 +3221,7 @@ function getRosterFormationSide() {
     const onlyBattleMechs = rosterCards.every(c => String(c.unit_type || '').toLowerCase() === 'battlemech');
     if (!onlyBattleMechs) return 'mixed';
 
-    // Priority: explicit roster faction selection should drive Lance/Star availability.
+    // Priority: explicit roster faction selection should drive Lance / Star / Level / Century availability.
     // This avoids flips for factions like Clan Sea Fox that can contain mixed tech-base units.
     if (state.selectedFaction) {
         const selected = String(state.selectedFaction || '').toLowerCase();
@@ -3178,6 +3229,7 @@ function getRosterFormationSide() {
         const isComStarLike = selected.includes('comstar') || selected.includes('word of blake') || selected.includes('wob') ||
             group.includes('comstar') || group.includes('word of blake');
         if (isComStarLike) return 'comstar';
+        if (selected.includes('marian hegemony')) return 'marian';
         if (selected.includes('clan') || group.includes('clan') || selected.includes('sea fox')) return 'clan';
         if (selected.includes('inner sphere') || group.includes('inner sphere')) return 'inner_sphere';
     }
@@ -3203,7 +3255,7 @@ function getRosterFormationSide() {
 
         function migrateStoredFormationTypesToClanStars() {
             const side = getRosterFormationSide();
-            if (side !== 'clan' && side !== 'comstar') return;
+            if (side !== 'clan' && side !== 'comstar' && side !== 'marian') return;
             state.formations.forEach(f => {
                 if (!f || !f.formationType || f.formationType === 'No Formation') return;
                 let t = f.formationType;
@@ -3217,6 +3269,14 @@ function getRosterFormationSide() {
                     if (t.includes('Lance')) {
                         t = lanceFormationToLevel(t);
                     }
+                } else if (side === 'marian') {
+                    if (t === 'Omni Star') {
+                        t = 'Battle Century';
+                    } else if (t.includes('Lance')) {
+                        t = lanceFormationToCentury(t);
+                    } else if (t.includes('Star')) {
+                        t = starFormationToCentury(t);
+                    }
                 }
                 if (t !== f.formationType) {
                     f.formationType = t;
@@ -3225,6 +3285,8 @@ function getRosterFormationSide() {
                             f.name = String(f.name).replace(/\bOmni Star\b/gi, 'Battle Star').replace(/Lance/g, 'Star');
                         } else if (side === 'comstar') {
                             f.name = String(f.name).replace(/Lance/g, 'Level');
+                        } else if (side === 'marian') {
+                            f.name = String(f.name).replace(/\bOmni Star\b/gi, 'Battle Century').replace(/Lance/g, 'Century').replace(/\bStar\b/g, 'Century');
                         }
                     }
                 }
@@ -3250,7 +3312,7 @@ function displayFormations() {
         const validation = validateFormation(formation);
         const isValid = validation.valid;
         const statusIcon = isValid ? '✓' : '✗';
-        const cardKind = formation.formationType.includes('Star') ? 'star' : (formation.formationType.includes('Level') ? 'star' : 'lance');
+        const cardKind = formation.formationType.includes('Lance') ? 'lance' : 'star';
 
         return `
             <div class="formation-card ${cardKind}" 
@@ -3501,6 +3563,7 @@ function displayFormations() {
         function getFormationSize(formationType) {
             if (formationType.includes('Lance')) return 4;
             if (formationType.includes('Star')) return 5;
+            if (formationType.includes('Century')) return 5;
             if (formationType.includes('Level')) return 6;
             return 0;
         }
@@ -3692,7 +3755,9 @@ function displayFormations() {
                 if (med3plus < Math.ceil(n * 0.75)) reasons.push('Минимум 75% юнитов должны иметь Medium Damage 3+');
                 if (!(juggernauts >= 1 || snipers >= 2)) reasons.push('Нужен 1 Juggernaut или 2 Sniper');
             } else if (type === 'Fast Assault') {
-                const assaultAnalog = formation.formationType.includes('Star') ? 'Assault Star' : 'Assault Lance';
+                const assaultAnalog = (formation.formationType.includes('Star') || formation.formationType.includes('Century'))
+                    ? 'Assault Star'
+                    : 'Assault Lance';
                 const base = validateFormation({ ...formation, formationType: assaultAnalog });
                 base.reasons.forEach(r => reasons.push(r));
                 const fastGood = members.filter(u => {
@@ -3829,6 +3894,7 @@ function displayFormations() {
                 const side = getRosterFormationSide();
                 if (side === 'clan') return ['No Formation', 'Support Star'];
                 if (side === 'comstar') return ['No Formation', 'Support Level'];
+                if (side === 'marian') return ['No Formation', 'Support Century'];
                 return ['No Formation', 'Support Lance'];
             }
             const side = getRosterFormationSide();
@@ -3838,6 +3904,9 @@ function displayFormations() {
             }
             if (side === 'comstar') {
                 return ['No Formation', ...FORMATION_BATTLEMECH_LANCE_TYPES.map(lanceFormationToLevel)];
+            }
+            if (side === 'marian') {
+                return ['No Formation', ...FORMATION_BATTLEMECH_LANCE_TYPES.map(lanceFormationToCentury)];
             }
             if (side === 'inner_sphere') {
                 return lanceTypes;
@@ -4316,7 +4385,27 @@ function dropMechToFormation(event, toFormationId) {
             return lines.length ? lines.join('<br>') : '';
         }
 
-        function findOneFormationSwapFix(formation, activeCardFilters) {
+        function hangarSpareAfterReleasingRosterRow(rosterRow) {
+            return buildHangarSpareAfterRemovingFailures(
+                rosterRow
+                    ? [{ rosterRow, merged: mergeRosterRowWithCard(rosterRow), reasons: ['formation-fix'] }]
+                    : []
+            );
+        }
+
+        function hangarSpareWithExtraRelease(simBase, rosterRow) {
+            const out = new Map(simBase || []);
+            if (!rosterRow) return out;
+            const k = rosterRow.hangar_key;
+            if (!k) return out;
+            const key = String(k);
+            const q = Number(rosterRow.hangar_used_qty ?? rosterRow.quantity ?? 1) || 1;
+            out.set(key, (out.get(key) || 0) + q);
+            return out;
+        }
+
+        function findOneFormationSwapFix(formation, activeCardFilters, opts) {
+            const spareBase = opts && opts.spareMapBase instanceof Map ? opts.spareMapBase : null;
             const v0 = validateFormation(formation);
             if (v0.valid) return null;
             const members = formation.members || [];
@@ -4356,8 +4445,9 @@ function dropMechToFormation(event, toFormationId) {
             for (const m of ordered) {
                 const rosterRow = rosterRowForFormationSwapMember(m);
                 if (!rosterRow) continue;
-                const synthetic = [{ rosterRow, merged: mergeRosterRowWithCard(rosterRow), reasons: ['formation-fix'] }];
-                const spareMap = buildHangarSpareAfterRemovingFailures(synthetic);
+                const spareMap = spareBase
+                    ? hangarSpareWithExtraRelease(spareBase, rosterRow)
+                    : hangarSpareAfterReleasingRosterRow(rosterRow);
                 const otherChassis = formationOtherMemberChassisKeys(formation, m.id);
 
                 for (const h of state.hangar || []) {
@@ -4376,7 +4466,7 @@ function dropMechToFormation(event, toFormationId) {
                     }
                 }
 
-                const spareAfter = buildHangarSpareAfterRemovingFailures(synthetic);
+                const spareAfter = spareMap;
                 let catalogPool = (state.allCards || []).filter(c =>
                     Number(c?.point_value || 0) > 0 &&
                     String(c.id) !== String(m.id) &&
@@ -4399,20 +4489,69 @@ function dropMechToFormation(event, toFormationId) {
             return null;
         }
 
-        function buildFormationHangarFixPlan(active) {
-            if (!active.formations) return { swaps: [], ok: true };
-            const invalids = (state.formations || []).filter(f => {
-                if (!f || f.formationType === 'No Formation') return false;
-                return !validateFormation(f).valid;
-            });
-            if (!invalids.length) return { swaps: [], ok: true };
+        function cloneFormationForSim(f) {
+            if (!f) return null;
+            return { ...f, members: (f.members || []).map((mem) => ({ ...mem })) };
+        }
+
+        function hangarKeyForFormationMember(member) {
+            if (member && member.hangar_key) return String(member.hangar_key);
+            const card = state.allCards.find(c => String(c.id) === String(member?.id));
+            return card ? hangarStorageKeyFromCard(card) : '';
+        }
+
+        function applyPlannedSwapToSimSpare(simSpare, sw, removedMember) {
+            const m = new Map(simSpare);
+            const addK = sw.add && sw.add.hangarKey ? String(sw.add.hangarKey) : '';
+            if (addK) m.set(addK, (m.get(addK) || 0) - 1);
+            const rel = hangarKeyForFormationMember(removedMember);
+            if (rel) m.set(rel, (m.get(rel) || 0) + 1);
+            return m;
+        }
+
+        /** Repeated single swaps on a clone until validateFormation passes. Returns { swaps, simSpare } or null. */
+        function findFormationSwapFixesUntilValid(formation, active, simSpareIn, maxSwaps = 20) {
             const swaps = [];
-            for (const formation of invalids) {
-                const sw = findOneFormationSwapFix(formation, active);
-                if (!sw) return { swaps: [], ok: false };
+            let sim = cloneFormationForSim(formation);
+            if (!sim) return null;
+            let simSpare = new Map(simSpareIn || []);
+            for (let i = 0; i < maxSwaps; i++) {
+                if (validateFormation(sim).valid) return { swaps, simSpare };
+                const sw = findOneFormationSwapFix(sim, active, { spareMapBase: simSpare });
+                if (!sw) return null;
+                const removed = (sim.members || []).find((x) => String(x.id) === String(sw.removeMemberId));
+                if (!removed) return null;
+                const card = state.allCards.find((c) => String(c.id) === String(sw.add.id));
+                if (!card) return null;
+                const newMember = buildFormationMemberFromCardForSwap(card, removed);
+                sim = {
+                    ...sim,
+                    members: (sim.members || []).map((x) =>
+                        String(x.id) === String(sw.removeMemberId) ? newMember : x
+                    ),
+                };
+                simSpare = applyPlannedSwapToSimSpare(simSpare, sw, removed);
                 swaps.push(sw);
             }
-            return { swaps, ok: true };
+            return validateFormation(sim).valid ? { swaps, simSpare } : null;
+        }
+
+        function buildFormationHangarFixPlan(active) {
+            if (!active.formations) return { swaps: [], ok: true };
+            const swaps = [];
+            let simSpare = hangarSpareAfterReleasingRosterRow(null);
+            let guard = 0;
+            while (guard++ < 40) {
+                const invalid = (state.formations || []).find(
+                    (f) => f && f.formationType !== 'No Formation' && !validateFormation(f).valid
+                );
+                if (!invalid) return { swaps, ok: true };
+                const res = findFormationSwapFixesUntilValid(invalid, active, simSpare, 20);
+                if (!res || !res.swaps.length) return { swaps: [], ok: false };
+                swaps.push(...res.swaps);
+                simSpare = res.simSpare;
+            }
+            return { swaps: [], ok: false };
         }
 
         function buildRosterValidationResult(active) {
@@ -4623,7 +4762,7 @@ function dropMechToFormation(event, toFormationId) {
                 suggestHtml += `
                     <div style="margin-top:16px;padding-top:12px;border-top:1px solid #e0e0e0;">
                         <div style="font-weight:700;color:#1e3c72;margin-bottom:8px;">Замена из ангара (формации)</div>
-                        <p style="font-size:12px;color:#555;margin-bottom:8px;">Один юнит в каждой проблемной формации будет заменён подходящей моделью из ангара с учётом отмеченных фильтров; skill сохраняется с заменяемой записи.</p>
+                        <p style="font-size:12px;color:#555;margin-bottom:8px;">Для каждой проблемной формации подбирается цепочка замен из ангара (до валидного состава или лимита шагов), с учётом отмеченных фильтров; skill переносится с заменяемой записи на каждую новую карту.</p>
                         <div class="availability-table-wrap">
                             <table class="availability-table"><thead><tr><th style="text-align:left;">Формация</th><th style="text-align:left;">Замена</th><th>база PV</th></tr></thead><tbody>${frows}</tbody></table>
                         </div>
