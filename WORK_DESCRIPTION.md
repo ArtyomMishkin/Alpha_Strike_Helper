@@ -220,9 +220,6 @@ HTTP-эндпоинты:
 
 1. Добавить автотесты для `repository/service` слоев и импортеров.
 2. Описать API (включая новые query-параметры) в отдельной документации.
-3. Подготовить полноценный `docker-compose.yml` (app + postgres).
-4. Добавить сидирование/команды smoke-проверки после импорта.
-5. Провести оптимизацию тяжелых запросов и индексацию (по необходимости).
 
 ## 11. Практическая эксплуатация (текущее состояние)
 
@@ -330,7 +327,7 @@ HTTP-эндпоинты:
 - `era`
 - `available_era`
 - `unit_type` (рекомендуемый)
-- `type` (legacy-синоним)
+- `type` (legacy)
 - `role`
 - `size`
 - `techbase`
@@ -426,9 +423,8 @@ HTTP-эндпоинты:
 
 - для Clan добавлены Star-аналоги Lance-типов (`Battle Lance` → `Battle Star` и т.д.);
 - для ComStar / Word of Blake — Level-аналоги (`Battle Lance` → `Battle Level` и т.д.; размер **6**);
-- для **Marian Hegemony** — **Century**-аналоги (`Battle Lance` → `Battle Century` и т.д.; размер **5**, как у Star);
+- для Marian Hegemony — Century-аналоги (`Battle Lance` → `Battle Century` и т.д.; размер 5, как у Star);
 - размер Star- и Century-формаций зафиксирован как **5**;
-- `Omni Star` удален из активных типов (и мигрируется в `Battle Star` для старых данных UI);
 - исправлено определение стороны ростера с приоритетом выбранной фракции (например, `Clan Sea Fox`, **Marian Hegemony**);
 - ограничено переполнение формации при drag&drop (проверка капа по размеру).
 
